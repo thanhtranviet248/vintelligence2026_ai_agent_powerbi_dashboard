@@ -1,0 +1,75 @@
+table WebTraffic
+	lineageTag: 9e0956b1-7b32-4bfe-aba6-a5bed4e90d66
+
+	column Date
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: bd92d8f9-c3d0-40a1-83d1-e53e0d6b2db6
+		summarizeBy: none
+		sourceColumn: date
+		annotation SummarizationSetBy = Automatic
+
+	column Sessions
+		dataType: int64
+		formatString: 0
+		lineageTag: 7a732b91-6a5c-47a8-9c5d-c8d5d79972f0
+		summarizeBy: sum
+		sourceColumn: sessions
+		annotation SummarizationSetBy = Automatic
+
+	column UniqueVisitors
+		dataType: int64
+		formatString: 0
+		lineageTag: 2b3d84d1-1fd4-4c4a-b71d-86357d719d98
+		summarizeBy: sum
+		sourceColumn: unique_visitors
+		annotation SummarizationSetBy = Automatic
+
+	column PageViews
+		dataType: int64
+		formatString: 0
+		lineageTag: 7a92d96d-cc96-42dd-b6a5-3e460ef9f3d0
+		summarizeBy: sum
+		sourceColumn: page_views
+		annotation SummarizationSetBy = Automatic
+
+	column BounceRate
+		dataType: double
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 71f6ac0d-f5de-4e13-8bbf-74d8d701d72e
+		summarizeBy: average
+		sourceColumn: bounce_rate
+		annotation SummarizationSetBy = Automatic
+
+	column AvgSessionDurationSec
+		dataType: double
+		formatString: 0.00
+		lineageTag: b517ac24-91be-4e1d-b8eb-5d5d00799890
+		summarizeBy: average
+		sourceColumn: avg_session_duration_sec
+		annotation SummarizationSetBy = Automatic
+
+	column TrafficSource
+		dataType: string
+		lineageTag: 9dd10297-5d5b-4dc9-9da7-f371af7bb7a9
+		summarizeBy: none
+		sourceColumn: traffic_source
+		annotation SummarizationSetBy = Automatic
+		annotation PBI_FormatHint = {"isText":true}
+
+	measure 'Total Sessions' = SUM(WebTraffic[Sessions])
+	measure 'Users or Visitors' = SUM(WebTraffic[UniqueVisitors])
+	measure 'Page Views' = SUM(WebTraffic[PageViews])
+	measure 'Conversion Rate' = DIVIDE([Total Orders], [Total Sessions])
+	measure 'Average Session Duration' = AVERAGE(WebTraffic[AvgSessionDurationSec])
+
+	partition WebTraffic-ecfc45a6-a1bd-4f25-8b74-7acea39170bb = m
+		mode: import
+		source = ```
+			let
+			    Source = Csv.Document(File.Contents("D:\projects\VinTelligence2026\data\web_traffic.csv"), [Delimiter = ",", Columns = 7, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+			    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+			    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"date", type date}, {"sessions", Int64.Type}, {"unique_visitors", Int64.Type}, {"page_views", Int64.Type}, {"bounce_rate", type number}, {"avg_session_duration_sec", type number}, {"traffic_source", type text}})
+			in
+			    #"Changed Type"
+			```

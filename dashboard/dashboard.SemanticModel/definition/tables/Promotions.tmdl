@@ -1,0 +1,77 @@
+table Promotions
+	lineageTag: 4d83365a-3d1d-4c0f-8d2d-1ad4629b39cf
+
+	column PromoID
+		dataType: string
+		lineageTag: 90f57e39-5c4b-4a84-9cf4-8f1d6d21f1f2
+		summarizeBy: none
+		sourceColumn: promo_id
+		annotation SummarizationSetBy = Automatic
+		annotation PBI_FormatHint = {"isText":true}
+
+	column PromoName
+		dataType: string
+		lineageTag: 1f7d80d6-9fd7-4ff1-b25c-4a7c6997ca8d
+		summarizeBy: none
+		sourceColumn: promo_name
+		annotation SummarizationSetBy = Automatic
+		annotation PBI_FormatHint = {"isText":true}
+
+	column PromoType
+		dataType: string
+		lineageTag: 7d4005ed-c5ff-4f0f-a18d-4a2a7dce4c91
+		summarizeBy: none
+		sourceColumn: promo_type
+		annotation SummarizationSetBy = Automatic
+		annotation PBI_FormatHint = {"isText":true}
+
+	column DiscountValue
+		dataType: double
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 54d2f11f-cfa4-4e97-ba91-fbdb63aa8510
+		summarizeBy: sum
+		sourceColumn: discount_value
+		annotation SummarizationSetBy = Automatic
+
+	column StartDate
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: ee6d4c4a-2200-4dfe-bf00-bfbd2e1bc9d2
+		summarizeBy: none
+		sourceColumn: start_date
+		annotation SummarizationSetBy = Automatic
+
+	column EndDate
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 3847eec0-e862-4c4d-bc68-e0f6d3df415d
+		summarizeBy: none
+		sourceColumn: end_date
+		annotation SummarizationSetBy = Automatic
+
+	column ApplicableCategory
+		dataType: string
+		lineageTag: 1d4d8d1a-8d20-4acc-a3e5-1c7b2de457f7
+		summarizeBy: none
+		sourceColumn: applicable_category
+		annotation SummarizationSetBy = Automatic
+		annotation PBI_FormatHint = {"isText":true}
+
+	column PromoChannel
+		dataType: string
+		lineageTag: 9f6b7b49-4680-46d3-a2f9-d4ad67680c0d
+		summarizeBy: none
+		sourceColumn: promo_channel
+		annotation SummarizationSetBy = Automatic
+		annotation PBI_FormatHint = {"isText":true}
+
+	partition Promotions-f47f9f9b-c445-42b0-b2a5-bc9fdb5d4f21 = m
+		mode: import
+		source = ```
+			let
+			    Source = Csv.Document(File.Contents("D:\projects\VinTelligence2026\data\promotions.csv"), [Delimiter = ",", Columns = 10, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+			    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+			    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"promo_id", type text}, {"promo_name", type text}, {"promo_type", type text}, {"discount_value", type number}, {"start_date", type date}, {"end_date", type date}, {"applicable_category", type text}, {"promo_channel", type text}, {"stackable_flag", Int64.Type}, {"min_order_value", Int64.Type}})
+			in
+			    #"Changed Type"
+			```

@@ -1,0 +1,49 @@
+table Shipments
+	lineageTag: 7d4de668-25fe-4ad2-b8d2-9c0d54004531
+
+	column OrderID
+		dataType: int64
+		formatString: 0
+		lineageTag: 0a49fb8d-7dd9-43c8-9598-886cf5e227ca
+		summarizeBy: none
+		sourceColumn: order_id
+		annotation SummarizationSetBy = Automatic
+
+	column ShipDate
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: d7e7d39e-98d3-4ff9-9a39-95afc9e24355
+		summarizeBy: none
+		sourceColumn: ship_date
+		annotation SummarizationSetBy = Automatic
+
+	column DeliveryDate
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 9bcc4f5d-4f57-4d84-9fb2-46ffcd2b1981
+		summarizeBy: none
+		sourceColumn: delivery_date
+		annotation SummarizationSetBy = Automatic
+
+	column ShippingFee
+		dataType: double
+		formatString: "$#,0.00;($#,0.00);$#,0.00"
+		lineageTag: 5ad17f39-1f13-471a-b5e4-411d84f5d6d1
+		summarizeBy: sum
+		sourceColumn: shipping_fee
+		annotation SummarizationSetBy = Automatic
+
+	measure 'Shipment Cost' = SUM(Shipments[ShippingFee])
+	measure 'On-Time Delivery Rate' = DIVIDE(CALCULATE(DISTINCTCOUNT(Shipments[OrderID]), DATEDIFF(Shipments[ShipDate], Shipments[DeliveryDate], DAY) <= 3), DISTINCTCOUNT(Shipments[OrderID]))
+	measure 'Average Delivery Time' = AVERAGEX(Shipments, DATEDIFF(Shipments[ShipDate], Shipments[DeliveryDate], DAY))
+
+	partition Shipments-08dc9e91-5df4-4c1b-9d2e-b8696e8f3c54 = m
+		mode: import
+		source = ```
+			let
+			    Source = Csv.Document(File.Contents("D:\projects\VinTelligence2026\data\shipments.csv"), [Delimiter = ",", Columns = 4, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+			    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+			    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"order_id", Int64.Type}, {"ship_date", type date}, {"delivery_date", type date}, {"shipping_fee", type number}})
+			in
+			    #"Changed Type"
+			```

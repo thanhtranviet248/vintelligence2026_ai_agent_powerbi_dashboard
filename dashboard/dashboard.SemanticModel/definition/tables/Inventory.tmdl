@@ -1,0 +1,85 @@
+table Inventory
+	lineageTag: 7f3069cc-2f58-4d80-8d7f-ef8dbd8a4ed0
+
+	column SnapshotDate
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 92be170e-1d5d-470d-ac18-4e9f98dfb23f
+		summarizeBy: none
+		sourceColumn: snapshot_date
+		annotation SummarizationSetBy = Automatic
+
+	column ProductID
+		dataType: int64
+		formatString: 0
+		lineageTag: 285f6cf4-75a8-41f3-bdca-9d6176cb6e3f
+		summarizeBy: none
+		sourceColumn: product_id
+		annotation SummarizationSetBy = Automatic
+
+	column StockOnHand
+		dataType: int64
+		formatString: 0
+		lineageTag: 2d2c56d8-6663-4c22-8b1a-d6d7ad8ca79d
+		summarizeBy: sum
+		sourceColumn: stock_on_hand
+		annotation SummarizationSetBy = Automatic
+
+	column UnitsReceived
+		dataType: int64
+		formatString: 0
+		lineageTag: 59df209b-8e56-43f2-9470-e8f4aa1c5956
+		summarizeBy: sum
+		sourceColumn: units_received
+		annotation SummarizationSetBy = Automatic
+
+	column UnitsSold
+		dataType: int64
+		formatString: 0
+		lineageTag: bf539415-9100-48fb-b3bc-6e0d58d7fde9
+		summarizeBy: sum
+		sourceColumn: units_sold
+		annotation SummarizationSetBy = Automatic
+
+	column ProductName
+		dataType: string
+		lineageTag: 12b7cc58-4155-4425-8d04-20dbd2d273b3
+		summarizeBy: none
+		sourceColumn: product_name
+		annotation SummarizationSetBy = Automatic
+		annotation PBI_FormatHint = {"isText":true}
+
+	column Category
+		dataType: string
+		lineageTag: 350eb2b6-4f5a-4ab8-a220-3d9bdd1f8b76
+		summarizeBy: none
+		sourceColumn: category
+		annotation SummarizationSetBy = Automatic
+		annotation PBI_FormatHint = {"isText":true}
+
+	column Segment
+		dataType: string
+		lineageTag: c0ad49c9-d80b-4d89-b3ca-39f2d5bc0b5e
+		summarizeBy: none
+		sourceColumn: segment
+		annotation SummarizationSetBy = Automatic
+		annotation PBI_FormatHint = {"isText":true}
+
+	measure 'Current Stock' = SUM(Inventory[StockOnHand])
+	measure 'Inventory Value' = SUMX(Inventory, Inventory[StockOnHand] * RELATED(Products[Price]))
+	measure 'Stock In' = SUM(Inventory[UnitsReceived])
+	measure 'Stock Out' = SUM(Inventory[UnitsSold])
+	measure 'Low-Stock Products' = COUNTROWS(FILTER(Inventory, Inventory[StockOnHand] <= 20))
+	measure 'Out-of-Stock Products' = COUNTROWS(FILTER(Inventory, Inventory[StockOnHand] = 0))
+	measure 'Days of Inventory on Hand' = AVERAGE(Inventory[StockOnHand])
+
+	partition Inventory-3b69bbc0-5357-4b15-9001-0d7f9adfd4da = m
+		mode: import
+		source = ```
+			let
+			    Source = Csv.Document(File.Contents("D:\projects\VinTelligence2026\data\inventory.csv"), [Delimiter = ",", Columns = 17, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+			    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+			    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"snapshot_date", type date}, {"product_id", Int64.Type}, {"stock_on_hand", Int64.Type}, {"units_received", Int64.Type}, {"units_sold", Int64.Type}, {"stockout_days", Int64.Type}, {"days_of_supply", type number}, {"fill_rate", type number}, {"stockout_flag", Int64.Type}, {"overstock_flag", Int64.Type}, {"reorder_flag", Int64.Type}, {"sell_through_rate", type number}, {"product_name", type text}, {"category", type text}, {"segment", type text}, {"year", Int64.Type}, {"month", Int64.Type}})
+			in
+			    #"Changed Type"
+			```

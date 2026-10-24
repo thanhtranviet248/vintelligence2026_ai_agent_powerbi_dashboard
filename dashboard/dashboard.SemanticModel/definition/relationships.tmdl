@@ -1,0 +1,78 @@
+relationship 9dc180d4-bf66-4d8f-b960-e97d6e5b89af
+	fromColumn: Orders.CustomerID
+	toColumn: Customers.CustomerID
+
+relationship 7f1ae522-431d-4796-8db3-ee0d58f5464f
+	fromColumn: Orders.Zip
+	toColumn: Geography.Zip
+
+relationship 5b5d49dd-837e-4953-a72a-d4f1b3108f7f
+	fromColumn: OrderItems.OrderID
+	toColumn: Orders.OrderID
+
+relationship f01d1c8a-c2c3-4906-a4a7-1f4dbff82d4a
+	fromColumn: OrderItems.ProductID
+	toColumn: Products.ProductID
+
+relationship 2e8f7cb0-5b48-4110-b5ef-5d514c40d611
+	fromColumn: Payments.OrderID
+	toColumn: Orders.OrderID
+
+relationship 82db7f02-9328-4b40-94ad-fec8ddb6db13
+	fromColumn: Shipments.OrderID
+	toColumn: Orders.OrderID
+	isActive: false
+
+relationship 6d5a4b90-1df8-4b2a-bc0c-32f1f0615f3d
+	fromColumn: Returns.OrderID
+	toColumn: Orders.OrderID
+
+relationship 34fa17a2-b0be-4e89-b2db-68960a4d3b45
+	fromColumn: Returns.ProductID
+	toColumn: Products.ProductID
+
+relationship f9dcb2a1-0ef5-4922-a7cb-3ad70e4831ce
+	fromColumn: Reviews.OrderID
+	toColumn: Orders.OrderID
+
+relationship 19da0d6b-9a07-46ad-9cd0-fd90c73df3d2
+	fromColumn: Reviews.ProductID
+	toColumn: Products.ProductID
+
+relationship 3d8c4095-63f0-4d7c-aed0-7208be18305d
+	fromColumn: Inventory.ProductID
+	toColumn: Products.ProductID
+
+relationship 81419d98-c9c4-4f7d-b6a2-58dd65d3c988
+	fromColumn: Orders.OrderDate
+	toColumn: Date.Date
+
+relationship 143b9b4b-65c6-4ec6-b5f5-914b28d9e5bb
+	fromColumn: Shipments.ShipDate
+	toColumn: Date.Date
+	isActive: false
+
+relationship 57b27e8f-df9c-4692-b0af-5c57d2fe3a41
+	fromColumn: Shipments.DeliveryDate
+	toColumn: Date.Date
+	isActive: false
+
+relationship 9bb2e6d7-0d26-47d2-a2e0-e83af6d15044
+	fromColumn: Returns.ReturnDate
+	toColumn: Date.Date
+	isActive: false
+
+relationship f98ce7ca-4758-4453-93ce-d375f1da3647
+	fromColumn: Reviews.ReviewDate
+	toColumn: Date.Date
+	isActive: false
+
+relationship 70e7e93a-56fc-4b4d-bb5c-9f770330f5b6
+	fromColumn: Inventory.SnapshotDate
+	toColumn: Date.Date
+	isActive: false
+
+relationship 7aa2e166-273d-4d0d-9d1a-38d0db6f4fa5
+	fromColumn: WebTraffic.Date
+	toColumn: Date.Date
+	isActive: true

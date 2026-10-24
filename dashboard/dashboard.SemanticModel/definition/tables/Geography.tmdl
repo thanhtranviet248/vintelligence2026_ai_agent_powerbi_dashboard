@@ -1,0 +1,45 @@
+table Geography
+	lineageTag: 410e09ca-0efc-4bd0-bba5-c3d2b34a67a2
+
+	column Zip
+		dataType: int64
+		formatString: 0
+		lineageTag: d87979fe-60d8-4cc5-93c3-abe63bf18856
+		summarizeBy: none
+		sourceColumn: zip
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: b890d2ef-76e4-4afd-b0a7-0f34df4f9458
+		summarizeBy: none
+		sourceColumn: city
+		annotation SummarizationSetBy = Automatic
+		annotation PBI_FormatHint = {"isText":true}
+
+	column Region
+		dataType: string
+		lineageTag: 48b95134-fd31-4bc7-b122-1b2efd9f0fca
+		summarizeBy: none
+		sourceColumn: region
+		annotation SummarizationSetBy = Automatic
+		annotation PBI_FormatHint = {"isText":true}
+
+	column District
+		dataType: string
+		lineageTag: 10ad1fa0-0d2a-4fd8-a0a3-e453b5e98528
+		summarizeBy: none
+		sourceColumn: district
+		annotation SummarizationSetBy = Automatic
+		annotation PBI_FormatHint = {"isText":true}
+
+	partition Geography-f38e1d8e-63ec-4df5-bb5a-3063d9b11b8a = m
+		mode: import
+		source = ```
+			let
+			    Source = Csv.Document(File.Contents("D:\projects\VinTelligence2026\data\geography.csv"), [Delimiter = ",", Columns = 4, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+			    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+			    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"zip", Int64.Type}, {"city", type text}, {"region", type text}, {"district", type text}})
+			in
+			    #"Changed Type"
+			```

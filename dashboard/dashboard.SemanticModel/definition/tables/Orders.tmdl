@@ -1,0 +1,86 @@
+table Orders
+	lineageTag: 96ce3597-5dc5-418f-a932-8f8efcb791d2
+
+	column OrderID
+		dataType: int64
+		formatString: 0
+		lineageTag: d5d55f2d-1195-4db1-b7c4-33b991fdb66e
+		summarizeBy: none
+		sourceColumn: order_id
+		annotation SummarizationSetBy = Automatic
+
+	column OrderDate
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 2e7fd735-d299-420a-b6ac-5d1dff40a9ff
+		summarizeBy: none
+		sourceColumn: order_date
+		annotation SummarizationSetBy = Automatic
+
+	column CustomerID
+		dataType: int64
+		formatString: 0
+		lineageTag: 8d6c8ac9-aea9-4f83-a1ea-01d270ecf13d
+		summarizeBy: none
+		sourceColumn: customer_id
+		annotation SummarizationSetBy = Automatic
+
+	column Zip
+		dataType: int64
+		formatString: 0
+		lineageTag: 00d5f239-d949-4088-a12d-0d93f3ff6f2b
+		summarizeBy: none
+		sourceColumn: zip
+		annotation SummarizationSetBy = Automatic
+
+	column OrderStatus
+		dataType: string
+		lineageTag: 39129eed-23e0-441d-a03b-88c1777c9d92
+		summarizeBy: none
+		sourceColumn: order_status
+		annotation SummarizationSetBy = Automatic
+		annotation PBI_FormatHint = {"isText":true}
+
+	column PaymentMethod
+		dataType: string
+		lineageTag: 1f5282bf-2469-4d85-92c4-4bdd3d9f8272
+		summarizeBy: none
+		sourceColumn: payment_method
+		annotation SummarizationSetBy = Automatic
+		annotation PBI_FormatHint = {"isText":true}
+
+	column DeviceType
+		dataType: string
+		lineageTag: 74cd3f82-9573-47c7-ad9c-e1dc9e522715
+		summarizeBy: none
+		sourceColumn: device_type
+		annotation SummarizationSetBy = Automatic
+		annotation PBI_FormatHint = {"isText":true}
+
+	column OrderSource
+		dataType: string
+		lineageTag: c3d22ef9-a377-440b-986f-c4c85f5b7378
+		summarizeBy: none
+		sourceColumn: order_source
+		annotation SummarizationSetBy = Automatic
+		annotation PBI_FormatHint = {"isText":true}
+
+	measure 'Total Orders' = DISTINCTCOUNT(Orders[OrderID])
+	measure 'Distinct Customers' = DISTINCTCOUNT(Orders[CustomerID])
+	measure 'Shipped Orders' = CALCULATE([Total Orders], OR(Orders[OrderStatus]="shipped", Orders[OrderStatus]="delivered"))
+	measure 'Delivered Orders' = CALCULATE([Total Orders], Orders[OrderStatus]="delivered")
+	measure 'Pending Orders' = CALCULATE([Total Orders], OR(Orders[OrderStatus]="created", Orders[OrderStatus]="paid"))
+	measure 'Cancelled Orders' = CALCULATE([Total Orders], Orders[OrderStatus]="cancelled")
+	measure 'Fulfillment Rate' = DIVIDE([Delivered Orders], [Total Orders])
+	measure 'Order Status Mix' = DIVIDE([Total Orders], CALCULATE([Total Orders], ALL(Orders[OrderStatus])))
+
+	partition Orders-8ed3cc1d-5bb3-4d3d-bc33-afbebb5f66d7 = m
+		mode: import
+		source = ```
+			let
+			    Source = Csv.Document(File.Contents("D:\projects\VinTelligence2026\data\orders.csv"), [Delimiter = ",", Columns = 8, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+			    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+			    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"order_id", Int64.Type}, {"order_date", type date}, {"customer_id", Int64.Type}, {"zip", Int64.Type}, {"order_status", type text}, {"payment_method", type text}, {"device_type", type text}, {"order_source", type text}})
+			in
+			    #"Changed Type"
+			```

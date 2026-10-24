@@ -1,0 +1,68 @@
+table Customers
+	lineageTag: 7b156603-eb20-4c0a-8d4a-78cc3e41c21b
+
+	column CustomerID
+		dataType: int64
+		formatString: 0
+		lineageTag: 587ac73d-784d-4dbf-a9b1-0ecfd0bdbfcd
+		summarizeBy: none
+		sourceColumn: customer_id
+		annotation SummarizationSetBy = Automatic
+
+	column Zip
+		dataType: int64
+		lineageTag: acb2cb7d-a4b3-4f36-a9b7-cce86bfec17a
+		summarizeBy: none
+		sourceColumn: zip
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: 8bf7e17f-1f5b-4869-bba1-7408f764e27d
+		summarizeBy: none
+		sourceColumn: city
+		annotation SummarizationSetBy = Automatic
+		annotation PBI_FormatHint = {"isText":true}
+
+	column SignupDate
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 33b4d2a6-5d61-4418-9864-1d0c66f1d345
+		summarizeBy: none
+		sourceColumn: signup_date
+		annotation SummarizationSetBy = Automatic
+
+	column Gender
+		dataType: string
+		lineageTag: d8e3b18d-c1d4-4030-b2d0-2ea0ba3ae191
+		summarizeBy: none
+		sourceColumn: gender
+		annotation SummarizationSetBy = Automatic
+		annotation PBI_FormatHint = {"isText":true}
+
+	column AgeGroup
+		dataType: string
+		lineageTag: 90899b24-929d-4d80-a0e0-56ef357cebe0
+		summarizeBy: none
+		sourceColumn: age_group
+		annotation SummarizationSetBy = Automatic
+		annotation PBI_FormatHint = {"isText":true}
+
+	column AcquisitionChannel
+		dataType: string
+		lineageTag: c3ec1868-2a1d-4bf9-bdbd-52bbf9a37d16
+		summarizeBy: none
+		sourceColumn: acquisition_channel
+		annotation SummarizationSetBy = Automatic
+		annotation PBI_FormatHint = {"isText":true}
+
+	partition Customers-7d3e6387-caf9-4f8e-90d9-fcb7f752f0a6 = m
+		mode: import
+		source = ```
+			let
+			    Source = Csv.Document(File.Contents("D:\projects\VinTelligence2026\data\customers.csv"), [Delimiter = ",", Columns = 7, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+			    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+			    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"customer_id", Int64.Type}, {"zip", Int64.Type}, {"city", type text}, {"signup_date", type date}, {"gender", type text}, {"age_group", type text}, {"acquisition_channel", type text}})
+			in
+			    #"Changed Type"
+			```
