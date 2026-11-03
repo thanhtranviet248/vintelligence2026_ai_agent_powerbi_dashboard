@@ -3,11 +3,11 @@
   "name": "p1-table-segment",
   "position": {
     "x": 1280,
-    "y": 726,
+    "y": 896,
     "z": 1000,
     "height": 314,
     "width": 600,
-    "tabOrder": 24
+    "tabOrder": 34
   },
   "visual": {
     "visualType": "tableEx",
@@ -23,53 +23,67 @@
                       "Entity": "Products"
                     }
                   },
-                  "Property": "Segment"
+                  "Property": "Category"
                 }
               },
-              "queryRef": "Products.Segment",
-              "nativeQueryRef": "Segment"
+              "queryRef": "Products.Category",
+              "nativeQueryRef": "Category"
             },
             {
               "field": {
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "OrderItems"
+                      "Entity": "Inventory"
                     }
                   },
-                  "Property": "Net Sales"
+                  "Property": "Stockout Rate"
                 }
               },
-              "queryRef": "OrderItems.Net Sales",
-              "nativeQueryRef": "Net Sales"
+              "queryRef": "Inventory.Stockout Rate",
+              "nativeQueryRef": "Stockout Rate"
             },
             {
               "field": {
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Orders"
+                      "Entity": "Returns"
                     }
                   },
-                  "Property": "Total Orders"
+                  "Property": "Return Rate for Product Orders"
                 }
               },
-              "queryRef": "Orders.Total Orders",
-              "nativeQueryRef": "Total Orders"
+              "queryRef": "Returns.Return Rate for Product Orders",
+              "nativeQueryRef": "Return Rate for Product Orders"
             },
             {
               "field": {
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "OrderItems"
+                      "Entity": "Reviews"
                     }
                   },
-                  "Property": "Average Order Value"
+                  "Property": "Average Rating"
                 }
               },
-              "queryRef": "OrderItems.Average Order Value",
-              "nativeQueryRef": "Average Order Value"
+              "queryRef": "Reviews.Average Rating",
+              "nativeQueryRef": "Average Rating"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Shipments"
+                    }
+                  },
+                  "Property": "Product-Linked Average Transit Time"
+                }
+              },
+              "queryRef": "Shipments.Product-Linked Average Transit Time",
+              "nativeQueryRef": "Product-Linked Average Transit Time"
             }
           ]
         }
@@ -159,7 +173,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Segment Performance'"
+                  "Value": "'Category Health Signals'"
                 }
               }
             },

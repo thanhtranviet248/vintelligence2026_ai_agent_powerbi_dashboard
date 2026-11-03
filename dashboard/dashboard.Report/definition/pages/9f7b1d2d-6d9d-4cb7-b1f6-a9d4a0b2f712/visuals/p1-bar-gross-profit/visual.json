@@ -3,11 +3,11 @@
   "name": "p1-bar-gross-profit",
   "position": {
     "x": 980,
-    "y": 1070,
+    "y": 1240,
     "z": 1000,
     "height": 280,
     "width": 900,
-    "tabOrder": 41
+    "tabOrder": 51
   },
   "visual": {
     "visualType": "barChart",
@@ -39,14 +39,14 @@
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "OrderItems"
+                      "Entity": "Returns"
                     }
                   },
-                  "Property": "Gross Profit"
+                  "Property": "Return Rate for Product Orders"
                 }
               },
-              "queryRef": "OrderItems.Gross Profit",
-              "nativeQueryRef": "Gross Profit"
+              "queryRef": "Returns.Return Rate for Product Orders",
+              "nativeQueryRef": "Return Rate for Product Orders"
             }
           ]
         }
@@ -178,7 +178,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Estimated Gross Profit by Category (Catalog-Cost Basis)'"
+                  "Value": "'Return Rate by Category'"
                 }
               }
             },

@@ -3,11 +3,11 @@
   "name": "kpi-otd",
   "position": {
     "x": 1531.2,
-    "y": 124,
+    "y": 294,
     "z": 1000,
     "height": 132,
     "width": 348.8,
-    "tabOrder": 14
+    "tabOrder": 24
   },
   "visual": {
     "visualType": "card",
@@ -23,11 +23,11 @@
                       "Entity": "Orders"
                     }
                   },
-                  "Property": "Fulfillment Rate"
+                  "Property": "All-Time Repeat Customer Rate"
                 }
               },
-              "queryRef": "Orders.Fulfillment Rate",
-              "nativeQueryRef": "Fulfillment Rate"
+              "queryRef": "Orders.All-Time Repeat Customer Rate",
+              "nativeQueryRef": "All-Time Repeat Customer Rate"
             }
           ]
         }
@@ -118,7 +118,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Fulfillment Rate'"
+                  "Value": "'Repeat Customer Rate'"
                 }
               }
             },

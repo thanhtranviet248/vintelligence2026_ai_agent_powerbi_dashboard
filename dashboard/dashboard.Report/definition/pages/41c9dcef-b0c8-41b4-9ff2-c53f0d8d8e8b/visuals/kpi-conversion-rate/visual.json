@@ -3,11 +3,11 @@
   "name": "kpi-conversion-rate",
   "position": {
     "x": 972.0,
-    "y": 124,
+    "y": 294,
     "z": 1000,
     "height": 132,
     "width": 442.0,
-    "tabOrder": 12
+    "tabOrder": 22
   },
   "visual": {
     "visualType": "card",

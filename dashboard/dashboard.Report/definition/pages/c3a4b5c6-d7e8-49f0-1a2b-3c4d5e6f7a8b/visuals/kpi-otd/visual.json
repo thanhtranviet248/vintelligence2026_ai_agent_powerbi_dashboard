@@ -3,11 +3,11 @@
   "name": "kpi-otd",
   "position": {
     "x": 1531.2,
-    "y": 124,
+    "y": 294,
     "z": 1000,
     "height": 132,
     "width": 348.8,
-    "tabOrder": 14
+    "tabOrder": 24
   },
   "visual": {
     "visualType": "card",

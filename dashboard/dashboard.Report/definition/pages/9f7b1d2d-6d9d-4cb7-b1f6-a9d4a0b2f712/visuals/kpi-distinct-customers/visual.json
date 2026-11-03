@@ -3,11 +3,11 @@
   "name": "kpi-distinct-customers",
   "position": {
     "x": 785.6,
-    "y": 124,
+    "y": 294,
     "z": 1000,
     "height": 132,
     "width": 348.8,
-    "tabOrder": 12
+    "tabOrder": 22
   },
   "visual": {
     "visualType": "card",
@@ -20,14 +20,14 @@
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Orders"
+                      "Entity": "Returns"
                     }
                   },
-                  "Property": "Distinct Customers"
+                  "Property": "Return Rate"
                 }
               },
-              "queryRef": "Orders.Distinct Customers",
-              "nativeQueryRef": "Distinct Customers"
+              "queryRef": "Returns.Return Rate",
+              "nativeQueryRef": "Return Rate"
             }
           ]
         }
@@ -118,7 +118,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Distinct Customers'"
+                  "Value": "'Return Rate'"
                 }
               }
             },

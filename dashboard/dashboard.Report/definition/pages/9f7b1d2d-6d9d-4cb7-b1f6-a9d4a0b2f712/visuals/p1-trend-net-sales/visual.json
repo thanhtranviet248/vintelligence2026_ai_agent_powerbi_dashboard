@@ -3,11 +3,11 @@
   "name": "p1-trend-net-sales",
   "position": {
     "x": 40,
-    "y": 276,
+    "y": 446,
     "z": 1000,
     "height": 430,
     "width": 1180,
-    "tabOrder": 20
+    "tabOrder": 30
   },
   "visual": {
     "visualType": "lineChart",
@@ -47,6 +47,20 @@
               },
               "queryRef": "OrderItems.Net Sales",
               "nativeQueryRef": "Net Sales"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Orders"
+                    }
+                  },
+                  "Property": "Total Orders"
+                }
+              },
+              "queryRef": "Orders.Total Orders",
+              "nativeQueryRef": "Total Orders"
             }
           ]
         }
@@ -162,7 +176,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Net Sales Trend by Month'"
+                  "Value": "'Portfolio context: Net Sales and Orders by Month'"
                 }
               }
             },

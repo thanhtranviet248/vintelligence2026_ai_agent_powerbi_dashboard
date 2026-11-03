@@ -1,19 +1,19 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
-  "name": "p1-donut-category",
+  "name": "p1-signal-map",
   "position": {
     "x": 1240,
-    "y": 276,
+    "y": 446,
     "z": 1000,
     "height": 430,
     "width": 640,
-    "tabOrder": 21
+    "tabOrder": 31
   },
   "visual": {
-    "visualType": "donutChart",
+    "visualType": "scatterChart",
     "query": {
       "queryState": {
-        "Category": {
+        "Details": {
           "projections": [
             {
               "field": {
@@ -23,16 +23,15 @@
                       "Entity": "Products"
                     }
                   },
-                  "Property": "Category"
+                  "Property": "ProductName"
                 }
               },
-              "queryRef": "Products.Category",
-              "nativeQueryRef": "Category",
-              "active": true
+              "queryRef": "Products.ProductName",
+              "nativeQueryRef": "ProductName"
             }
           ]
         },
-        "Y": {
+        "X": {
           "projections": [
             {
               "field": {
@@ -49,39 +48,75 @@
               "nativeQueryRef": "Net Sales"
             }
           ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Reviews"
+                    }
+                  },
+                  "Property": "Average Rating"
+                }
+              },
+              "queryRef": "Reviews.Average Rating",
+              "nativeQueryRef": "Average Rating"
+            }
+          ]
+        },
+        "Size": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "OrderItems"
+                    }
+                  },
+                  "Property": "Units Sold"
+                }
+              },
+              "queryRef": "OrderItems.Units Sold",
+              "nativeQueryRef": "Units Sold"
+            }
+          ]
+        },
+        "Legend": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Products"
+                    }
+                  },
+                  "Property": "Category"
+                }
+              },
+              "queryRef": "Products.Category",
+              "nativeQueryRef": "Category"
+            }
+          ]
         }
-      },
-      "sortDefinition": {
-        "sort": [
-          {
-            "field": {
-              "Measure": {
-                "Expression": {
-                  "SourceRef": {
-                    "Entity": "OrderItems"
-                  }
-                },
-                "Property": "Net Sales"
-              }
-            },
-            "direction": "Descending"
-          }
-        ],
-        "isDefaultSort": true
       }
     },
     "objects": {
-      "labels": [
+      "categoryAxis": [
         {
           "properties": {
-            "show": {
+            "titleText": {
               "expr": {
                 "Literal": {
-                  "Value": "true"
+                  "Value": "'Net Sales'"
                 }
               }
             },
-            "color": {
+            "labelColor": {
               "solid": {
                 "color": {
                   "expr": {
@@ -91,11 +126,28 @@
                   }
                 }
               }
-            },
-            "fontSize": {
+            }
+          }
+        }
+      ],
+      "valueAxis": [
+        {
+          "properties": {
+            "titleText": {
               "expr": {
                 "Literal": {
-                  "Value": "10D"
+                  "Value": "'Average Rating'"
+                }
+              }
+            },
+            "labelColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#344054'"
+                    }
+                  }
                 }
               }
             }
@@ -105,13 +157,6 @@
       "legend": [
         {
           "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
             "position": {
               "expr": {
                 "Literal": {
@@ -137,7 +182,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Net Sales by Category'"
+                  "Value": "'Product Value vs Customer Experience'"
                 }
               }
             },
@@ -163,13 +208,6 @@
                       "Value": "'#17365D'"
                     }
                   }
-                }
-              }
-            },
-            "fontFamily": {
-              "expr": {
-                "Literal": {
-                  "Value": "'''Segoe UI Semibold'', wf_segoe-ui_semibold, helvetica, arial, sans-serif'"
                 }
               }
             }
@@ -232,19 +270,6 @@
               "expr": {
                 "Literal": {
                   "Value": "10D"
-                }
-              }
-            }
-          }
-        }
-      ],
-      "dropShadow": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "false"
                 }
               }
             }

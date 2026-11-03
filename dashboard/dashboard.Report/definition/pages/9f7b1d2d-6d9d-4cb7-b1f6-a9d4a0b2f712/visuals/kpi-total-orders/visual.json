@@ -3,11 +3,11 @@
   "name": "kpi-total-orders",
   "position": {
     "x": 412.8,
-    "y": 124,
+    "y": 294,
     "z": 1000,
     "height": 132,
     "width": 348.8,
-    "tabOrder": 11
+    "tabOrder": 21
   },
   "visual": {
     "visualType": "card",
@@ -20,14 +20,14 @@
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Orders"
+                      "Entity": "Inventory"
                     }
                   },
-                  "Property": "Total Orders"
+                  "Property": "Stockout Rate"
                 }
               },
-              "queryRef": "Orders.Total Orders",
-              "nativeQueryRef": "Total Orders"
+              "queryRef": "Inventory.Stockout Rate",
+              "nativeQueryRef": "Stockout Rate"
             }
           ]
         }
@@ -118,7 +118,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Total Orders'"
+                  "Value": "'Stockout Rate'"
                 }
               }
             },

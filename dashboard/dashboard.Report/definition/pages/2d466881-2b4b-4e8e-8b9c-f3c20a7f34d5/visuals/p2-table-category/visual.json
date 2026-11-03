@@ -3,11 +3,11 @@
   "name": "p2-table-category",
   "position": {
     "x": 1420,
-    "y": 726,
+    "y": 896,
     "z": 1000,
     "height": 314,
     "width": 460,
-    "tabOrder": 24
+    "tabOrder": 34
   },
   "visual": {
     "visualType": "tableEx",

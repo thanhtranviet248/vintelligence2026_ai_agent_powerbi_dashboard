@@ -3,11 +3,11 @@
   "name": "p6-detail-returns",
   "position": {
     "x": 40,
-    "y": 1070,
+    "y": 1240,
     "z": 1000,
     "height": 280,
     "width": 900,
-    "tabOrder": 40
+    "tabOrder": 50
   },
   "visual": {
     "visualType": "tableEx",

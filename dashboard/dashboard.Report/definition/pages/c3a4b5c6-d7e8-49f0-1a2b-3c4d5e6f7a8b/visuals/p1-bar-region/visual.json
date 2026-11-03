@@ -3,11 +3,11 @@
   "name": "p1-bar-region",
   "position": {
     "x": 660,
-    "y": 726,
+    "y": 896,
     "z": 1000,
     "height": 314,
     "width": 600,
-    "tabOrder": 23
+    "tabOrder": 33
   },
   "visual": {
     "visualType": "barChart",

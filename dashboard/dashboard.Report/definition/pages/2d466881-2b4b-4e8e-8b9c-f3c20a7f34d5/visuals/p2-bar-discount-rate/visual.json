@@ -3,11 +3,11 @@
   "name": "p2-bar-discount-rate",
   "position": {
     "x": 980,
-    "y": 1070,
+    "y": 1240,
     "z": 1000,
     "height": 280,
     "width": 900,
-    "tabOrder": 41
+    "tabOrder": 51
   },
   "visual": {
     "visualType": "barChart",

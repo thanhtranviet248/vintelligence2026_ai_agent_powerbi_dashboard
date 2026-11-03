@@ -3,11 +3,11 @@
   "name": "kpi-aov",
   "position": {
     "x": 1158.4,
-    "y": 124,
+    "y": 294,
     "z": 1000,
     "height": 132,
     "width": 348.8,
-    "tabOrder": 13
+    "tabOrder": 23
   },
   "visual": {
     "visualType": "card",
@@ -20,14 +20,14 @@
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "OrderItems"
+                      "Entity": "Reviews"
                     }
                   },
-                  "Property": "Average Order Value"
+                  "Property": "Average Rating"
                 }
               },
-              "queryRef": "OrderItems.Average Order Value",
-              "nativeQueryRef": "Average Order Value"
+              "queryRef": "Reviews.Average Rating",
+              "nativeQueryRef": "Average Rating"
             }
           ]
         }
@@ -118,7 +118,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Average Order Value'"
+                  "Value": "'Average Rating'"
                 }
               }
             },
