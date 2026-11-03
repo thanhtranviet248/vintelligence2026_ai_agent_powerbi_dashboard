@@ -1,9 +1,9 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
   "name": "filter-1-year-month",
   "position": {
     "x": 40,
-    "y": 270,
+    "y": 110,
     "z": 1000,
     "height": 110,
     "width": 420,
@@ -72,6 +72,11 @@
               }
             }
           }
+        }
+      ],
+      "general": [
+        {
+          "properties": {}
         }
       ]
     },
@@ -183,6 +188,11 @@
           }
         }
       ]
+    },
+    "syncGroup": {
+      "groupName": "a1c9d6f0-8b2e-4e31-9c7d-1f5a6b8c2d10",
+      "fieldChanges": true,
+      "filterChanges": true
     },
     "drillFilterOtherVisuals": true
   }

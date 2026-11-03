@@ -3,7 +3,7 @@
   "name": "filter-2-category",
   "position": {
     "x": 500,
-    "y": 270,
+    "y": 110,
     "z": 1000,
     "height": 110,
     "width": 420,
@@ -184,6 +184,11 @@
         }
       ]
     },
-    "drillFilterOtherVisuals": true
+    "drillFilterOtherVisuals": true,
+    "syncGroup": {
+      "groupName": "b2d8e7a1-9c3f-4f52-a8e1-2a6b7c9d3e21",
+      "fieldChanges": true,
+      "filterChanges": true
+    }
   }
 }

@@ -1,12 +1,52 @@
 table Returns
 	lineageTag: 0048b1d5-bb30-4190-9e42-ea1d9056f39d
 
+	measure 'Returned Orders' = DISTINCTCOUNT(Returns[OrderID])
+		lineageTag: 181a146a-8b3d-450b-b10b-2a5362378639
+
+	measure 'Return Quantity' = SUM(Returns[ReturnQuantity])
+		lineageTag: 890b7584-34c2-4a5d-ac6e-5c4fb9eee8ba
+
+	measure 'Return Amount' = SUM(Returns[RefundAmount])
+		lineageTag: f2658a13-7756-4081-8e29-6dd8037206a3
+
+	measure 'Return Rate' = DIVIDE([Returned Orders], [Total Orders])
+		formatString: 0.0%
+		lineageTag: ee358c2d-0b1e-4f0f-b732-d66bb9bd0da9
+
+	measure 'Return Rate for Product Orders' = DIVIDE([Returned Orders], DISTINCTCOUNT(OrderItems[OrderID]))
+		formatString: 0.0%
+		lineageTag: 3a692559-cddb-4854-b365-9d0eb1d948a6
+
+	measure 'Return Reason Share' = DIVIDE([Return Quantity], CALCULATE([Return Quantity], REMOVEFILTERS(Returns[ReturnReason])))
+		formatString: 0.0%
+		lineageTag: 7fd99d0b-0161-4e8d-8b5a-675ac01352a9
+
+	measure 'Refund Amount' = SUM(Returns[RefundAmount])
+		lineageTag: 52a919f0-abb3-462c-8716-b4cd48dba7d5
+
+	measure 'Return Quantity by Return Date' = CALCULATE([Return Quantity], USERELATIONSHIP('Date'[Date], Returns[ReturnDate]), CROSSFILTER('Date'[Date], Orders[OrderDate], NONE))
+		formatString: #,0
+		lineageTag: 70e98b4a-8f2b-4899-99d8-0829c40d6ad7
+
+	measure 'Refund Amount by Return Date' = CALCULATE([Refund Amount], USERELATIONSHIP('Date'[Date], Returns[ReturnDate]), CROSSFILTER('Date'[Date], Orders[OrderDate], NONE))
+		formatString: $#,0.00;($#,0.00);$#,0.00
+		lineageTag: 1faa4ef2-8332-490f-aac8-255c265e34b0
+
+	measure 'Net Sales After Returns' = [Net Sales] - [Refund Amount]
+		lineageTag: 5f54d2a8-86f3-44ed-8715-cca94c4727bb
+
+	measure 'Return Reasons' = DISTINCTCOUNT(Returns[ReturnReason])
+		lineageTag: 244b46e5-02ce-4633-a905-d698eb13dce9
+
 	column ReturnID
 		dataType: string
 		lineageTag: f1d1ea8d-7af3-47f3-9c89-8943f6e9bd2c
 		summarizeBy: none
 		sourceColumn: return_id
+
 		annotation SummarizationSetBy = Automatic
+
 		annotation PBI_FormatHint = {"isText":true}
 
 	column OrderID
@@ -15,6 +55,7 @@ table Returns
 		lineageTag: 0fb6b51d-5c0d-4d54-b123-6ada36dac3ff
 		summarizeBy: none
 		sourceColumn: order_id
+
 		annotation SummarizationSetBy = Automatic
 
 	column ProductID
@@ -23,6 +64,7 @@ table Returns
 		lineageTag: a0d15d7d-8752-4d92-9eb0-4556b41c8952
 		summarizeBy: none
 		sourceColumn: product_id
+
 		annotation SummarizationSetBy = Automatic
 
 	column ReturnDate
@@ -31,14 +73,19 @@ table Returns
 		lineageTag: 60f81262-23fd-41de-8bc9-0d5601a4ec80
 		summarizeBy: none
 		sourceColumn: return_date
+
 		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
 
 	column ReturnReason
 		dataType: string
 		lineageTag: 663a4dd0-c0ee-4f29-9987-eefc50d0e3a6
 		summarizeBy: none
 		sourceColumn: return_reason
+
 		annotation SummarizationSetBy = Automatic
+
 		annotation PBI_FormatHint = {"isText":true}
 
 	column ReturnQuantity
@@ -47,40 +94,25 @@ table Returns
 		lineageTag: 9ae66d44-b815-4e90-b741-f20f65d3d1cf
 		summarizeBy: sum
 		sourceColumn: return_quantity
+
 		annotation SummarizationSetBy = Automatic
 
 	column RefundAmount
 		dataType: double
-		formatString: "$#,0.00;($#,0.00);$#,0.00"
+		formatString: $#,0.00;($#,0.00);$#,0.00
 		lineageTag: d7fd78cc-4ad6-41a0-8ef2-f9869d95ae78
 		summarizeBy: sum
 		sourceColumn: refund_amount
-		annotation SummarizationSetBy = Automatic
 
-	measure 'Returned Orders' = DISTINCTCOUNT(Returns[OrderID])
-	measure 'Return Quantity' = SUM(Returns[ReturnQuantity])
-	measure 'Return Amount' = SUM(Returns[RefundAmount])
-	measure 'Return Rate' = DIVIDE([Returned Orders], [Total Orders])
-		formatString: 0.0%
-	measure 'Return Rate for Product Orders' = DIVIDE([Returned Orders], DISTINCTCOUNT(OrderItems[OrderID]))
-		formatString: 0.0%
-	measure 'Return Reason Share' = DIVIDE([Return Quantity], CALCULATE([Return Quantity], REMOVEFILTERS(Returns[ReturnReason])))
-		formatString: 0.0%
-	measure 'Refund Amount' = SUM(Returns[RefundAmount])
-	measure 'Return Quantity by Return Date' = CALCULATE([Return Quantity], USERELATIONSHIP('Date'[Date], Returns[ReturnDate]), CROSSFILTER('Date'[Date], Orders[OrderDate], NONE))
-		formatString: #,0
-	measure 'Refund Amount by Return Date' = CALCULATE([Refund Amount], USERELATIONSHIP('Date'[Date], Returns[ReturnDate]), CROSSFILTER('Date'[Date], Orders[OrderDate], NONE))
-		formatString: "$#,0.00;($#,0.00);$#,0.00"
-	measure 'Net Sales After Returns' = [Net Sales] - [Refund Amount]
-	measure 'Return Reasons' = DISTINCTCOUNT(Returns[ReturnReason])
+		annotation SummarizationSetBy = Automatic
 
 	partition Returns-4efc74dc-6ee0-4f9f-8f22-319ec5ef649c = m
 		mode: import
-		source = ```
-			let
-			    Source = Csv.Document(File.Contents("D:\projects\vintelligence2026_ai_agent_powerbi_dashboard\data\returns.csv"), [Delimiter = ",", Columns = 7, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
-			    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
-			    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"return_id", type text}, {"order_id", Int64.Type}, {"product_id", Int64.Type}, {"return_date", type date}, {"return_reason", type text}, {"return_quantity", Int64.Type}, {"refund_amount", type number}})
-			in
-			    #"Changed Type"
-			```
+		source =
+				let
+				    Source = Csv.Document(File.Contents("D:\projects\vintelligence2026_ai_agent_powerbi_dashboard\data\returns.csv"), [Delimiter = ",", Columns = 7, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"return_id", type text}, {"order_id", Int64.Type}, {"product_id", Int64.Type}, {"return_date", type date}, {"return_reason", type text}, {"return_quantity", Int64.Type}, {"refund_amount", type number}})
+				in
+				    #"Changed Type"
+

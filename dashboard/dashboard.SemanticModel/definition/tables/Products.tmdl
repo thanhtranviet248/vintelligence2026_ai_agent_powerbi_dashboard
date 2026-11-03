@@ -1,12 +1,22 @@
 table Products
 	lineageTag: 8f546b66-4b3a-4075-a6db-a5bfc3cb130a
 
+	measure 'Average Product Price' = AVERAGE(Products[Price])
+		lineageTag: a52ef434-2fc5-4cb2-a391-f83ca66a6b1f
+
+	measure 'Average COGS' = AVERAGE(Products[COGS])
+		lineageTag: afe7b049-0ec1-43e6-9519-b4d5aebd35be
+
+	measure 'Products in Catalog' = DISTINCTCOUNT(Products[ProductID])
+		lineageTag: 727f4008-bb5d-400d-b318-65fd921b2550
+
 	column ProductID
 		dataType: int64
 		formatString: 0
 		lineageTag: 116d7e3d-3b4a-4d7d-bf42-4cf4df6d3f7f
 		summarizeBy: none
 		sourceColumn: product_id
+
 		annotation SummarizationSetBy = Automatic
 
 	column ProductName
@@ -14,7 +24,9 @@ table Products
 		lineageTag: be168fe1-4892-4d1c-b47b-77217208b32d
 		summarizeBy: none
 		sourceColumn: product_name
+
 		annotation SummarizationSetBy = Automatic
+
 		annotation PBI_FormatHint = {"isText":true}
 
 	column Category
@@ -22,7 +34,9 @@ table Products
 		lineageTag: 901083c2-2e6a-4a2e-9d4b-9c32f43fcc75
 		summarizeBy: none
 		sourceColumn: category
+
 		annotation SummarizationSetBy = Automatic
+
 		annotation PBI_FormatHint = {"isText":true}
 
 	column Segment
@@ -30,7 +44,9 @@ table Products
 		lineageTag: 2d82908d-9ca7-4d49-89bb-4f01ebdb20c5
 		summarizeBy: none
 		sourceColumn: segment
+
 		annotation SummarizationSetBy = Automatic
+
 		annotation PBI_FormatHint = {"isText":true}
 
 	column Size
@@ -38,7 +54,9 @@ table Products
 		lineageTag: d9d7db59-5141-4710-b2c8-ea01d7d93661
 		summarizeBy: none
 		sourceColumn: size
+
 		annotation SummarizationSetBy = Automatic
+
 		annotation PBI_FormatHint = {"isText":true}
 
 	column Color
@@ -46,37 +64,36 @@ table Products
 		lineageTag: 7a991d3d-86ec-4c72-b5d4-5dceb0e6bf42
 		summarizeBy: none
 		sourceColumn: color
+
 		annotation SummarizationSetBy = Automatic
+
 		annotation PBI_FormatHint = {"isText":true}
 
 	column Price
 		dataType: double
-		formatString: "$#,0.00;($#,0.00);$#,0.00"
+		formatString: $#,0.00;($#,0.00);$#,0.00
 		lineageTag: 8d7f3d51-1d56-489f-8276-0530fd32b6a2
 		summarizeBy: sum
 		sourceColumn: price
+
 		annotation SummarizationSetBy = Automatic
 
 	column COGS
 		dataType: double
-		formatString: "$#,0.00;($#,0.00);$#,0.00"
+		formatString: $#,0.00;($#,0.00);$#,0.00
 		lineageTag: 3d39d4ea-3249-4c89-8b51-6087e4fcec9f
 		summarizeBy: sum
 		sourceColumn: cogs
-		annotation SummarizationSetBy = Automatic
 
-	measure 'Average Product Price' = AVERAGE(Products[Price])
-	measure 'Average COGS' = AVERAGE(Products[COGS])
-	measure 'Products in Catalog' = DISTINCTCOUNT(Products[ProductID])
+		annotation SummarizationSetBy = Automatic
 
 	partition Products-e5ee4904-5e90-4e65-9e05-4a4cb42e1a7f = m
 		mode: import
-		source = ```
-			let
-			    Source = Csv.Document(File.Contents("D:\projects\vintelligence2026_ai_agent_powerbi_dashboard\data\products.csv"), [Delimiter = ",", Columns = 8, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
-			    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
-			    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"product_id", Int64.Type}, {"product_name", type text}, {"category", type text}, {"segment", type text}, {"size", type text}, {"color", type text}, {"price", type number}, {"cogs", type number}})
-			in
-			    #"Changed Type"
-			```
+		source =
+				let
+				    Source = Csv.Document(File.Contents("D:\projects\vintelligence2026_ai_agent_powerbi_dashboard\data\products.csv"), [Delimiter = ",", Columns = 8, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"product_id", Int64.Type}, {"product_name", type text}, {"category", type text}, {"segment", type text}, {"size", type text}, {"color", type text}, {"price", type number}, {"cogs", type number}})
+				in
+				    #"Changed Type"
 

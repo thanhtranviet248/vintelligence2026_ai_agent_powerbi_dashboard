@@ -19,9 +19,9 @@ relationship 2e8f7cb0-5b48-4110-b5ef-5d514c40d611
 	toColumn: Orders.OrderID
 
 relationship 82db7f02-9328-4b40-94ad-fec8ddb6db13
+	isActive: false
 	fromColumn: Shipments.OrderID
 	toColumn: Orders.OrderID
-	isActive: false
 
 relationship 6d5a4b90-1df8-4b2a-bc0c-32f1f0615f3d
 	fromColumn: Returns.OrderID
@@ -48,36 +48,50 @@ relationship 81419d98-c9c4-4f7d-b6a2-58dd65d3c988
 	toColumn: Date.Date
 
 relationship 143b9b4b-65c6-4ec6-b5f5-914b28d9e5bb
+	isActive: false
 	fromColumn: Shipments.ShipDate
 	toColumn: Date.Date
-	isActive: false
 
 relationship 57b27e8f-df9c-4692-b0af-5c57d2fe3a41
+	isActive: false
 	fromColumn: Shipments.DeliveryDate
 	toColumn: Date.Date
-	isActive: false
 
 relationship 9bb2e6d7-0d26-47d2-a2e0-e83af6d15044
+	isActive: false
 	fromColumn: Returns.ReturnDate
 	toColumn: Date.Date
-	isActive: false
 
 relationship f98ce7ca-4758-4453-93ce-d375f1da3647
+	isActive: false
 	fromColumn: Reviews.ReviewDate
 	toColumn: Date.Date
-	isActive: false
 
 relationship 70e7e93a-56fc-4b4d-bb5c-9f770330f5b6
+	isActive: false
 	fromColumn: Inventory.SnapshotDate
 	toColumn: Date.Date
-	isActive: false
 
 relationship 7aa2e166-273d-4d0d-9d1a-38d0db6f4fa5
 	fromColumn: WebTraffic.Date
 	toColumn: Date.Date
-	isActive: true
 
 relationship 3c4f7f22-1f24-4a80-9f88-5a8bf3ef6a17
 	fromColumn: Sales.Date
 	toColumn: Date.Date
-	isActive: true
+
+relationship ffdeece2-3019-4689-92cd-05795f70df9e
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Customers.SignupDate
+	toColumn: LocalDateTable_3eaa25eb-3058-4a65-aed3-fc8ae4fbf34a.Date
+
+relationship 68d0ca14-73b7-49cb-b106-ebbab4a4d295
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Promotions.StartDate
+	toColumn: LocalDateTable_72b8f196-8ba6-4eea-99d5-494cc312ecb3.Date
+
+relationship 8186f0d5-e55a-4caa-87ea-58fc3981084c
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Promotions.EndDate
+	toColumn: LocalDateTable_6e707ba1-3953-4cf9-9d56-ae8a916408d0.Date
+

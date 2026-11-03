@@ -18,7 +18,7 @@ This Power BI project analyzes the repository's retail and operations data acros
 - sales.csv
 
 ## Report pages
-The report uses a 1920x1400 canvas and nine pages, following the design in
+The report uses a 1920x1700 canvas and seven pages, following the design in
 `dashboard/DASHBOARD_INSTRUCTION.md`:
 
 1. **Executive Overview** - Sales, order, customer, fulfillment, category, region,
@@ -36,10 +36,7 @@ The report uses a 1920x1400 canvas and nine pages, following the design in
    category/product performance, and return activity by return month.
 7. **Customer Satisfaction** - Review volume and ratings by review month, product,
    and customer segment, with sample counts.
-8. **Cross-Domain Diagnostics** - Exploratory sales, stock, return, and rating
-   comparisons; these show associations, not causes.
-9. **Data Quality and Definitions** - Shipment/review coverage, monthly inventory
-   snapshot indicators, order-status counts, and interpretation caveats.
+8. **Cross-domain perspectives** - Product, category, inventory, delivery, returns, and satisfaction relationships are embedded in the analytical pages as diagnostic scatter views.
 
 Shipment, return, and review trends use their own date roles. Inventory is monthly
 snapshot data and is never presented as daily or weekly stock.
@@ -53,7 +50,7 @@ snapshot data and is never presented as daily or weekly stock.
 - Average Order Value
 - Revenue per Customer
 - Shipment Cost
-- On-Time Delivery Rate
+- Fulfillment Rate
 - Return Rate
 - Current Stock
 - Inventory Value

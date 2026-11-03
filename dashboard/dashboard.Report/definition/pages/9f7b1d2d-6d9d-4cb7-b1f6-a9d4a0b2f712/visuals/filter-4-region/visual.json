@@ -3,7 +3,7 @@
   "name": "filter-4-region",
   "position": {
     "x": 1420,
-    "y": 270,
+    "y": 110,
     "z": 1000,
     "height": 110,
     "width": 420,
@@ -184,6 +184,11 @@
         }
       ]
     },
-    "drillFilterOtherVisuals": true
+    "drillFilterOtherVisuals": true,
+    "syncGroup": {
+      "groupName": "d4f0a9c3-1e5b-4164-c0a3-4d8e9f1a5b43",
+      "fieldChanges": true,
+      "filterChanges": true
+    }
   }
 }

@@ -7,9 +7,10 @@ model Model
 		returnErrorValuesAsNull
 
 annotation __PBI_TimeIntelligenceEnabled = 1
-annotation PBIDesktopVersion = 2.146.1254.0 (25.08)+791a7518fadc83da883d79322a2658aff57c8db3
-annotation PBI_QueryOrder = ["Date","Customers","Geography","Products","Orders","OrderItems","Payments","Shipments","Returns","Reviews","Inventory","Sales","WebTraffic","Promotions"]
+
 annotation PBI_ProTooling = ["DevMode"]
+
+annotation PBI_QueryOrder = ["Customers","Geography","Products","Orders","OrderItems","Payments","Shipments","Returns","Reviews","Inventory","Sales","WebTraffic","Promotions"]
 
 ref table Date
 ref table Customers
@@ -25,5 +26,10 @@ ref table Inventory
 ref table Sales
 ref table WebTraffic
 ref table Promotions
+ref table DateTableTemplate_9136b3bc-35a1-4634-9b18-f5a024f9180e
+ref table LocalDateTable_3eaa25eb-3058-4a65-aed3-fc8ae4fbf34a
+ref table LocalDateTable_72b8f196-8ba6-4eea-99d5-494cc312ecb3
+ref table LocalDateTable_6e707ba1-3953-4cf9-9d56-ae8a916408d0
 
 ref cultureInfo en-US
+

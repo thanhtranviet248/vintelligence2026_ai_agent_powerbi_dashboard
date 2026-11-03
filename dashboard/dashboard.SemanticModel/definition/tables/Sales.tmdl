@@ -1,41 +1,51 @@
 table Sales
 	lineageTag: 4f2dc7d6-4d73-4f4e-bf19-df3f5b5f2a11
 
+	measure 'Benchmark Revenue' = SUM(Sales[Revenue])
+		lineageTag: 331bd4bb-f946-4ae4-9526-659e0ebfac90
+
+	measure 'Benchmark COGS' = SUM(Sales[COGS])
+		lineageTag: fd24046e-c2a2-4169-b89f-b2db86479b15
+
+	measure 'Benchmark Gross Profit' = [Benchmark Revenue] - [Benchmark COGS]
+		lineageTag: 27f807be-b76e-43fa-a14f-bfca6d3025e1
+
 	column Date
 		dataType: dateTime
 		formatString: Short Date
 		lineageTag: 3f4b4c3a-1e84-4b13-95dd-2d0b1c8b7f01
 		summarizeBy: none
 		sourceColumn: Date
+
 		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
 
 	column Revenue
 		dataType: double
-		formatString: "$#,0.00;($#,0.00);$#,0.00"
+		formatString: $#,0.00;($#,0.00);$#,0.00
 		lineageTag: 5e68bfb9-c36b-40cb-aabb-6c8c0e8d1d6e
 		summarizeBy: sum
 		sourceColumn: Revenue
+
 		annotation SummarizationSetBy = Automatic
 
 	column COGS
 		dataType: double
-		formatString: "$#,0.00;($#,0.00);$#,0.00"
+		formatString: $#,0.00;($#,0.00);$#,0.00
 		lineageTag: d3a4b1f8-0c5d-4d76-a2cb-0e91f75806bd
 		summarizeBy: sum
 		sourceColumn: COGS
-		annotation SummarizationSetBy = Automatic
 
-	measure 'Benchmark Revenue' = SUM(Sales[Revenue])
-	measure 'Benchmark COGS' = SUM(Sales[COGS])
-	measure 'Benchmark Gross Profit' = [Benchmark Revenue] - [Benchmark COGS]
+		annotation SummarizationSetBy = Automatic
 
 	partition Sales-0a0cdb6e-4e29-4587-8e5f-3a4de4c8f1b3 = m
 		mode: import
-		source = ```
-			let
-			    Source = Csv.Document(File.Contents("D:\projects\vintelligence2026_ai_agent_powerbi_dashboard\data\sales.csv"), [Delimiter = ",", Columns = 3, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
-			    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
-			    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"Date", type date}, {"Revenue", type number}, {"COGS", type number}})
-			in
-			    #"Changed Type"
-			```
+		source =
+				let
+				    Source = Csv.Document(File.Contents("D:\projects\vintelligence2026_ai_agent_powerbi_dashboard\data\sales.csv"), [Delimiter = ",", Columns = 3, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"Date", type date}, {"Revenue", type number}, {"COGS", type number}})
+				in
+				    #"Changed Type"
+

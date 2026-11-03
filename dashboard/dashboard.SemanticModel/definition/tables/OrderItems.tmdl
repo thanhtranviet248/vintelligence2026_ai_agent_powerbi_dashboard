@@ -1,12 +1,46 @@
 table OrderItems
 	lineageTag: 5e071dd1-6201-4d9d-b6d6-854b7b2ef2ad
 
+	measure 'Gross Sales' = SUMX(OrderItems, OrderItems[Quantity] * OrderItems[UnitPrice])
+		lineageTag: 44510809-5d18-4290-b397-3eba005b8c5c
+
+	measure 'Discount Amount' = SUMX(OrderItems, OrderItems[Quantity] * OrderItems[DiscountAmount])
+		lineageTag: 079152f3-ec6c-4b48-b0d5-f55a05c45a49
+
+	measure 'Net Sales' = SUMX(OrderItems, OrderItems[Quantity] * (OrderItems[UnitPrice] - OrderItems[DiscountAmount]))
+		lineageTag: b22c417c-3ab8-4f86-a329-0c9299b5c8df
+
+	measure 'Discount Rate' = DIVIDE([Discount Amount], [Gross Sales])
+		lineageTag: a2c91505-4617-4906-b5f1-24e08dcaa6ed
+
+	measure 'Units Sold' = SUM(OrderItems[Quantity])
+		lineageTag: d9459fd1-e6db-460e-8f3e-86902fa24873
+
+	measure 'Average Order Value' = DIVIDE([Net Sales], [Total Orders])
+		lineageTag: b270b75c-3102-43d2-b8dc-42b908b324ce
+
+	measure 'Revenue per Customer' = DIVIDE([Net Sales], [Distinct Customers])
+		lineageTag: 867ddd5b-df29-48b3-a9fd-719a769abc4f
+
+	measure COGS = SUMX(OrderItems, OrderItems[Quantity] * RELATED(Products[COGS]))
+		lineageTag: 78697382-ed02-4234-8da3-534e432f9778
+
+	measure 'Gross Profit' = [Net Sales] - [COGS]
+		lineageTag: cf5151c7-dd5a-47ba-a1ce-18c5b947d1e1
+
+	measure 'Gross Margin %' = DIVIDE([Gross Profit], [Net Sales])
+		lineageTag: ab2ffd9d-65a7-4da9-8abc-8877c8a6e477
+
+	measure 'Contribution %' = DIVIDE([Net Sales], CALCULATE([Net Sales], ALL(Products[Category])))
+		lineageTag: 49ec5ac3-e469-43ed-8840-f5ee45fca280
+
 	column OrderID
 		dataType: int64
 		formatString: 0
 		lineageTag: 2dac4407-c5f5-4d8d-b4f7-6f7a7911b2b2
 		summarizeBy: none
 		sourceColumn: order_id
+
 		annotation SummarizationSetBy = Automatic
 
 	column ProductID
@@ -15,6 +49,7 @@ table OrderItems
 		lineageTag: 75414f14-9567-485c-81ec-ee123cb45d6d
 		summarizeBy: none
 		sourceColumn: product_id
+
 		annotation SummarizationSetBy = Automatic
 
 	column Quantity
@@ -23,22 +58,25 @@ table OrderItems
 		lineageTag: d459c6cb-1968-4b8b-98b1-32b50ef99816
 		summarizeBy: sum
 		sourceColumn: quantity
+
 		annotation SummarizationSetBy = Automatic
 
 	column UnitPrice
 		dataType: double
-		formatString: "$#,0.00;($#,0.00);$#,0.00"
+		formatString: $#,0.00;($#,0.00);$#,0.00
 		lineageTag: 6645180a-74e5-4165-97a1-d379ad18e872
 		summarizeBy: sum
 		sourceColumn: unit_price
+
 		annotation SummarizationSetBy = Automatic
 
 	column DiscountAmount
 		dataType: double
-		formatString: "$#,0.00;($#,0.00);$#,0.00"
+		formatString: $#,0.00;($#,0.00);$#,0.00
 		lineageTag: 3a1dbb2d-c048-480c-b6ff-a622622cfe97
 		summarizeBy: sum
 		sourceColumn: discount_amount
+
 		annotation SummarizationSetBy = Automatic
 
 	column PromoID
@@ -46,7 +84,9 @@ table OrderItems
 		lineageTag: 2e9ae75e-17e7-4d9d-bd02-0d4a1e87a54b
 		summarizeBy: none
 		sourceColumn: promo_id
+
 		annotation SummarizationSetBy = Automatic
+
 		annotation PBI_FormatHint = {"isText":true}
 
 	column PromoID2
@@ -54,28 +94,18 @@ table OrderItems
 		lineageTag: 8de55e0d-c1ef-4d5a-a0ec-8f79413031b3
 		summarizeBy: none
 		sourceColumn: promo_id_2
-		annotation SummarizationSetBy = Automatic
-		annotation PBI_FormatHint = {"isText":true}
 
-	measure 'Gross Sales' = SUMX(OrderItems, OrderItems[Quantity] * OrderItems[UnitPrice])
-	measure 'Discount Amount' = SUMX(OrderItems, OrderItems[Quantity] * OrderItems[DiscountAmount])
-	measure 'Net Sales' = SUMX(OrderItems, OrderItems[Quantity] * (OrderItems[UnitPrice] - OrderItems[DiscountAmount]))
-	measure 'Discount Rate' = DIVIDE([Discount Amount], [Gross Sales])
-	measure 'Units Sold' = SUM(OrderItems[Quantity])
-	measure 'Average Order Value' = DIVIDE([Net Sales], [Total Orders])
-	measure 'Revenue per Customer' = DIVIDE([Net Sales], [Distinct Customers])
-	measure 'COGS' = SUMX(OrderItems, OrderItems[Quantity] * RELATED(Products[COGS]))
-	measure 'Gross Profit' = [Net Sales] - [COGS]
-	measure 'Gross Margin %' = DIVIDE([Gross Profit], [Net Sales])
-	measure 'Contribution %' = DIVIDE([Net Sales], CALCULATE([Net Sales], ALL(Products[Category])))
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isText":true}
 
 	partition OrderItems-0a12d14d-5d7c-4cda-a23d-3f6b1ec909e5 = m
 		mode: import
-		source = ```
-			let
-			    Source = Csv.Document(File.Contents("D:\projects\vintelligence2026_ai_agent_powerbi_dashboard\data\order_items.csv"), [Delimiter = ",", Columns = 7, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
-			    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
-			    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"order_id", Int64.Type}, {"product_id", Int64.Type}, {"quantity", Int64.Type}, {"unit_price", type number}, {"discount_amount", type number}, {"promo_id", type text}, {"promo_id_2", type text}})
-			in
-			    #"Changed Type"
-			```
+		source =
+				let
+				    Source = Csv.Document(File.Contents("D:\projects\vintelligence2026_ai_agent_powerbi_dashboard\data\order_items.csv"), [Delimiter = ",", Columns = 7, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"order_id", Int64.Type}, {"product_id", Int64.Type}, {"quantity", Int64.Type}, {"unit_price", type number}, {"discount_amount", type number}, {"promo_id", type text}, {"promo_id_2", type text}})
+				in
+				    #"Changed Type"
+

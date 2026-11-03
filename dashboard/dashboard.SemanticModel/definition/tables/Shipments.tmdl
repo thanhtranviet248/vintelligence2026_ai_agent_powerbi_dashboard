@@ -1,12 +1,51 @@
 table Shipments
 	lineageTag: 7d4de668-25fe-4ad2-b8d2-9c0d54004531
 
+	measure 'Shipment Cost' = SUM(Shipments[ShippingFee])
+		lineageTag: f2661db0-496c-498f-9b9a-f4740583c483
+
+	measure 'Shipment Records' = DISTINCTCOUNT(Shipments[OrderID])
+		lineageTag: 80cefb9b-08ad-4776-8c8e-ffb2beae3009
+
+	measure 'Shipment Coverage Rate' = DIVIDE([Shipment Records], [Total Orders])
+		formatString: 0.0%
+		lineageTag: a9274e62-e6e3-41b6-bd51-87c5045f234d
+
+	measure 'Delivered Shipments' = CALCULATE(DISTINCTCOUNT(Shipments[OrderID]), NOT ISBLANK(Shipments[ShipDate]), NOT ISBLANK(Shipments[DeliveryDate]), Shipments[DeliveryDate] >= Shipments[ShipDate])
+		lineageTag: a5d9b4d4-9f1f-45a9-b7b0-dfe30268a0ac
+
+	measure 'Transit Within 3 Days' = DIVIDE(CALCULATE(DISTINCTCOUNT(Shipments[OrderID]), NOT ISBLANK(Shipments[ShipDate]), NOT ISBLANK(Shipments[DeliveryDate]), Shipments[DeliveryDate] >= Shipments[ShipDate], DATEDIFF(Shipments[ShipDate], Shipments[DeliveryDate], DAY) <= 3), [Delivered Shipments])
+		formatString: 0.0%
+		lineageTag: 64322fb3-742b-4247-8d7e-c4d7bc6cb5a3
+
+	measure 'Shipment Cost by Ship Date' = CALCULATE([Shipment Cost], USERELATIONSHIP('Date'[Date], Shipments[ShipDate]), CROSSFILTER('Date'[Date], Orders[OrderDate], NONE))
+		formatString: $#,0.00;($#,0.00);$#,0.00
+		lineageTag: 9cf8d11d-7964-4933-83d3-fd861ef25485
+
+	measure 'Transit Within 3 Days by Ship Date' = CALCULATE([Transit Within 3 Days], USERELATIONSHIP('Date'[Date], Shipments[ShipDate]), CROSSFILTER('Date'[Date], Orders[OrderDate], NONE))
+		formatString: 0.0%
+		lineageTag: ccd4246e-e815-4fb9-bd08-7bffbf90d4e1
+
+	measure 'Average Delivery Time' = AVERAGEX(FILTER(Shipments, NOT ISBLANK(Shipments[ShipDate]) && NOT ISBLANK(Shipments[DeliveryDate]) && Shipments[DeliveryDate] >= Shipments[ShipDate]), DATEDIFF(Shipments[ShipDate], Shipments[DeliveryDate], DAY))
+		lineageTag: 530c60db-d662-4004-88e7-f2cdadc5da14
+
+	measure 'Average Transit Time' = [Average Delivery Time]
+		lineageTag: a8ab7fe8-57a5-4af1-9463-048da5b0fcf6
+
+	measure 'Product-Linked Shipment Orders' = CALCULATE(DISTINCTCOUNT(Shipments[OrderID]), TREATAS(VALUES(OrderItems[OrderID]), Shipments[OrderID]))
+		lineageTag: bfa669f8-c1c4-4cfb-9eb5-eefd242de2a1
+
+	measure 'Product-Linked Average Transit Time' = CALCULATE([Average Transit Time], TREATAS(VALUES(OrderItems[OrderID]), Shipments[OrderID]))
+		formatString: 0.0
+		lineageTag: 597f9726-7231-435d-9383-d63778b78b72
+
 	column OrderID
 		dataType: int64
 		formatString: 0
 		lineageTag: 0a49fb8d-7dd9-43c8-9598-886cf5e227ca
 		summarizeBy: none
 		sourceColumn: order_id
+
 		annotation SummarizationSetBy = Automatic
 
 	column ShipDate
@@ -15,7 +54,10 @@ table Shipments
 		lineageTag: d7e7d39e-98d3-4ff9-9a39-95afc9e24355
 		summarizeBy: none
 		sourceColumn: ship_date
+
 		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
 
 	column DeliveryDate
 		dataType: dateTime
@@ -23,40 +65,27 @@ table Shipments
 		lineageTag: 9bcc4f5d-4f57-4d84-9fb2-46ffcd2b1981
 		summarizeBy: none
 		sourceColumn: delivery_date
+
 		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
 
 	column ShippingFee
 		dataType: double
-		formatString: "$#,0.00;($#,0.00);$#,0.00"
+		formatString: $#,0.00;($#,0.00);$#,0.00
 		lineageTag: 5ad17f39-1f13-471a-b5e4-411d84f5d6d1
 		summarizeBy: sum
 		sourceColumn: shipping_fee
-		annotation SummarizationSetBy = Automatic
 
-	measure 'Shipment Cost' = SUM(Shipments[ShippingFee])
-	measure 'Shipment Records' = DISTINCTCOUNT(Shipments[OrderID])
-	measure 'Shipment Coverage Rate' = DIVIDE([Shipment Records], [Total Orders])
-		formatString: 0.0%
-	measure 'Delivered Shipments' = CALCULATE(DISTINCTCOUNT(Shipments[OrderID]), NOT ISBLANK(Shipments[ShipDate]), NOT ISBLANK(Shipments[DeliveryDate]), Shipments[DeliveryDate] >= Shipments[ShipDate])
-	measure 'Transit Within 3 Days' = DIVIDE(CALCULATE(DISTINCTCOUNT(Shipments[OrderID]), NOT ISBLANK(Shipments[ShipDate]), NOT ISBLANK(Shipments[DeliveryDate]), Shipments[DeliveryDate] >= Shipments[ShipDate], DATEDIFF(Shipments[ShipDate], Shipments[DeliveryDate], DAY) <= 3), [Delivered Shipments])
-		formatString: 0.0%
-	measure 'Shipment Cost by Ship Date' = CALCULATE([Shipment Cost], USERELATIONSHIP('Date'[Date], Shipments[ShipDate]), CROSSFILTER('Date'[Date], Orders[OrderDate], NONE))
-		formatString: "$#,0.00;($#,0.00);$#,0.00"
-	measure 'Transit Within 3 Days by Ship Date' = CALCULATE([Transit Within 3 Days], USERELATIONSHIP('Date'[Date], Shipments[ShipDate]), CROSSFILTER('Date'[Date], Orders[OrderDate], NONE))
-		formatString: 0.0%
-	measure 'Average Delivery Time' = AVERAGEX(FILTER(Shipments, NOT ISBLANK(Shipments[ShipDate]) && NOT ISBLANK(Shipments[DeliveryDate]) && Shipments[DeliveryDate] >= Shipments[ShipDate]), DATEDIFF(Shipments[ShipDate], Shipments[DeliveryDate], DAY))
-	measure 'Average Transit Time' = [Average Delivery Time]
-	measure 'Product-Linked Shipment Orders' = CALCULATE(DISTINCTCOUNT(Shipments[OrderID]), TREATAS(VALUES(OrderItems[OrderID]), Shipments[OrderID]))
-	measure 'Product-Linked Average Transit Time' = CALCULATE([Average Transit Time], TREATAS(VALUES(OrderItems[OrderID]), Shipments[OrderID]))
-		formatString: 0.0
+		annotation SummarizationSetBy = Automatic
 
 	partition Shipments-08dc9e91-5df4-4c1b-9d2e-b8696e8f3c54 = m
 		mode: import
-		source = ```
-			let
-			    Source = Csv.Document(File.Contents("D:\projects\vintelligence2026_ai_agent_powerbi_dashboard\data\shipments.csv"), [Delimiter = ",", Columns = 4, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
-			    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
-			    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"order_id", Int64.Type}, {"ship_date", type date}, {"delivery_date", type date}, {"shipping_fee", type number}})
-			in
-			    #"Changed Type"
-			```
+		source =
+				let
+				    Source = Csv.Document(File.Contents("D:\projects\vintelligence2026_ai_agent_powerbi_dashboard\data\shipments.csv"), [Delimiter = ",", Columns = 4, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"order_id", Int64.Type}, {"ship_date", type date}, {"delivery_date", type date}, {"shipping_fee", type number}})
+				in
+				    #"Changed Type"
+

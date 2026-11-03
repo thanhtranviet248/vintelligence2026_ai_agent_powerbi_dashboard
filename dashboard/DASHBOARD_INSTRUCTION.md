@@ -377,7 +377,7 @@ because Reviews already connect to customers through Orders.
 
 ## 6.1. Design Objective and Page Count
 
-Build **nine report pages**. The report must use a consistent top-down reading order:
+Build **seven report pages**. The report must use a consistent top-down reading order:
 context and controls first, headline results second, trends and comparisons third,
 and diagnostic detail last. Do not compress content to fit a default canvas. Use a
 custom page size of approximately **1,920 x 1,400 pixels** and allow additional
@@ -393,12 +393,10 @@ The page sequence is:
 5. Delivery and Logistics
 6. Returns and Product Quality
 7. Customer Satisfaction
-8. Cross-Domain Diagnostics
-9. Data Quality and Definitions
 
-The first eight pages support management analysis. The ninth page documents data
-coverage, definitions, and exceptions so that users can interpret the metrics without
-leaving the report.
+Cross-domain diagnostics and data-quality caveats are embedded in the seven analytical
+pages. Each page must expose relevant sample sizes, date-basis notes, source-coverage
+warnings, and interpretation guidance so users do not need a separate definitions page.
 
 ## 6.2. Common Page Structure
 
@@ -449,7 +447,8 @@ layout below states otherwise:
 
 - Use two or three aligned visuals for product, category, channel, customer, region,
   status, reason, or threshold comparisons.
-- Prefer sorted horizontal bars, column charts, decomposition trees, or scatter plots
+- Prefer sorted horizontal bars, column charts, decomposition trees, or diagnostic
+  comparison charts
   over crowded legends.
 - Keep the same measure, unit, and filter context within a visual.
 - Show the denominator or sample size when a rate, average, or rating could be
@@ -461,8 +460,8 @@ layout below states otherwise:
   investigation.
 - Use conditional formatting only when the rule is defined and the underlying
   measure is valid.
-- Include a short “What to investigate” text box or smart narrative area that
-  describes observed patterns without claiming causation.
+- Use clear chart subtitles, caveat notes, and detail-table labels to describe
+  observed patterns without claiming causation.
 - Use drillthrough from summary visuals to the relevant detail page or table where
   the model supports it.
 
@@ -609,52 +608,13 @@ Top-down content:
 Flag low-review samples and avoid ranking products by rating alone. Written review
 titles may be shown for qualitative inspection but must not be treated as a numeric KPI.
 
-### Page 8: Cross-Domain Diagnostics
+### Integrated cross-domain and data-quality perspectives
 
-**Purpose:** Help users investigate relationships across sales, inventory, delivery,
-returns, promotions, and satisfaction.
-
-Top-down content:
-
-1. Filters: period, product/category, customer segment, channel, region, and the
-   diagnostic grouping selected by the user.
-2. KPI cards: use only the measures relevant to the selected diagnostic; always show
-   the applicable denominator or sample count.
-3. Main comparison: select one diagnostic at a time rather than combining unrelated
-   scales in one chart.
-4. Diagnostic visuals:
-   - Stock availability versus observed units sold and net sales.
-   - Transit group versus return rate.
-   - Promotion presence versus net sales, units, discount amount, and returns.
-   - Rating versus return rate, fulfillment, or transit time by product/category.
-5. Detail table: comparison group, numerator, denominator, rate or average, sample
-   size, date basis, and data-quality warning.
-
-Label every visual as “diagnostic” or “association.” Do not show lost-sales estimates,
-causal claims, or unsupported late-delivery classifications.
-
-### Page 9: Data Quality and Definitions
-
-**Purpose:** Make source coverage, metric definitions, and known limitations visible
-to report users.
-
-Top-down content:
-
-1. Report metadata: refresh timestamp, source-file dates, model version, and selected
-   report period.
-2. Coverage cards: orders, order items, shipments, returns, reviews, customers,
-   inventory snapshots, sales dates, and web-traffic dates.
-3. Quality visuals: shipment coverage, unmatched-key counts, missing promotion
-   references, duplicate order-item combinations, invalid-date counts, and status
-   counts.
-4. Definitions table: metric name, definition, date basis, denominator, source table,
-   implementation status, and caveat.
-5. Assumptions panel: inventory snapshot rule, order eligibility, discount basis,
-   COGS basis, delivery threshold, return cohort rule, and rating sample guidance.
-
-This page is informational and must not be used as a substitute for correcting source
-data. Any quality exception affecting a KPI must also be surfaced on the relevant
-analytical page.
+Cross-domain comparisons and data-quality caveats are distributed across the seven
+analytical pages. Use scatter views for relationships such as product value versus
+rating, stock availability versus sell-through, transit versus shipping cost, and
+return rate versus refund impact. Surface sample counts, date roles, missing-record
+warnings, and metric assumptions in chart subtitles, caveat notes, and detail tables.
 
 ## 6.4. Visual and Interaction Standards
 

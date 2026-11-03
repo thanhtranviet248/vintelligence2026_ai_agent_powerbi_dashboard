@@ -4,18 +4,18 @@
     "baseTheme": {
       "name": "purple-slicer",
       "reportVersionAtImport": {
-        "visual": "2.1.0",
-        "page": "2.1.0",
-        "report": "3.3.0"
+        "visual": "2.12.0",
+        "report": "3.4.0",
+        "page": "2.3.1"
       },
       "type": "SharedResources"
     },
     "customTheme": {
       "name": "purple-slicer.json",
       "reportVersionAtImport": {
-        "visual": "2.1.0",
-        "page": "2.1.0",
-        "report": "3.3.0"
+        "visual": "2.12.0",
+        "report": "3.4.0",
+        "page": "2.3.1"
       },
       "type": "RegisteredResources"
     }
@@ -28,6 +28,19 @@
             "expr": {
               "Literal": {
                 "Value": "'Top'"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "outspacePane": [
+      {
+        "properties": {
+          "expanded": {
+            "expr": {
+              "Literal": {
+                "Value": "false"
               }
             }
           }

@@ -1,6 +1,34 @@
 table Date
 	lineageTag: 6e5f99d5-5ee3-4d2f-8bce-39d10e7dce7d
 
+	measure 'Revenue Growth' =
+			VAR CurrentRevenue = [Net Sales]
+			VAR PreviousRevenue = CALCULATE([Net Sales], DATEADD(Date[Date], -1, YEAR))
+			RETURN
+				DIVIDE(CurrentRevenue - PreviousRevenue, PreviousRevenue)
+		lineageTag: a75b16f6-3ef7-4d09-a723-63bbf6377f04
+
+	measure 'Order Growth' =
+			VAR CurrentOrderCount = [Total Orders]
+			VAR PreviousOrderCount = CALCULATE([Total Orders], DATEADD(Date[Date], -1, YEAR))
+			RETURN
+				DIVIDE(CurrentOrderCount - PreviousOrderCount, PreviousOrderCount)
+		lineageTag: ecf13118-e109-4605-99bf-67a4ab89136e
+
+	measure 'Month-over-Month Growth' =
+			VAR CurrentRevenue = [Net Sales]
+			VAR PreviousRevenue = CALCULATE([Net Sales], DATEADD(Date[Date], -1, MONTH))
+			RETURN
+				DIVIDE(CurrentRevenue - PreviousRevenue, PreviousRevenue)
+		lineageTag: 5dc7872e-b108-4505-9336-8632e11ed067
+
+	measure 'Year-over-Year Growth' =
+			VAR CurrentRevenue = [Net Sales]
+			VAR PreviousRevenue = CALCULATE([Net Sales], DATEADD(Date[Date], -1, YEAR))
+			RETURN
+				DIVIDE(CurrentRevenue - PreviousRevenue, PreviousRevenue)
+		lineageTag: 409049cd-5fa4-40cd-accd-1f3fc59a2dbf
+
 	column Date
 		formatString: Short Date
 		lineageTag: 9a993d1b-e7d1-4df7-bf6d-685fd5e09798
@@ -9,6 +37,7 @@ table Date
 		sourceColumn: [Date]
 
 		annotation SummarizationSetBy = Automatic
+
 		annotation UnderlyingDateTimeDataType = Date
 
 	column Year
@@ -38,6 +67,7 @@ table Date
 		sortByColumn: 'Month Number'
 
 		annotation SummarizationSetBy = Automatic
+
 		annotation PBI_FormatHint = {"isText":true}
 
 	column Quarter
@@ -45,10 +75,12 @@ table Date
 		summarizeBy: none
 		isNameInferred
 		sourceColumn: [Quarter]
+
 		annotation SummarizationSetBy = Automatic
+
 		annotation PBI_FormatHint = {"isText":true}
 
-	column 'Year-Month'
+	column Year-Month
 		lineageTag: 17d0cdf6-91a5-40a0-b6cf-29135b43be9d
 		summarizeBy: none
 		isNameInferred
@@ -56,6 +88,7 @@ table Date
 		sortByColumn: 'Year-Month Sort'
 
 		annotation SummarizationSetBy = Automatic
+
 		annotation PBI_FormatHint = {"isText":true}
 
 	column 'Year-Month Sort'
@@ -68,40 +101,16 @@ table Date
 
 		annotation SummarizationSetBy = Automatic
 
-	measure 'Revenue Growth' =
-		VAR CurrentRevenue = [Net Sales]
-		VAR PreviousRevenue = CALCULATE([Net Sales], DATEADD(Date[Date], -1, YEAR))
-		RETURN
-			DIVIDE(CurrentRevenue - PreviousRevenue, PreviousRevenue)
-
-	measure 'Order Growth' =
-		VAR CurrentOrderCount = [Total Orders]
-		VAR PreviousOrderCount = CALCULATE([Total Orders], DATEADD(Date[Date], -1, YEAR))
-		RETURN
-			DIVIDE(CurrentOrderCount - PreviousOrderCount, PreviousOrderCount)
-
-	measure 'Month-over-Month Growth' =
-		VAR CurrentRevenue = [Net Sales]
-		VAR PreviousRevenue = CALCULATE([Net Sales], DATEADD(Date[Date], -1, MONTH))
-		RETURN
-			DIVIDE(CurrentRevenue - PreviousRevenue, PreviousRevenue)
-
-	measure 'Year-over-Year Growth' =
-		VAR CurrentRevenue = [Net Sales]
-		VAR PreviousRevenue = CALCULATE([Net Sales], DATEADD(Date[Date], -1, YEAR))
-		RETURN
-			DIVIDE(CurrentRevenue - PreviousRevenue, PreviousRevenue)
-
 	partition Date-b4b5d9c0-c498-41af-8c9a-1296fd53372c = calculated
 		mode: import
-		source = ```
-			ADDCOLUMNS(
-				CALENDAR(DATE(2012,1,1), DATE(2023,12,31)),
-				"Year", YEAR([Date]),
-				"Month Number", MONTH([Date]),
-				"Month Name", FORMAT([Date], "MMMM"),
-				"Quarter", "Q" & FORMAT([Date], "Q"),
-				"Year-Month", FORMAT([Date], "YYYY-MM"),
-				"Year-Month Sort", YEAR([Date]) * 100 + MONTH([Date])
-			)
-			```
+		source =
+				ADDCOLUMNS(
+					CALENDAR(DATE(2012,1,1), DATE(2023,12,31)),
+					"Year", YEAR([Date]),
+					"Month Number", MONTH([Date]),
+					"Month Name", FORMAT([Date], "MMMM"),
+					"Quarter", "Q" & FORMAT([Date], "Q"),
+					"Year-Month", FORMAT([Date], "YYYY-MM"),
+					"Year-Month Sort", YEAR([Date]) * 100 + MONTH([Date])
+				)
+

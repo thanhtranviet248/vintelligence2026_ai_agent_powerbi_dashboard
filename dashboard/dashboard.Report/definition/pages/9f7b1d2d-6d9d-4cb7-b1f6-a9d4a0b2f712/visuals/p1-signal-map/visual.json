@@ -1,19 +1,19 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
   "name": "p1-signal-map",
   "position": {
-    "x": 1240,
-    "y": 576,
+    "x": 39.361544939266047,
+    "y": 856.1136024290364,
     "z": 1000,
-    "height": 430,
-    "width": 640,
-    "tabOrder": 41
+    "height": 313.48659005201171,
+    "width": 590.42317408899066,
+    "tabOrder": 31
   },
   "visual": {
-    "visualType": "scatterChart",
+    "visualType": "barChart",
     "query": {
       "queryState": {
-        "Details": {
+        "Category": {
           "projections": [
             {
               "field": {
@@ -23,29 +23,12 @@
                       "Entity": "Products"
                     }
                   },
-                  "Property": "ProductName"
+                  "Property": "Category"
                 }
               },
-              "queryRef": "Products.ProductName",
-              "nativeQueryRef": "ProductName"
-            }
-          ]
-        },
-        "X": {
-          "projections": [
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "OrderItems"
-                    }
-                  },
-                  "Property": "Net Sales"
-                }
-              },
-              "queryRef": "OrderItems.Net Sales",
-              "nativeQueryRef": "Net Sales"
+              "queryRef": "Products.Category",
+              "nativeQueryRef": "Category",
+              "active": true
             }
           ]
         },
@@ -63,56 +46,65 @@
                 }
               },
               "queryRef": "Reviews.Average Rating",
-              "nativeQueryRef": "Average Rating"
-            }
-          ]
-        },
-        "Size": {
-          "projections": [
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "OrderItems"
-                    }
-                  },
-                  "Property": "Units Sold"
-                }
-              },
-              "queryRef": "OrderItems.Units Sold",
-              "nativeQueryRef": "Units Sold"
-            }
-          ]
-        },
-        "Legend": {
-          "projections": [
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Products"
-                    }
-                  },
-                  "Property": "Category"
-                }
-              },
-              "queryRef": "Products.Category",
-              "nativeQueryRef": "Category"
+              "nativeQueryRef": "Average Rating",
+              "active": true
             }
           ]
         }
       }
     },
     "objects": {
+      "labels": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#344054'"
+                    }
+                  }
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "legend": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
       "categoryAxis": [
         {
           "properties": {
-            "titleText": {
+            "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "'Net Sales'"
+                  "Value": "10D"
                 }
               }
             },
@@ -133,10 +125,10 @@
       "valueAxis": [
         {
           "properties": {
-            "titleText": {
+            "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "'Average Rating'"
+                  "Value": "10D"
                 }
               }
             },
@@ -154,13 +146,18 @@
           }
         }
       ],
-      "legend": [
+      "dataPoint": [
         {
           "properties": {
-            "position": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Bottom'"
+            "defaultColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "ThemeDataColor": {
+                      "ColorId": 4,
+                      "Percent": 0
+                    }
+                  }
                 }
               }
             }
@@ -182,7 +179,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Product Value vs Customer Experience'"
+                  "Value": "'Average Rating by Category'"
                 }
               }
             },
@@ -208,6 +205,13 @@
                       "Value": "'#17365D'"
                     }
                   }
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'''Segoe UI Semibold'', wf_segoe-ui_semibold, helvetica, arial, sans-serif'"
                 }
               }
             }
@@ -270,6 +274,19 @@
               "expr": {
                 "Literal": {
                   "Value": "10D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dropShadow": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }
