@@ -61,13 +61,24 @@ table Returns
 	measure 'Return Quantity' = SUM(Returns[ReturnQuantity])
 	measure 'Return Amount' = SUM(Returns[RefundAmount])
 	measure 'Return Rate' = DIVIDE([Returned Orders], [Total Orders])
+		formatString: 0.0%
+	measure 'Return Rate for Product Orders' = DIVIDE([Returned Orders], DISTINCTCOUNT(OrderItems[OrderID]))
+		formatString: 0.0%
+	measure 'Return Reason Share' = DIVIDE([Return Quantity], CALCULATE([Return Quantity], REMOVEFILTERS(Returns[ReturnReason])))
+		formatString: 0.0%
 	measure 'Refund Amount' = SUM(Returns[RefundAmount])
+	measure 'Return Quantity by Return Date' = CALCULATE([Return Quantity], USERELATIONSHIP('Date'[Date], Returns[ReturnDate]), CROSSFILTER('Date'[Date], Orders[OrderDate], NONE))
+		formatString: #,0
+	measure 'Refund Amount by Return Date' = CALCULATE([Refund Amount], USERELATIONSHIP('Date'[Date], Returns[ReturnDate]), CROSSFILTER('Date'[Date], Orders[OrderDate], NONE))
+		formatString: "$#,0.00;($#,0.00);$#,0.00"
+	measure 'Net Sales After Returns' = [Net Sales] - [Refund Amount]
+	measure 'Return Reasons' = DISTINCTCOUNT(Returns[ReturnReason])
 
 	partition Returns-4efc74dc-6ee0-4f9f-8f22-319ec5ef649c = m
 		mode: import
 		source = ```
 			let
-			    Source = Csv.Document(File.Contents("D:\projects\VinTelligence2026\data\returns.csv"), [Delimiter = ",", Columns = 7, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+			    Source = Csv.Document(File.Contents("D:\projects\vintelligence2026_ai_agent_powerbi_dashboard\data\returns.csv"), [Delimiter = ",", Columns = 7, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
 			    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
 			    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"return_id", type text}, {"order_id", Int64.Type}, {"product_id", Int64.Type}, {"return_date", type date}, {"return_reason", type text}, {"return_quantity", Int64.Type}, {"refund_amount", type number}})
 			in

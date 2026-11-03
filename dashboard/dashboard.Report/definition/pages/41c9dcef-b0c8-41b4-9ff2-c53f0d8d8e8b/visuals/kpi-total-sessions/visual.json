@@ -20,14 +20,14 @@
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "WebTraffic"
+                      "Entity": "Orders"
                     }
                   },
-                  "Property": "Total Sessions"
+                  "Property": "Total Orders"
                 }
               },
-              "queryRef": "WebTraffic.Total Sessions",
-              "nativeQueryRef": "Total Sessions"
+              "queryRef": "Orders.Total Orders",
+              "nativeQueryRef": "Total Orders"
             }
           ]
         }
@@ -39,10 +39,10 @@
               "Measure": {
                 "Expression": {
                   "SourceRef": {
-                    "Entity": "WebTraffic"
+                    "Entity": "Orders"
                   }
                 },
-                "Property": "Total Sessions"
+                "Property": "Total Orders"
               }
             },
             "direction": "Descending"
@@ -74,7 +74,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5560BC'"
+                      "Value": "'#1F3A70'"
                     }
                   }
                 }
@@ -118,7 +118,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Total Sessions'"
+                  "Value": "'Total Orders'"
                 }
               }
             },
@@ -141,7 +141,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5F6B7A'"
+                      "Value": "'#344054'"
                     }
                   }
                 }
@@ -203,7 +203,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#E3E6F0'"
+                      "Value": "'#B8C4D6'"
                     }
                   }
                 }

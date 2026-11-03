@@ -10,7 +10,7 @@
     "tabOrder": 24
   },
   "visual": {
-    "visualType": "columnChart",
+    "visualType": "lineChart",
     "query": {
       "queryState": {
         "Category": {
@@ -20,14 +20,14 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Customers"
+                      "Entity": "Date"
                     }
                   },
-                  "Property": "Gender"
+                  "Property": "Year-Month"
                 }
               },
-              "queryRef": "Customers.Gender",
-              "nativeQueryRef": "Gender",
+              "queryRef": "Date.Year-Month",
+              "nativeQueryRef": "Year-Month",
               "active": true
             }
           ]
@@ -36,22 +36,17 @@
           "projections": [
             {
               "field": {
-                "Aggregation": {
+                "Measure": {
                   "Expression": {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "Customers"
-                        }
-                      },
-                      "Property": "CustomerID"
+                    "SourceRef": {
+                      "Entity": "Reviews"
                     }
                   },
-                  "Function": 2
+                  "Property": "Average Rating by Review Date"
                 }
               },
-              "queryRef": "Customers.CustomerID",
-              "nativeQueryRef": "Distinct Customers"
+              "queryRef": "Reviews.Average Rating by Review Date",
+              "nativeQueryRef": "Average Rating by Review Date"
             }
           ]
         }
@@ -60,18 +55,13 @@
         "sort": [
           {
             "field": {
-              "Aggregation": {
+              "Measure": {
                 "Expression": {
-                  "Column": {
-                    "Expression": {
-                      "SourceRef": {
-                        "Entity": "Customers"
-                      }
-                    },
-                    "Property": "CustomerID"
+                  "SourceRef": {
+                    "Entity": "Reviews"
                   }
                 },
-                "Function": 2
+                "Property": "Average Rating by Review Date"
               }
             },
             "direction": "Descending"
@@ -96,7 +86,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5F6B7A'"
+                      "Value": "'#344054'"
                     }
                   }
                 }
@@ -140,7 +130,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5F6B7A'"
+                      "Value": "'#344054'"
                     }
                   }
                 }
@@ -164,7 +154,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5F6B7A'"
+                      "Value": "'#344054'"
                     }
                   }
                 }
@@ -188,7 +178,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Customers by Gender'"
+                  "Value": "'Average Rating by Review Month'"
                 }
               }
             },
@@ -211,7 +201,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#3E4694'"
+                      "Value": "'#17365D'"
                     }
                   }
                 }
@@ -273,7 +263,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#E3E6F0'"
+                      "Value": "'#B8C4D6'"
                     }
                   }
                 }

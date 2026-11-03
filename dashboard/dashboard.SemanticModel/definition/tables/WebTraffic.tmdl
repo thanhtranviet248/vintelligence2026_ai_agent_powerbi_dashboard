@@ -67,9 +67,10 @@ table WebTraffic
 		mode: import
 		source = ```
 			let
-			    Source = Csv.Document(File.Contents("D:\projects\VinTelligence2026\data\web_traffic.csv"), [Delimiter = ",", Columns = 7, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+			    Source = Csv.Document(File.Contents("D:\projects\vintelligence2026_ai_agent_powerbi_dashboard\data\web_traffic.csv"), [Delimiter = ",", Columns = 7, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
 			    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
 			    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"date", type date}, {"sessions", Int64.Type}, {"unique_visitors", Int64.Type}, {"page_views", Int64.Type}, {"bounce_rate", type number}, {"avg_session_duration_sec", type number}, {"traffic_source", type text}})
 			in
 			    #"Changed Type"
 			```
+

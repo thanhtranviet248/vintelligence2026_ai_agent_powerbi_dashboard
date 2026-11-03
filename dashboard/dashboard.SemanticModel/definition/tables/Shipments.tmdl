@@ -34,14 +34,27 @@ table Shipments
 		annotation SummarizationSetBy = Automatic
 
 	measure 'Shipment Cost' = SUM(Shipments[ShippingFee])
-	measure 'On-Time Delivery Rate' = DIVIDE(CALCULATE(DISTINCTCOUNT(Shipments[OrderID]), DATEDIFF(Shipments[ShipDate], Shipments[DeliveryDate], DAY) <= 3), DISTINCTCOUNT(Shipments[OrderID]))
-	measure 'Average Delivery Time' = AVERAGEX(Shipments, DATEDIFF(Shipments[ShipDate], Shipments[DeliveryDate], DAY))
+	measure 'Shipment Records' = DISTINCTCOUNT(Shipments[OrderID])
+	measure 'Shipment Coverage Rate' = DIVIDE([Shipment Records], [Total Orders])
+		formatString: 0.0%
+	measure 'Delivered Shipments' = CALCULATE(DISTINCTCOUNT(Shipments[OrderID]), NOT ISBLANK(Shipments[ShipDate]), NOT ISBLANK(Shipments[DeliveryDate]), Shipments[DeliveryDate] >= Shipments[ShipDate])
+	measure 'Transit Within 3 Days' = DIVIDE(CALCULATE(DISTINCTCOUNT(Shipments[OrderID]), NOT ISBLANK(Shipments[ShipDate]), NOT ISBLANK(Shipments[DeliveryDate]), Shipments[DeliveryDate] >= Shipments[ShipDate], DATEDIFF(Shipments[ShipDate], Shipments[DeliveryDate], DAY) <= 3), [Delivered Shipments])
+		formatString: 0.0%
+	measure 'Shipment Cost by Ship Date' = CALCULATE([Shipment Cost], USERELATIONSHIP('Date'[Date], Shipments[ShipDate]), CROSSFILTER('Date'[Date], Orders[OrderDate], NONE))
+		formatString: "$#,0.00;($#,0.00);$#,0.00"
+	measure 'Transit Within 3 Days by Ship Date' = CALCULATE([Transit Within 3 Days], USERELATIONSHIP('Date'[Date], Shipments[ShipDate]), CROSSFILTER('Date'[Date], Orders[OrderDate], NONE))
+		formatString: 0.0%
+	measure 'Average Delivery Time' = AVERAGEX(FILTER(Shipments, NOT ISBLANK(Shipments[ShipDate]) && NOT ISBLANK(Shipments[DeliveryDate]) && Shipments[DeliveryDate] >= Shipments[ShipDate]), DATEDIFF(Shipments[ShipDate], Shipments[DeliveryDate], DAY))
+	measure 'Average Transit Time' = [Average Delivery Time]
+	measure 'Product-Linked Shipment Orders' = CALCULATE(DISTINCTCOUNT(Shipments[OrderID]), TREATAS(VALUES(OrderItems[OrderID]), Shipments[OrderID]))
+	measure 'Product-Linked Average Transit Time' = CALCULATE([Average Transit Time], TREATAS(VALUES(OrderItems[OrderID]), Shipments[OrderID]))
+		formatString: 0.0
 
 	partition Shipments-08dc9e91-5df4-4c1b-9d2e-b8696e8f3c54 = m
 		mode: import
 		source = ```
 			let
-			    Source = Csv.Document(File.Contents("D:\projects\VinTelligence2026\data\shipments.csv"), [Delimiter = ",", Columns = 4, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+			    Source = Csv.Document(File.Contents("D:\projects\vintelligence2026_ai_agent_powerbi_dashboard\data\shipments.csv"), [Delimiter = ",", Columns = 4, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
 			    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
 			    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"order_id", Int64.Type}, {"ship_date", type date}, {"delivery_date", type date}, {"shipping_fee", type number}})
 			in

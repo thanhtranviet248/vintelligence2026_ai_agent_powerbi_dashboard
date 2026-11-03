@@ -38,9 +38,10 @@ table Payments
 		mode: import
 		source = ```
 			let
-			    Source = Csv.Document(File.Contents("D:\projects\VinTelligence2026\data\payments.csv"), [Delimiter = ",", Columns = 4, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+			    Source = Csv.Document(File.Contents("D:\projects\vintelligence2026_ai_agent_powerbi_dashboard\data\payments.csv"), [Delimiter = ",", Columns = 4, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
 			    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
 			    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"order_id", Int64.Type}, {"payment_method", type text}, {"payment_value", type number}, {"installments", Int64.Type}})
 			in
 			    #"Changed Type"
 			```
+

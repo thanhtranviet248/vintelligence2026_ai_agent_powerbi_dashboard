@@ -1,0 +1,8 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
+  "name": "b2f3c4d5-e6a7-48d9-0e1f-2a3b4c5d6e7f",
+  "displayName": "Returns and Product Quality",
+  "displayOption": "FitToWidth",
+  "height": 1580,
+  "width": 1920
+}

@@ -20,14 +20,14 @@
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "WebTraffic"
+                      "Entity": "Shipments"
                     }
                   },
-                  "Property": "Users or Visitors"
+                  "Property": "Shipment Coverage Rate"
                 }
               },
-              "queryRef": "WebTraffic.Users or Visitors",
-              "nativeQueryRef": "Users or Visitors"
+              "queryRef": "Shipments.Shipment Coverage Rate",
+              "nativeQueryRef": "Shipment Coverage Rate"
             }
           ]
         }
@@ -39,10 +39,10 @@
               "Measure": {
                 "Expression": {
                   "SourceRef": {
-                    "Entity": "WebTraffic"
+                    "Entity": "Shipments"
                   }
                 },
-                "Property": "Users or Visitors"
+                "Property": "Shipment Coverage Rate"
               }
             },
             "direction": "Descending"
@@ -74,7 +74,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5560BC'"
+                      "Value": "'#1F3A70'"
                     }
                   }
                 }
@@ -118,7 +118,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Users or Visitors'"
+                  "Value": "'Shipment Coverage'"
                 }
               }
             },
@@ -141,7 +141,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5F6B7A'"
+                      "Value": "'#344054'"
                     }
                   }
                 }
@@ -203,7 +203,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#E3E6F0'"
+                      "Value": "'#B8C4D6'"
                     }
                   }
                 }

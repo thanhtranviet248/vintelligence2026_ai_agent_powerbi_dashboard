@@ -76,3 +76,8 @@ relationship 7aa2e166-273d-4d0d-9d1a-38d0db6f4fa5
 	fromColumn: WebTraffic.Date
 	toColumn: Date.Date
 	isActive: true
+
+relationship 3c4f7f22-1f24-4a80-9f88-5a8bf3ef6a17
+	fromColumn: Sales.Date
+	toColumn: Date.Date
+	isActive: true

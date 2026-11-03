@@ -20,56 +20,56 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Products"
+                      "Entity": "Geography"
                     }
                   },
-                  "Property": "Category"
+                  "Property": "Region"
                 }
               },
-              "queryRef": "Products.Category",
-              "nativeQueryRef": "Category"
+              "queryRef": "Geography.Region",
+              "nativeQueryRef": "Region"
             },
             {
               "field": {
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Returns"
+                      "Entity": "Shipments"
                     }
                   },
-                  "Property": "Return Quantity"
+                  "Property": "Shipment Records"
                 }
               },
-              "queryRef": "Returns.Return Quantity",
-              "nativeQueryRef": "Return Quantity"
+              "queryRef": "Shipments.Shipment Records",
+              "nativeQueryRef": "Shipment Records"
             },
             {
               "field": {
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Returns"
+                      "Entity": "Shipments"
                     }
                   },
-                  "Property": "Return Amount"
+                  "Property": "Average Transit Time"
                 }
               },
-              "queryRef": "Returns.Return Amount",
-              "nativeQueryRef": "Return Amount"
+              "queryRef": "Shipments.Average Transit Time",
+              "nativeQueryRef": "Average Transit Time"
             },
             {
               "field": {
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Returns"
+                      "Entity": "Shipments"
                     }
                   },
-                  "Property": "Returned Orders"
+                  "Property": "Shipment Cost"
                 }
               },
-              "queryRef": "Returns.Returned Orders",
-              "nativeQueryRef": "Returned Orders"
+              "queryRef": "Shipments.Shipment Cost",
+              "nativeQueryRef": "Shipment Cost"
             }
           ]
         }
@@ -95,7 +95,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5560BC'"
+                      "Value": "'#1F3A70'"
                     }
                   }
                 }
@@ -159,7 +159,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Returns by Product Category'"
+                  "Value": "'Shipment Volume, Transit, and Cost by Region'"
                 }
               }
             },
@@ -182,7 +182,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#3E4694'"
+                      "Value": "'#17365D'"
                     }
                   }
                 }
@@ -244,7 +244,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#E3E6F0'"
+                      "Value": "'#B8C4D6'"
                     }
                   }
                 }

@@ -20,14 +20,14 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Shipments"
+                      "Entity": "Date"
                     }
                   },
-                  "Property": "ShipDate"
+                  "Property": "Year-Month"
                 }
               },
-              "queryRef": "Shipments.ShipDate",
-              "nativeQueryRef": "ShipDate",
+              "queryRef": "Date.Year-Month",
+              "nativeQueryRef": "Year-Month",
               "active": true
             }
           ]
@@ -42,11 +42,11 @@
                       "Entity": "Shipments"
                     }
                   },
-                  "Property": "Shipment Cost"
+                  "Property": "Shipment Cost by Ship Date"
                 }
               },
-              "queryRef": "Shipments.Shipment Cost",
-              "nativeQueryRef": "Shipment Cost"
+              "queryRef": "Shipments.Shipment Cost by Ship Date",
+              "nativeQueryRef": "Shipment Cost by Ship Date"
             }
           ]
         }
@@ -101,7 +101,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5F6B7A'"
+                      "Value": "'#344054'"
                     }
                   }
                 }
@@ -125,7 +125,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5F6B7A'"
+                      "Value": "'#344054'"
                     }
                   }
                 }
@@ -162,7 +162,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Shipment Cost Trend by Ship Date'"
+                  "Value": "'Shipment Cost by Ship Month'"
                 }
               }
             },
@@ -185,7 +185,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#3E4694'"
+                      "Value": "'#17365D'"
                     }
                   }
                 }
@@ -247,7 +247,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#E3E6F0'"
+                      "Value": "'#B8C4D6'"
                     }
                   }
                 }

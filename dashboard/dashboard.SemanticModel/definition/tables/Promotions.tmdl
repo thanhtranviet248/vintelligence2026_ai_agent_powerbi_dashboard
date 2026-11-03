@@ -69,9 +69,10 @@ table Promotions
 		mode: import
 		source = ```
 			let
-			    Source = Csv.Document(File.Contents("D:\projects\VinTelligence2026\data\promotions.csv"), [Delimiter = ",", Columns = 10, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+			    Source = Csv.Document(File.Contents("D:\projects\vintelligence2026_ai_agent_powerbi_dashboard\data\promotions.csv"), [Delimiter = ",", Columns = 10, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
 			    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
 			    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"promo_id", type text}, {"promo_name", type text}, {"promo_type", type text}, {"discount_value", type number}, {"start_date", type date}, {"end_date", type date}, {"applicable_category", type text}, {"promo_channel", type text}, {"stackable_flag", Int64.Type}, {"min_order_value", Int64.Type}})
 			in
 			    #"Changed Type"
 			```
+

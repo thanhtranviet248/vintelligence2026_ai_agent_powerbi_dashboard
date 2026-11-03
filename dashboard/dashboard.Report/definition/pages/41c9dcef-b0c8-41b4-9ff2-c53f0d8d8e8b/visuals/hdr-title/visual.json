@@ -19,7 +19,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Web Traffic & Conversion",
+                    "value": "Data Quality and Definitions",
                     "textStyle": {
                       "fontFamily": "'Segoe UI Semibold', wf_segoe-ui_semibold, helvetica, arial, sans-serif",
                       "fontSize": "22pt",
@@ -31,11 +31,11 @@
               {
                 "textRuns": [
                   {
-                    "value": "Digital acquisition channels and site-to-order conversion",
+                    "value": "Source coverage, monthly inventory snapshot quality, and metric interpretation",
                     "textStyle": {
                       "fontFamily": "'Segoe UI', wf_segoe-ui_normal, helvetica, arial, sans-serif",
                       "fontSize": "11pt",
-                      "color": "#DEE1FB"
+                      "color": "#EAF2FF"
                     }
                   }
                 ]

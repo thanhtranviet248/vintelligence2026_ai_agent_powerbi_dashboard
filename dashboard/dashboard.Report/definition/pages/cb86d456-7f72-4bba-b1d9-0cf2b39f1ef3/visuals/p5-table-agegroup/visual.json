@@ -34,42 +34,42 @@
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Orders"
+                      "Entity": "Reviews"
                     }
                   },
-                  "Property": "Distinct Customers"
+                  "Property": "Average Rating"
                 }
               },
-              "queryRef": "Orders.Distinct Customers",
-              "nativeQueryRef": "Distinct Customers"
+              "queryRef": "Reviews.Average Rating",
+              "nativeQueryRef": "Average Rating"
             },
             {
               "field": {
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "OrderItems"
+                      "Entity": "Reviews"
                     }
                   },
-                  "Property": "Net Sales"
+                  "Property": "Review Count"
                 }
               },
-              "queryRef": "OrderItems.Net Sales",
-              "nativeQueryRef": "Net Sales"
+              "queryRef": "Reviews.Review Count",
+              "nativeQueryRef": "Review Count"
             },
             {
               "field": {
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "OrderItems"
+                      "Entity": "Reviews"
                     }
                   },
-                  "Property": "Revenue per Customer"
+                  "Property": "Negative Review Rate"
                 }
               },
-              "queryRef": "OrderItems.Revenue per Customer",
-              "nativeQueryRef": "Revenue per Customer"
+              "queryRef": "Reviews.Negative Review Rate",
+              "nativeQueryRef": "Negative Review Rate"
             }
           ]
         }
@@ -95,7 +95,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5560BC'"
+                      "Value": "'#1F3A70'"
                     }
                   }
                 }
@@ -159,7 +159,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Customer Segment Summary'"
+                  "Value": "'Satisfaction by Customer Age Group'"
                 }
               }
             },
@@ -182,7 +182,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#3E4694'"
+                      "Value": "'#17365D'"
                     }
                   }
                 }
@@ -244,7 +244,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#E3E6F0'"
+                      "Value": "'#B8C4D6'"
                     }
                   }
                 }

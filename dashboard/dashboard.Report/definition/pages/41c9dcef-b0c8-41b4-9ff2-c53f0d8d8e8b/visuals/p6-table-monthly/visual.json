@@ -20,56 +20,56 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Date"
+                      "Entity": "Inventory"
                     }
                   },
-                  "Property": "Year-Month"
+                  "Property": "SnapshotDate"
                 }
               },
-              "queryRef": "Date.Year-Month",
-              "nativeQueryRef": "Year-Month"
+              "queryRef": "Inventory.SnapshotDate",
+              "nativeQueryRef": "SnapshotDate"
             },
             {
               "field": {
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "WebTraffic"
+                      "Entity": "Inventory"
                     }
                   },
-                  "Property": "Total Sessions"
+                  "Property": "Stock In"
                 }
               },
-              "queryRef": "WebTraffic.Total Sessions",
-              "nativeQueryRef": "Total Sessions"
+              "queryRef": "Inventory.Stock In",
+              "nativeQueryRef": "Stock In"
             },
             {
               "field": {
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "WebTraffic"
+                      "Entity": "Inventory"
                     }
                   },
-                  "Property": "Conversion Rate"
+                  "Property": "Stock Out"
                 }
               },
-              "queryRef": "WebTraffic.Conversion Rate",
-              "nativeQueryRef": "Conversion Rate"
+              "queryRef": "Inventory.Stock Out",
+              "nativeQueryRef": "Stock Out"
             },
             {
               "field": {
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "WebTraffic"
+                      "Entity": "Inventory"
                     }
                   },
-                  "Property": "Average Session Duration"
+                  "Property": "Fill Rate"
                 }
               },
-              "queryRef": "WebTraffic.Average Session Duration",
-              "nativeQueryRef": "Average Session Duration"
+              "queryRef": "Inventory.Fill Rate",
+              "nativeQueryRef": "Fill Rate"
             }
           ]
         }
@@ -95,7 +95,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5560BC'"
+                      "Value": "'#1F3A70'"
                     }
                   }
                 }
@@ -159,7 +159,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Monthly Web Performance'"
+                  "Value": "'Inventory Snapshot Metrics by Date'"
                 }
               }
             },
@@ -182,7 +182,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#3E4694'"
+                      "Value": "'#17365D'"
                     }
                   }
                 }
@@ -244,7 +244,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#E3E6F0'"
+                      "Value": "'#B8C4D6'"
                     }
                   }
                 }

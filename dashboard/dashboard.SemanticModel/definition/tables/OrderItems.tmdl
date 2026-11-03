@@ -58,17 +58,22 @@ table OrderItems
 		annotation PBI_FormatHint = {"isText":true}
 
 	measure 'Gross Sales' = SUMX(OrderItems, OrderItems[Quantity] * OrderItems[UnitPrice])
+	measure 'Discount Amount' = SUMX(OrderItems, OrderItems[Quantity] * OrderItems[DiscountAmount])
 	measure 'Net Sales' = SUMX(OrderItems, OrderItems[Quantity] * (OrderItems[UnitPrice] - OrderItems[DiscountAmount]))
+	measure 'Discount Rate' = DIVIDE([Discount Amount], [Gross Sales])
 	measure 'Units Sold' = SUM(OrderItems[Quantity])
 	measure 'Average Order Value' = DIVIDE([Net Sales], [Total Orders])
 	measure 'Revenue per Customer' = DIVIDE([Net Sales], [Distinct Customers])
+	measure 'COGS' = SUMX(OrderItems, OrderItems[Quantity] * RELATED(Products[COGS]))
+	measure 'Gross Profit' = [Net Sales] - [COGS]
+	measure 'Gross Margin %' = DIVIDE([Gross Profit], [Net Sales])
 	measure 'Contribution %' = DIVIDE([Net Sales], CALCULATE([Net Sales], ALL(Products[Category])))
 
 	partition OrderItems-0a12d14d-5d7c-4cda-a23d-3f6b1ec909e5 = m
 		mode: import
 		source = ```
 			let
-			    Source = Csv.Document(File.Contents("D:\projects\VinTelligence2026\data\order_items.csv"), [Delimiter = ",", Columns = 7, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+			    Source = Csv.Document(File.Contents("D:\projects\vintelligence2026_ai_agent_powerbi_dashboard\data\order_items.csv"), [Delimiter = ",", Columns = 7, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
 			    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
 			    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"order_id", Int64.Type}, {"product_id", Int64.Type}, {"quantity", Int64.Type}, {"unit_price", type number}, {"discount_amount", type number}, {"promo_id", type text}, {"promo_id_2", type text}})
 			in

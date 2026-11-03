@@ -18,36 +18,31 @@ This Power BI project analyzes the repository's retail and operations data acros
 - sales.csv
 
 ## Report pages
-Each page uses a 1920x1080 canvas with a purple brand header, a KPI card row, and a
-grid of charts/tables bound to the semantic model's measures.
+The report uses a 1920x1400 canvas and nine pages, following the design in
+`dashboard/DASHBOARD_INSTRUCTION.md`:
 
-1. **Executive Overview** - Net Sales/Orders/Customers/AOV/On-Time Delivery KPIs, a
-   monthly Net Sales trend line, Net Sales by Category donut, Orders by Status column
-   chart, Net Sales by Region bar chart, and a Segment Performance table.
-2. **Sales and Orders** - Net Sales/Gross Sales/Orders/AOV KPIs, a full-width monthly
-   Net Sales trend, and Net Sales broken down by Device Type, Order Source, and
-   Payment Method, plus a Category Performance table.
-3. **Shipping and Returns** - Shipment Cost/On-Time Delivery/Return Rate/Refund
-   Amount KPIs, Shipment Cost and On-Time Delivery Rate trends by ship date, Returns
-   by Reason donut, Orders by Status column chart, and a Returns by Product Category
-   table.
-4. **Inventory** - Current Stock/Inventory Value/Low-Stock/Out-of-Stock KPIs, a Stock
-   In vs. Stock Out trend by snapshot date, Current Stock by Category donut,
-   Inventory Value by Segment bar chart, Low & Out-of-Stock Products by Category
-   column chart, and an Inventory Summary table.
-5. **Customers and Reviews** - Distinct Customers/Revenue per Customer/Average
-   Rating/Positive Review Rate KPIs, Customers by Acquisition Channel, Age Group,
-   and Gender charts, a Rating Distribution donut, an Average Rating by Category bar
-   chart, and a Customer Segment Summary table.
-6. **Web Traffic and Conversion** - Total Sessions/Users/Conversion Rate/Average
-   Session Duration KPIs, a Sessions & Visitors monthly trend, Sessions by Traffic
-   Source donut, Page Views and Bounce Rate by Traffic Source charts, and a Monthly
-   Web Performance table.
+1. **Executive Overview** - Sales, order, customer, fulfillment, category, region,
+   and product summaries.
+2. **Sales and Profitability** - Sales trends, discounting, order source, device,
+   payment method, and product/category profitability.
+3. **Customers and Market Performance** - Buyer frequency, all-time first-time and
+   repeat buyer rates, acquisition channel, order source, device, and geography.
+4. **Inventory Performance** - Latest stock snapshot, inventory value, stockout and
+   overstock flags, replenishment, and inventory exceptions.
+5. **Delivery and Logistics** - Shipment coverage, shipping cost, transit duration,
+   order status, and regional delivery diagnostics. The three-day split is not an
+   on-time KPI because no promised delivery date or service target is available.
+6. **Returns and Product Quality** - Return quantity, refund values, reasons,
+   category/product performance, and return activity by return month.
+7. **Customer Satisfaction** - Review volume and ratings by review month, product,
+   and customer segment, with sample counts.
+8. **Cross-Domain Diagnostics** - Exploratory sales, stock, return, and rating
+   comparisons; these show associations, not causes.
+9. **Data Quality and Definitions** - Shipment/review coverage, monthly inventory
+   snapshot indicators, order-status counts, and interpretation caveats.
 
-All charts and cards are bound to the measures defined in the semantic model (see
-`DATA_MODEL.md`) and respect the model's relationship directions - for example,
-Shipment-related measures are trended by `Shipments[ShipDate]` directly rather than
-through the `Date` table, since the `Shipments` -> `Orders` relationship is inactive.
+Shipment, return, and review trends use their own date roles. Inventory is monthly
+snapshot data and is never presented as daily or weekly stock.
 
 ## Key KPIs
 - Net Sales

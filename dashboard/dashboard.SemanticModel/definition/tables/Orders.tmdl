@@ -71,6 +71,16 @@ table Orders
 	measure 'Delivered Orders' = CALCULATE([Total Orders], Orders[OrderStatus]="delivered")
 	measure 'Pending Orders' = CALCULATE([Total Orders], OR(Orders[OrderStatus]="created", Orders[OrderStatus]="paid"))
 	measure 'Cancelled Orders' = CALCULATE([Total Orders], Orders[OrderStatus]="cancelled")
+	measure 'Returned Status Orders' = CALCULATE([Total Orders], Orders[OrderStatus]="returned")
+	measure 'New Customers' = COUNTROWS(FILTER(VALUES(Orders[CustomerID]), VAR FirstOrderDate = CALCULATE(MIN(Orders[OrderDate]), ALL(Orders[OrderDate])) RETURN FirstOrderDate >= MIN(Date[Date]) && FirstOrderDate <= MAX(Date[Date])))
+	measure 'Repeat Customers' = COUNTROWS(FILTER(VALUES(Orders[CustomerID]), VAR FirstOrderDate = CALCULATE(MIN(Orders[OrderDate]), ALL(Orders[OrderDate])) RETURN FirstOrderDate < MIN(Date[Date])))
+	measure 'Order Frequency' = DIVIDE([Total Orders], [Distinct Customers])
+	measure 'All-Time First-Time Customers' = COUNTROWS(FILTER(CALCULATETABLE(VALUES(Orders[CustomerID]), ALL('Date')), CALCULATE(DISTINCTCOUNT(Orders[OrderID]), ALL('Date')) = 1))
+	measure 'All-Time Repeat Customers' = COUNTROWS(FILTER(CALCULATETABLE(VALUES(Orders[CustomerID]), ALL('Date')), CALCULATE(DISTINCTCOUNT(Orders[OrderID]), ALL('Date')) > 1))
+	measure 'All-Time First-Time Customer Rate' = DIVIDE([All-Time First-Time Customers], CALCULATE([Distinct Customers], ALL('Date')))
+		formatString: 0.0%
+	measure 'All-Time Repeat Customer Rate' = DIVIDE([All-Time Repeat Customers], CALCULATE([Distinct Customers], ALL('Date')))
+		formatString: 0.0%
 	measure 'Fulfillment Rate' = DIVIDE([Delivered Orders], [Total Orders])
 	measure 'Order Status Mix' = DIVIDE([Total Orders], CALCULATE([Total Orders], ALL(Orders[OrderStatus])))
 
@@ -78,7 +88,7 @@ table Orders
 		mode: import
 		source = ```
 			let
-			    Source = Csv.Document(File.Contents("D:\projects\VinTelligence2026\data\orders.csv"), [Delimiter = ",", Columns = 8, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+			    Source = Csv.Document(File.Contents("D:\projects\vintelligence2026_ai_agent_powerbi_dashboard\data\orders.csv"), [Delimiter = ",", Columns = 8, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
 			    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
 			    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"order_id", Int64.Type}, {"order_date", type date}, {"customer_id", Int64.Type}, {"zip", Int64.Type}, {"order_status", type text}, {"payment_method", type text}, {"device_type", type text}, {"order_source", type text}})
 			in

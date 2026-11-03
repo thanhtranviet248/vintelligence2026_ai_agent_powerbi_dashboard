@@ -59,14 +59,24 @@ table Reviews
 
 	measure 'Average Rating' = AVERAGE(Reviews[Rating])
 	measure 'Review Count' = COUNTROWS(Reviews)
+	measure 'Reviewed Orders' = DISTINCTCOUNT(Reviews[OrderID])
+	measure 'Review Order Coverage Rate' = DIVIDE([Reviewed Orders], [Total Orders])
+		formatString: 0.0%
 	measure 'Positive Review Rate' = DIVIDE(CALCULATE(COUNTROWS(Reviews), Reviews[Rating] >= 4), [Review Count])
+		formatString: 0.0%
 	measure 'Negative Review Rate' = DIVIDE(CALCULATE(COUNTROWS(Reviews), Reviews[Rating] <= 2), [Review Count])
+		formatString: 0.0%
+	measure 'Review Count by Review Date' = CALCULATE([Review Count], USERELATIONSHIP('Date'[Date], Reviews[ReviewDate]), CROSSFILTER('Date'[Date], Orders[OrderDate], NONE))
+		formatString: #,0
+	measure 'Average Rating by Review Date' = CALCULATE([Average Rating], USERELATIONSHIP('Date'[Date], Reviews[ReviewDate]), CROSSFILTER('Date'[Date], Orders[OrderDate], NONE))
+		formatString: 0.0
+	measure 'Low Rating Products' = COUNTROWS(FILTER(VALUES(Products[ProductID]), [Average Rating] < 3))
 
 	partition Reviews-d1f34ff8-f0fd-4358-9d6b-c95f4537b0f8 = m
 		mode: import
 		source = ```
 			let
-			    Source = Csv.Document(File.Contents("D:\projects\VinTelligence2026\data\reviews.csv"), [Delimiter = ",", Columns = 7, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+			    Source = Csv.Document(File.Contents("D:\projects\vintelligence2026_ai_agent_powerbi_dashboard\data\reviews.csv"), [Delimiter = ",", Columns = 7, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
 			    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
 			    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"review_id", type text}, {"order_id", Int64.Type}, {"product_id", Int64.Type}, {"customer_id", Int64.Type}, {"review_date", type date}, {"rating", Int64.Type}, {"review_title", type text}})
 			in

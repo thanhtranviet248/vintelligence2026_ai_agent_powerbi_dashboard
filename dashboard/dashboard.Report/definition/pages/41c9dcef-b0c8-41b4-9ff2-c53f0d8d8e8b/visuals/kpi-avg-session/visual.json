@@ -20,14 +20,14 @@
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "WebTraffic"
+                      "Entity": "Inventory"
                     }
                   },
-                  "Property": "Average Session Duration"
+                  "Property": "Snapshot Dates"
                 }
               },
-              "queryRef": "WebTraffic.Average Session Duration",
-              "nativeQueryRef": "Average Session Duration"
+              "queryRef": "Inventory.Snapshot Dates",
+              "nativeQueryRef": "Snapshot Dates"
             }
           ]
         }
@@ -39,10 +39,10 @@
               "Measure": {
                 "Expression": {
                   "SourceRef": {
-                    "Entity": "WebTraffic"
+                    "Entity": "Inventory"
                   }
                 },
-                "Property": "Average Session Duration"
+                "Property": "Snapshot Dates"
               }
             },
             "direction": "Descending"
@@ -74,7 +74,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5560BC'"
+                      "Value": "'#1F3A70'"
                     }
                   }
                 }
@@ -118,7 +118,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Average Session Duration'"
+                  "Value": "'Inventory Snapshot Dates'"
                 }
               }
             },
@@ -141,7 +141,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5F6B7A'"
+                      "Value": "'#344054'"
                     }
                   }
                 }
@@ -203,7 +203,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#E3E6F0'"
+                      "Value": "'#B8C4D6'"
                     }
                   }
                 }

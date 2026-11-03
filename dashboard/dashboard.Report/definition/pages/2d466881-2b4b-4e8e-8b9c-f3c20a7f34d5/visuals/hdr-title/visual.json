@@ -19,7 +19,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Sales & Orders",
+                    "value": "Sales and Profitability",
                     "textStyle": {
                       "fontFamily": "'Segoe UI Semibold', wf_segoe-ui_semibold, helvetica, arial, sans-serif",
                       "fontSize": "22pt",
@@ -31,11 +31,11 @@
               {
                 "textRuns": [
                   {
-                    "value": "Revenue, order volume, and channel performance",
+                    "value": "Net Sales assumes per-unit discounts; profitability uses catalog COGS estimates",
                     "textStyle": {
                       "fontFamily": "'Segoe UI', wf_segoe-ui_normal, helvetica, arial, sans-serif",
                       "fontSize": "11pt",
-                      "color": "#DEE1FB"
+                      "color": "#EAF2FF"
                     }
                   }
                 ]

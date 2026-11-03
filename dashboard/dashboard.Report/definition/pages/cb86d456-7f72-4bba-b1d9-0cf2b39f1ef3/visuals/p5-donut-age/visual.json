@@ -36,22 +36,17 @@
           "projections": [
             {
               "field": {
-                "Aggregation": {
+                "Measure": {
                   "Expression": {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "Customers"
-                        }
-                      },
-                      "Property": "CustomerID"
+                    "SourceRef": {
+                      "Entity": "Reviews"
                     }
                   },
-                  "Function": 2
+                  "Property": "Review Count"
                 }
               },
-              "queryRef": "Customers.CustomerID",
-              "nativeQueryRef": "Distinct Customers"
+              "queryRef": "Reviews.Review Count",
+              "nativeQueryRef": "Review Count"
             }
           ]
         }
@@ -73,7 +68,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5F6B7A'"
+                      "Value": "'#344054'"
                     }
                   }
                 }
@@ -124,7 +119,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5F6B7A'"
+                      "Value": "'#344054'"
                     }
                   }
                 }
@@ -148,7 +143,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5F6B7A'"
+                      "Value": "'#344054'"
                     }
                   }
                 }
@@ -172,7 +167,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Customers by Age Group'"
+                  "Value": "'Review Count by Customer Age Group'"
                 }
               }
             },
@@ -195,7 +190,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#3E4694'"
+                      "Value": "'#17365D'"
                     }
                   }
                 }
@@ -257,7 +252,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#E3E6F0'"
+                      "Value": "'#B8C4D6'"
                     }
                   }
                 }

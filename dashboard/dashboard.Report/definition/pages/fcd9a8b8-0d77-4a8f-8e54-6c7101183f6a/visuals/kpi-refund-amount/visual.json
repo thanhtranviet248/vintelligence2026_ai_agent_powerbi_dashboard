@@ -20,14 +20,14 @@
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Returns"
+                      "Entity": "Shipments"
                     }
                   },
-                  "Property": "Refund Amount"
+                  "Property": "Average Transit Time"
                 }
               },
-              "queryRef": "Returns.Refund Amount",
-              "nativeQueryRef": "Refund Amount"
+              "queryRef": "Shipments.Average Transit Time",
+              "nativeQueryRef": "Average Transit Time"
             }
           ]
         }
@@ -39,10 +39,10 @@
               "Measure": {
                 "Expression": {
                   "SourceRef": {
-                    "Entity": "Returns"
+                    "Entity": "Shipments"
                   }
                 },
-                "Property": "Refund Amount"
+                "Property": "Average Transit Time"
               }
             },
             "direction": "Descending"
@@ -74,7 +74,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5560BC'"
+                      "Value": "'#1F3A70'"
                     }
                   }
                 }
@@ -118,7 +118,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Refund Amount'"
+                  "Value": "'Average Transit Time'"
                 }
               }
             },
@@ -141,7 +141,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5F6B7A'"
+                      "Value": "'#344054'"
                     }
                   }
                 }
@@ -203,7 +203,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#E3E6F0'"
+                      "Value": "'#B8C4D6'"
                     }
                   }
                 }

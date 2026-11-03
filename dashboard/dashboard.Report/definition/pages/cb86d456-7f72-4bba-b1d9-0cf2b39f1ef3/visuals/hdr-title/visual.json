@@ -19,7 +19,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Customers & Reviews",
+                    "value": "Customer Satisfaction",
                     "textStyle": {
                       "fontFamily": "'Segoe UI Semibold', wf_segoe-ui_semibold, helvetica, arial, sans-serif",
                       "fontSize": "22pt",
@@ -31,11 +31,11 @@
               {
                 "textRuns": [
                   {
-                    "value": "Customer base, acquisition, and satisfaction",
+                    "value": "Ratings, review volume, and customer experience diagnostics",
                     "textStyle": {
                       "fontFamily": "'Segoe UI', wf_segoe-ui_normal, helvetica, arial, sans-serif",
                       "fontSize": "11pt",
-                      "color": "#DEE1FB"
+                      "color": "#EAF2FF"
                     }
                   }
                 ]

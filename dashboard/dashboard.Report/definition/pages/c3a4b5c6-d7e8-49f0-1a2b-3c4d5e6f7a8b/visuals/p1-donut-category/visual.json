@@ -1,6 +1,6 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
-  "name": "p6-donut-source",
+  "name": "p1-donut-category",
   "position": {
     "x": 1240,
     "y": 276,
@@ -20,14 +20,14 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "WebTraffic"
+                      "Entity": "Products"
                     }
                   },
-                  "Property": "TrafficSource"
+                  "Property": "Category"
                 }
               },
-              "queryRef": "WebTraffic.TrafficSource",
-              "nativeQueryRef": "TrafficSource",
+              "queryRef": "Products.Category",
+              "nativeQueryRef": "Category",
               "active": true
             }
           ]
@@ -39,14 +39,14 @@
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "WebTraffic"
+                      "Entity": "OrderItems"
                     }
                   },
-                  "Property": "Total Sessions"
+                  "Property": "Net Sales"
                 }
               },
-              "queryRef": "WebTraffic.Total Sessions",
-              "nativeQueryRef": "Total Sessions"
+              "queryRef": "OrderItems.Net Sales",
+              "nativeQueryRef": "Net Sales"
             }
           ]
         }
@@ -58,10 +58,10 @@
               "Measure": {
                 "Expression": {
                   "SourceRef": {
-                    "Entity": "WebTraffic"
+                    "Entity": "OrderItems"
                   }
                 },
-                "Property": "Total Sessions"
+                "Property": "Net Sales"
               }
             },
             "direction": "Descending"
@@ -86,7 +86,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5F6B7A'"
+                      "Value": "'#344054'"
                     }
                   }
                 }
@@ -137,7 +137,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Sessions by Traffic Source'"
+                  "Value": "'Net Sales by Category'"
                 }
               }
             },
@@ -160,7 +160,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#3E4694'"
+                      "Value": "'#17365D'"
                     }
                   }
                 }
@@ -222,7 +222,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#E3E6F0'"
+                      "Value": "'#B8C4D6'"
                     }
                   }
                 }

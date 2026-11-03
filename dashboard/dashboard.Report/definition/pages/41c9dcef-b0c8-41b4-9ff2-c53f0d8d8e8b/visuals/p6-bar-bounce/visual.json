@@ -20,14 +20,14 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "WebTraffic"
+                      "Entity": "Inventory"
                     }
                   },
-                  "Property": "TrafficSource"
+                  "Property": "Category"
                 }
               },
-              "queryRef": "WebTraffic.TrafficSource",
-              "nativeQueryRef": "TrafficSource",
+              "queryRef": "Inventory.Category",
+              "nativeQueryRef": "Category",
               "active": true
             }
           ]
@@ -36,22 +36,17 @@
           "projections": [
             {
               "field": {
-                "Aggregation": {
+                "Measure": {
                   "Expression": {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "WebTraffic"
-                        }
-                      },
-                      "Property": "BounceRate"
+                    "SourceRef": {
+                      "Entity": "Inventory"
                     }
                   },
-                  "Function": 1
+                  "Property": "Overstock Rate"
                 }
               },
-              "queryRef": "WebTraffic.BounceRate",
-              "nativeQueryRef": "Bounce Rate"
+              "queryRef": "Inventory.Overstock Rate",
+              "nativeQueryRef": "Overstock Rate"
             }
           ]
         }
@@ -60,18 +55,13 @@
         "sort": [
           {
             "field": {
-              "Aggregation": {
+              "Measure": {
                 "Expression": {
-                  "Column": {
-                    "Expression": {
-                      "SourceRef": {
-                        "Entity": "WebTraffic"
-                      }
-                    },
-                    "Property": "BounceRate"
+                  "SourceRef": {
+                    "Entity": "Inventory"
                   }
                 },
-                "Function": 1
+                "Property": "Overstock Rate"
               }
             },
             "direction": "Descending"
@@ -96,7 +86,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5F6B7A'"
+                      "Value": "'#344054'"
                     }
                   }
                 }
@@ -140,7 +130,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5F6B7A'"
+                      "Value": "'#344054'"
                     }
                   }
                 }
@@ -164,7 +154,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5F6B7A'"
+                      "Value": "'#344054'"
                     }
                   }
                 }
@@ -188,7 +178,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Bounce Rate by Traffic Source'"
+                  "Value": "'Overstock Rate by Category'"
                 }
               }
             },
@@ -211,7 +201,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#3E4694'"
+                      "Value": "'#17365D'"
                     }
                   }
                 }
@@ -273,7 +263,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#E3E6F0'"
+                      "Value": "'#B8C4D6'"
                     }
                   }
                 }

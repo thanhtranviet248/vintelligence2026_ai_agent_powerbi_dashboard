@@ -65,19 +65,86 @@ table Inventory
 		annotation SummarizationSetBy = Automatic
 		annotation PBI_FormatHint = {"isText":true}
 
-	measure 'Current Stock' = SUM(Inventory[StockOnHand])
-	measure 'Inventory Value' = SUMX(Inventory, Inventory[StockOnHand] * RELATED(Products[Price]))
+	column StockoutDays
+		dataType: int64
+		formatString: 0
+		lineageTag: 2f9b9d1c-51f0-4c46-9e3f-4d8f6c7d7a01
+		summarizeBy: average
+		sourceColumn: stockout_days
+		annotation SummarizationSetBy = Automatic
+
+	column DaysOfSupply
+		dataType: double
+		formatString: 0.0
+		lineageTag: 71a9c5e1-4a2d-4c4a-9c33-2f4d0f0b5a11
+		summarizeBy: average
+		sourceColumn: days_of_supply
+		annotation SummarizationSetBy = Automatic
+
+	column FillRate
+		dataType: double
+		formatString: 0.0%
+		lineageTag: a9e2b4d7-0c1a-4f69-bf55-7d8c2e9a1f22
+		summarizeBy: average
+		sourceColumn: fill_rate
+		annotation SummarizationSetBy = Automatic
+
+	column StockoutFlag
+		dataType: int64
+		formatString: 0
+		lineageTag: 3b8f1d6e-2a44-4c5d-9e77-1f6b0a2d3c33
+		summarizeBy: sum
+		sourceColumn: stockout_flag
+		annotation SummarizationSetBy = Automatic
+
+	column OverstockFlag
+		dataType: int64
+		formatString: 0
+		lineageTag: 5c2d7e8f-9a11-4b6c-8d33-0f4e1a2b3c44
+		summarizeBy: sum
+		sourceColumn: overstock_flag
+		annotation SummarizationSetBy = Automatic
+
+	column ReorderFlag
+		dataType: int64
+		formatString: 0
+		lineageTag: 6d3e8f9a-0b22-4c7d-9e44-1a5f2b3c4d55
+		summarizeBy: sum
+		sourceColumn: reorder_flag
+		annotation SummarizationSetBy = Automatic
+
+	column SellThroughRate
+		dataType: double
+		formatString: 0.0%
+		lineageTag: 7e4f9a0b-1c33-4d8e-0f55-2b6a3c4d5e66
+		summarizeBy: average
+		sourceColumn: sell_through_rate
+		annotation SummarizationSetBy = Automatic
+
+	measure 'Current Stock' = VAR LatestSnapshot = MAX(Inventory[SnapshotDate]) RETURN CALCULATE(SUM(Inventory[StockOnHand]), Inventory[SnapshotDate] = LatestSnapshot)
+	measure 'Inventory Value' = VAR LatestSnapshot = MAX(Inventory[SnapshotDate]) RETURN CALCULATE(SUMX(Inventory, Inventory[StockOnHand] * RELATED(Products[Price])), Inventory[SnapshotDate] = LatestSnapshot)
 	measure 'Stock In' = SUM(Inventory[UnitsReceived])
 	measure 'Stock Out' = SUM(Inventory[UnitsSold])
-	measure 'Low-Stock Products' = COUNTROWS(FILTER(Inventory, Inventory[StockOnHand] <= 20))
-	measure 'Out-of-Stock Products' = COUNTROWS(FILTER(Inventory, Inventory[StockOnHand] = 0))
-	measure 'Days of Inventory on Hand' = AVERAGE(Inventory[StockOnHand])
+	measure 'Low-Stock Products' = VAR LatestSnapshot = MAX(Inventory[SnapshotDate]) RETURN CALCULATE(DISTINCTCOUNT(Inventory[ProductID]), Inventory[SnapshotDate] = LatestSnapshot, Inventory[StockOnHand] <= 20)
+	measure 'Out-of-Stock Products' = VAR LatestSnapshot = MAX(Inventory[SnapshotDate]) RETURN CALCULATE(DISTINCTCOUNT(Inventory[ProductID]), Inventory[SnapshotDate] = LatestSnapshot, Inventory[StockOnHand] = 0)
+	measure 'Stockout Days' = AVERAGE(Inventory[StockoutDays])
+	measure 'Days of Supply' = AVERAGE(Inventory[DaysOfSupply])
+	measure 'Fill Rate' = AVERAGE(Inventory[FillRate])
+		formatString: 0.0%
+	measure 'Sell-Through Rate' = AVERAGE(Inventory[SellThroughRate])
+	measure 'Reorder Candidates' = VAR LatestSnapshot = MAX(Inventory[SnapshotDate]) RETURN CALCULATE(DISTINCTCOUNT(Inventory[ProductID]), Inventory[SnapshotDate] = LatestSnapshot, Inventory[ReorderFlag] = 1)
+	measure 'Stockout Rate' = DIVIDE(SUM(Inventory[StockoutFlag]), COUNTROWS(Inventory))
+		formatString: 0.0%
+	measure 'Overstock Rate' = DIVIDE(SUM(Inventory[OverstockFlag]), COUNTROWS(Inventory))
+		formatString: 0.0%
+	measure 'Average Stock on Hand' = AVERAGE(Inventory[StockOnHand])
+	measure 'Snapshot Dates' = DISTINCTCOUNT(Inventory[SnapshotDate])
 
 	partition Inventory-3b69bbc0-5357-4b15-9001-0d7f9adfd4da = m
 		mode: import
 		source = ```
 			let
-			    Source = Csv.Document(File.Contents("D:\projects\VinTelligence2026\data\inventory.csv"), [Delimiter = ",", Columns = 17, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+			    Source = Csv.Document(File.Contents("D:\projects\vintelligence2026_ai_agent_powerbi_dashboard\data\inventory.csv"), [Delimiter = ",", Columns = 17, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
 			    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
 			    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"snapshot_date", type date}, {"product_id", Int64.Type}, {"stock_on_hand", Int64.Type}, {"units_received", Int64.Type}, {"units_sold", Int64.Type}, {"stockout_days", Int64.Type}, {"days_of_supply", type number}, {"fill_rate", type number}, {"stockout_flag", Int64.Type}, {"overstock_flag", Int64.Type}, {"reorder_flag", Int64.Type}, {"sell_through_rate", type number}, {"product_name", type text}, {"category", type text}, {"segment", type text}, {"year", Int64.Type}, {"month", Int64.Type}})
 			in

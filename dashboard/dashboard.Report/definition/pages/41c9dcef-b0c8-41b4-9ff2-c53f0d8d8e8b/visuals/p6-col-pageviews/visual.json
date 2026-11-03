@@ -20,14 +20,14 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "WebTraffic"
+                      "Entity": "Inventory"
                     }
                   },
-                  "Property": "TrafficSource"
+                  "Property": "Category"
                 }
               },
-              "queryRef": "WebTraffic.TrafficSource",
-              "nativeQueryRef": "TrafficSource",
+              "queryRef": "Inventory.Category",
+              "nativeQueryRef": "Category",
               "active": true
             }
           ]
@@ -39,14 +39,14 @@
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "WebTraffic"
+                      "Entity": "Inventory"
                     }
                   },
-                  "Property": "Page Views"
+                  "Property": "Stockout Rate"
                 }
               },
-              "queryRef": "WebTraffic.Page Views",
-              "nativeQueryRef": "Page Views"
+              "queryRef": "Inventory.Stockout Rate",
+              "nativeQueryRef": "Stockout Rate"
             }
           ]
         }
@@ -58,10 +58,10 @@
               "Measure": {
                 "Expression": {
                   "SourceRef": {
-                    "Entity": "WebTraffic"
+                    "Entity": "Inventory"
                   }
                 },
-                "Property": "Page Views"
+                "Property": "Stockout Rate"
               }
             },
             "direction": "Descending"
@@ -86,7 +86,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5F6B7A'"
+                      "Value": "'#344054'"
                     }
                   }
                 }
@@ -130,7 +130,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5F6B7A'"
+                      "Value": "'#344054'"
                     }
                   }
                 }
@@ -154,7 +154,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5F6B7A'"
+                      "Value": "'#344054'"
                     }
                   }
                 }
@@ -196,7 +196,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Page Views by Traffic Source'"
+                  "Value": "'Stockout Rate by Category'"
                 }
               }
             },
@@ -219,7 +219,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#3E4694'"
+                      "Value": "'#17365D'"
                     }
                   }
                 }
@@ -281,7 +281,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#E3E6F0'"
+                      "Value": "'#B8C4D6'"
                     }
                   }
                 }

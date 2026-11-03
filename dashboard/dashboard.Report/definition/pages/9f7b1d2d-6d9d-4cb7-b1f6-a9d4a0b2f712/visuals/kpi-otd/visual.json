@@ -20,14 +20,14 @@
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Shipments"
+                      "Entity": "Orders"
                     }
                   },
-                  "Property": "On-Time Delivery Rate"
+                  "Property": "Fulfillment Rate"
                 }
               },
-              "queryRef": "Shipments.On-Time Delivery Rate",
-              "nativeQueryRef": "On-Time Delivery Rate"
+              "queryRef": "Orders.Fulfillment Rate",
+              "nativeQueryRef": "Fulfillment Rate"
             }
           ]
         }
@@ -39,10 +39,10 @@
               "Measure": {
                 "Expression": {
                   "SourceRef": {
-                    "Entity": "Shipments"
+                    "Entity": "Orders"
                   }
                 },
-                "Property": "On-Time Delivery Rate"
+                "Property": "Fulfillment Rate"
               }
             },
             "direction": "Descending"
@@ -74,7 +74,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5560BC'"
+                      "Value": "'#1F3A70'"
                     }
                   }
                 }
@@ -118,7 +118,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'On-Time Delivery Rate'"
+                  "Value": "'Fulfillment Rate'"
                 }
               }
             },
@@ -141,7 +141,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#5F6B7A'"
+                      "Value": "'#344054'"
                     }
                   }
                 }
@@ -203,7 +203,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#E3E6F0'"
+                      "Value": "'#B8C4D6'"
                     }
                   }
                 }
