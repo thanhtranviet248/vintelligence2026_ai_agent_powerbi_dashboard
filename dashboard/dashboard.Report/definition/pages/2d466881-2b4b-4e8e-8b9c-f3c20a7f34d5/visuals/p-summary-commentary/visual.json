@@ -31,7 +31,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Compare Net Sales with orders, units, and AOV: sales growth from more orders is different from growth caused by larger baskets or higher-priced mix.",
+                    "value": "Use the dropdown filters above to select a reporting period, category, product, or region; multiple selections are supported. Compare Net Sales with orders, units, and AOV: sales growth from more orders is different from growth caused by larger baskets or higher-priced mix.",
                     "textStyle": {
                       "fontFamily": "'Segoe UI', wf_segoe-ui_normal, helvetica, arial, sans-serif",
                       "fontSize": "10pt",

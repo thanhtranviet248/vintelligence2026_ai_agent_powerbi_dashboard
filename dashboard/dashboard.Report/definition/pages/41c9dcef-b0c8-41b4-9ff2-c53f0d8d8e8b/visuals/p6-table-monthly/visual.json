@@ -3,11 +3,11 @@
   "name": "p6-table-monthly",
   "position": {
     "x": 1280,
-    "y": 896,
+    "y": 1026,
     "z": 1000,
     "height": 314,
     "width": 600,
-    "tabOrder": 34
+    "tabOrder": 44
   },
   "visual": {
     "visualType": "tableEx",

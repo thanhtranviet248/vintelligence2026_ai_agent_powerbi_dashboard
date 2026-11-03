@@ -3,11 +3,11 @@
   "name": "p2-trend-net-sales",
   "position": {
     "x": 40,
-    "y": 446,
+    "y": 576,
     "z": 1000,
     "height": 430,
     "width": 1840,
-    "tabOrder": 30
+    "tabOrder": 40
   },
   "visual": {
     "visualType": "lineChart",

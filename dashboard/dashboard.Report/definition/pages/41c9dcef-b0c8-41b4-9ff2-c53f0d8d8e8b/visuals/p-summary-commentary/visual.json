@@ -31,7 +31,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Use this page to confirm source coverage, date roles, snapshot grain, status populations, and the denominator behind each headline metric.",
+                    "value": "Use the dropdown filters above to select a reporting period, category, product, or region; multiple selections are supported. Use this page to confirm source coverage, date roles, snapshot grain, status populations, and the denominator behind each headline metric.",
                     "textStyle": {
                       "fontFamily": "'Segoe UI', wf_segoe-ui_normal, helvetica, arial, sans-serif",
                       "fontSize": "10pt",

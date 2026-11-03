@@ -3,11 +3,11 @@
   "name": "p1-donut-category",
   "position": {
     "x": 1240,
-    "y": 446,
+    "y": 576,
     "z": 1000,
     "height": 430,
     "width": 640,
-    "tabOrder": 31
+    "tabOrder": 41
   },
   "visual": {
     "visualType": "donutChart",

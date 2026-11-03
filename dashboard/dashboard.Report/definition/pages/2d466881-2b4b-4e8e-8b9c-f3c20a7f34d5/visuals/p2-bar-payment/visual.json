@@ -3,11 +3,11 @@
   "name": "p2-bar-payment",
   "position": {
     "x": 960,
-    "y": 896,
+    "y": 1026,
     "z": 1000,
     "height": 314,
     "width": 440,
-    "tabOrder": 33
+    "tabOrder": 43
   },
   "visual": {
     "visualType": "barChart",

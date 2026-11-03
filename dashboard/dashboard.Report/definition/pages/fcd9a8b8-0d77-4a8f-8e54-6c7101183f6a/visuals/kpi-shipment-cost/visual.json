@@ -3,11 +3,11 @@
   "name": "kpi-shipment-cost",
   "position": {
     "x": 40.0,
-    "y": 294,
+    "y": 424,
     "z": 1000,
     "height": 132,
     "width": 442.0,
-    "tabOrder": 20
+    "tabOrder": 30
   },
   "visual": {
     "visualType": "card",

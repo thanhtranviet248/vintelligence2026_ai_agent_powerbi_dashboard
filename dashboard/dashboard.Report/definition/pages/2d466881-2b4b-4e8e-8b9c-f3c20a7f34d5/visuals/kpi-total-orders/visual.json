@@ -3,11 +3,11 @@
   "name": "kpi-total-orders",
   "position": {
     "x": 972.0,
-    "y": 294,
+    "y": 424,
     "z": 1000,
     "height": 132,
     "width": 442.0,
-    "tabOrder": 22
+    "tabOrder": 32
   },
   "visual": {
     "visualType": "card",

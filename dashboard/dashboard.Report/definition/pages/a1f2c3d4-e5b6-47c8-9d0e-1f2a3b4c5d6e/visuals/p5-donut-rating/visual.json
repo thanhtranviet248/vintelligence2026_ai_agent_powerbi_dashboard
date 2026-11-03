@@ -3,11 +3,11 @@
   "name": "p5-donut-rating",
   "position": {
     "x": 1460,
-    "y": 446,
+    "y": 576,
     "z": 1000,
     "height": 430,
     "width": 420,
-    "tabOrder": 32
+    "tabOrder": 42
   },
   "visual": {
     "visualType": "donutChart",

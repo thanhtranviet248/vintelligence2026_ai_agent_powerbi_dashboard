@@ -3,11 +3,11 @@
   "name": "kpi-inventory-value",
   "position": {
     "x": 506.0,
-    "y": 294,
+    "y": 424,
     "z": 1000,
     "height": 132,
     "width": 442.0,
-    "tabOrder": 21
+    "tabOrder": 31
   },
   "visual": {
     "visualType": "card",

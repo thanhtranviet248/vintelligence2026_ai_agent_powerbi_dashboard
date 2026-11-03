@@ -3,11 +3,11 @@
   "name": "p3-trend-shipcost",
   "position": {
     "x": 40,
-    "y": 446,
+    "y": 576,
     "z": 1000,
     "height": 430,
     "width": 920,
-    "tabOrder": 30
+    "tabOrder": 40
   },
   "visual": {
     "visualType": "lineChart",

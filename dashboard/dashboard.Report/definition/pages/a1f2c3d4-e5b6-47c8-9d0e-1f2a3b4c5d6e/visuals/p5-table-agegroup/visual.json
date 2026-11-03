@@ -3,11 +3,11 @@
   "name": "p5-table-agegroup",
   "position": {
     "x": 1280,
-    "y": 896,
+    "y": 1026,
     "z": 1000,
     "height": 314,
     "width": 600,
-    "tabOrder": 35
+    "tabOrder": 45
   },
   "visual": {
     "visualType": "tableEx",

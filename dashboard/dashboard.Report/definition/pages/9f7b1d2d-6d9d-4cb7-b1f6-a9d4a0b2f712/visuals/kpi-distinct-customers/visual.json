@@ -3,11 +3,11 @@
   "name": "kpi-distinct-customers",
   "position": {
     "x": 785.6,
-    "y": 294,
+    "y": 424,
     "z": 1000,
     "height": 132,
     "width": 348.8,
-    "tabOrder": 22
+    "tabOrder": 32
   },
   "visual": {
     "visualType": "card",

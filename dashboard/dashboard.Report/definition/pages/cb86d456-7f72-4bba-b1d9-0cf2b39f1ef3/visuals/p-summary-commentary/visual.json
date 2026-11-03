@@ -31,7 +31,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Interpret average rating together with review count and positive/negative review rates; a small review sample should not determine a product ranking.",
+                    "value": "Use the dropdown filters above to select a reporting period, category, product, or region; multiple selections are supported. Interpret average rating together with review count and positive/negative review rates; a small review sample should not determine a product ranking.",
                     "textStyle": {
                       "fontFamily": "'Segoe UI', wf_segoe-ui_normal, helvetica, arial, sans-serif",
                       "fontSize": "10pt",

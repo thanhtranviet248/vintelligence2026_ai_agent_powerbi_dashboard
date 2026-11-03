@@ -31,7 +31,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "This page is a balanced view of demand coverage, inventory risk, returns, customer experience, and repeat purchasing—not a duplicate sales detail page.",
+                    "value": "Use the dropdown filters above to select a reporting period, category, product, or region; multiple selections are supported. This page is a balanced view of demand coverage, inventory risk, returns, customer experience, and repeat purchasing—not a duplicate sales detail page.",
                     "textStyle": {
                       "fontFamily": "'Segoe UI', wf_segoe-ui_normal, helvetica, arial, sans-serif",
                       "fontSize": "10pt",
