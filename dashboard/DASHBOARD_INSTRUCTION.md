@@ -1,3 +1,5 @@
+> **How to read this document.** Sections 1, 2.2, 3.1, and 5 are the original design intent and business rules. New measures and visuals should still follow them. Everything else (implementation status, data preparation, relationships, and the page design in section 6) describes the dashboard **as built** in `dashboard.Report/` and `dashboard.SemanticModel/`. Where the build departs from a rule, the as-built sections say so. Improvements to the build will be discussed separately.
+
 # 1. PURPOSES OF THE DASHBOARD
 
 ## 1.1. Primary User
@@ -72,21 +74,22 @@ Customer satisfaction: Review product ratings and written feedback alongside sal
 - How representative are the ratings, given the number of reviews received?
 - These comparisons should identify patterns for investigation rather than imply that one factor necessarily caused another.
 
+
 # 2. METRICS
 
 The dashboard must support weekly, monthly, and yearly comparisons wherever the underlying data allows. Metrics should be filterable by the relevant product, category, customer segment, sales channel, geography, and reporting period.
 
-The formulas below use semantic-model names where they were supplied. For additional metrics without confirmed table or column names, formulas are expressed as calculation logic rather than executable DAX.
+The tables below describe the semantic model **as built**. Formulas are the DAX in `dashboard.SemanticModel/definition/tables/*.tmdl`, shortened where needed. Measure names appear in backticks. Section 6 lists the pages where each measure is shown.
 
 ## 2.1. Implementation Status
 
-**Core:** Reported as already implemented in the supplied requirements. Implementation has not been independently verified.
+**Built:** a measure exists in the model. Where the measure is on a page, the Status cell names that page. "Model only" means no visual uses it yet.
 
-**Planned:** Not yet implemented, but the required fields are identified in the supplied source descriptions.
+**Built (differs):** the measure exists, but its logic departs from the rule in 2.2 or from the definition column. The note says how.
 
-**Conditional:** Requires additional fields, confirmed relationships, or an agreed business rule before implementation.
+**Not built:** the model has no measure for it. Usually a required field (for example a promised delivery date) or a business rule is missing.
 
-**Important:** A metric should not be labelled Core if part of its calculation is still Planned. For example, revenue-based product performance may be Core, while gross-profit-based product performance remains Planned.
+Page abbreviations: **EO** Executive Overview · **SP** Sales and Profitability · **CM** Customers and Market Performance · **IP** Inventory Performance · **DL** Delivery and Logistics · **RQ** Returns and Product Quality · **CS** Customer Satisfaction.
 
 ## 2.2. Common Calculation Rules
 
@@ -116,134 +119,132 @@ The formulas below use semantic-model names where they were supplied. For additi
 
 ## 2.3. Sales and Profitability Metrics
 
-Unless stated otherwise, sales measures use the eligible-order population defined in
-2.2. Exclude invalid quantities, prices, or dates from numeric measures and surface them
-as data-quality exceptions. Do not mix order-date and return-date totals in the same trend.
+The sales measures don't apply an order-status filter. They count every order line and order in context, whatever the status (see `Total Orders`). The model has no data-quality exclusions for invalid quantities, prices, or dates. Sales trends use the order date.
 
-| Metric | Definition | Formula / logic | Source | Status |
+| Metric | Definition | Formula / logic (as built) | Source | Status |
 | --- | --- | --- | --- | --- |
-| Gross Sales | Value of eligible order lines before discounts | `SUMX(OrderItems, Quantity * UnitPrice)` | order_items.csv | Core |
-| Discount Amount | Total discount applied to eligible units | `SUMX(OrderItems, Quantity * DiscountAmount)` only if discount is per unit; otherwise sum the line value | order_items.csv | Planned |
-| Net Sales | Gross sales less discounts, before refunds | `SUMX(OrderItems, Quantity * (UnitPrice - DiscountAmount))` when discount is confirmed per unit; otherwise use the approved line-level rule | order_items.csv | Conditional |
-| Discount Rate | Discount value as a share of gross sales | `DIVIDE([Discount Amount], [Gross Sales])` | order_items.csv | Planned |
-| Units Sold | Quantity on eligible order lines | `SUM(OrderItems[Quantity])` | order_items.csv | Core |
-| Total Orders | Distinct eligible orders; show all statuses separately | `DISTINCTCOUNT(Orders[OrderID])` using the agreed status filter | orders.csv | Core |
-| Average Order Value (AOV) | Net sales per eligible order | `DIVIDE([Net Sales], [Total Orders])`; available only when Net Sales is confirmed | orders.csv, order_items.csv | Conditional |
-| COGS | Cost of eligible units sold using the confirmed cost basis | `SUMX(OrderItems, Quantity * RELATED(Products[COGS]))` | order_items.csv, products.csv | Planned |
-| Gross Profit | Net sales less COGS | `[Net Sales] - [COGS]` | order_items.csv, products.csv | Planned |
-| Gross Margin % | Gross profit as a share of net sales | `DIVIDE([Gross Profit], [Net Sales])` | order_items.csv, products.csv | Planned |
-| Revenue Growth (YoY) | Net-sales change versus the equivalent prior-year period | `DIVIDE([Net Sales] - [Prior-Year Net Sales], [Prior-Year Net Sales])`; blank when Net Sales is unconfirmed or the denominator is zero | Date, order_items.csv | Conditional |
-| Order Growth (YoY) | Eligible-order change versus the equivalent prior-year period | `DIVIDE([Total Orders] - [Prior-Year Orders], [Prior-Year Orders])`; blank when the denominator is zero | Date, orders.csv | Core |
-| Product / Category / Channel Performance | Compare net sales, units, orders, and profit by the selected dimension | Apply the same eligible-order and date context to each measure | orders.csv, order_items.csv, products.csv | Conditional |
-| Contribution % | Selected product or category share of net sales within the retained report context | `DIVIDE([Net Sales], [Net Sales] with only the selected product/category filter removed)` | order_items.csv, products.csv | Conditional |
-| Catalog Benchmarks | Catalog price and cost references, not realized sales or profit | `AVERAGE(Products[Price])`, `AVERAGE(Products[COGS])`; label as catalog values | products.csv | Core |
+| Gross Sales | Value of order lines before discounts | `SUMX(OrderItems, Quantity * UnitPrice)` | order_items.csv | Built `Gross Sales`: SP |
+| Discount Amount | Total discount, treating `DiscountAmount` as per unit | `SUMX(OrderItems, Quantity * DiscountAmount)` | order_items.csv | Built `Discount Amount`: SP |
+| Net Sales | Gross sales less discounts, before refunds | `SUMX(OrderItems, Quantity * (UnitPrice - DiscountAmount))` | order_items.csv | Built `Net Sales`: EO, SP, CM |
+| Discount Rate | Discount value as a share of gross sales | `DIVIDE([Discount Amount], [Gross Sales])` | order_items.csv | Built `Discount Rate`: SP |
+| Units Sold | Quantity on order lines | `SUM(OrderItems[Quantity])` | order_items.csv | Built `Units Sold`: SP |
+| Total Orders | Distinct orders | `DISTINCTCOUNT(Orders[OrderID])`, all statuses, no eligibility filter. Status-specific counts: `Delivered Orders`, `Shipped Orders` (shipped + delivered), `Pending Orders` (created + paid), `Cancelled Orders`, `Returned Status Orders` | orders.csv | Built (differs): no eligible-order rule. SP, CM, DL |
+| Average Order Value (AOV) | Net sales per order | `DIVIDE([Net Sales], [Total Orders])` | orders.csv, order_items.csv | Built `Average Order Value`: SP |
+| COGS | Cost of units sold at **current catalog cost** | `SUMX(OrderItems, Quantity * RELATED(Products[COGS]))` | order_items.csv, products.csv | Built `COGS`: SP (titled as a catalog-cost estimate) |
+| Gross Profit | Net sales less COGS | `[Net Sales] - [COGS]` | order_items.csv, products.csv | Built `Gross Profit`: EO, SP |
+| Gross Margin % | Gross profit as a share of net sales | `DIVIDE([Gross Profit], [Net Sales])` | order_items.csv, products.csv | Built `Gross Margin %`: SP |
+| Revenue Growth (YoY) | Net-sales change versus the same period a year earlier | Inline `CALCULATE([Net Sales], DATEADD('Date'[Date], -1, YEAR))`; no separate prior-year measure; no completeness check | Date, order_items.csv | Built twice, identically: `Revenue Growth` and `Year-over-Year Growth`. Model only |
+| Month-over-Month Growth | Net-sales change versus the previous month | Inline `DATEADD('Date'[Date], -1, MONTH)` | Date, order_items.csv | Built `Month-over-Month Growth`. Model only |
+| Order Growth (YoY) | Order change versus the same period a year earlier | Inline prior-year `[Total Orders]` | Date, orders.csv | Built `Order Growth`. Model only |
+| Product / Category / Channel Performance | Net sales, units, and orders by dimension | Existing measures by `Products[Category]`, `Orders[OrderSource]`, `Orders[DeviceType]`, `Payments[PaymentMethod]` | orders.csv, order_items.csv, products.csv, payments.csv | Built as visuals: SP |
+| Contribution % | Category share of net sales | `DIVIDE([Net Sales], CALCULATE([Net Sales], ALL(Products[Category])))` | order_items.csv, products.csv | Built `Contribution %`. Model only |
+| Catalog Benchmarks | Catalog price and cost references, not realized values | `AVERAGE(Products[Price])`, `AVERAGE(Products[COGS])`, product count | products.csv | Built `Average Product Price`, `Average COGS`, `Products in Catalog`. Model only |
 
-Growth measures must compare complete, equivalent periods and must not be shown as
-meaningful when the comparison period is incomplete or has no denominator.
+Growth measures should compare complete, equivalent periods. The built growth measures don't check whether a period is complete.
 
 ## 2.4. Customers and Market Performance Metrics
 
-| Metric | Definition / requirement | Formula / logic | Source | Status |
+| Metric | Definition / requirement | Formula / logic (as built) | Source | Status |
 | --- | --- | --- | --- | --- |
-| Distinct Customers | Unique customers with at least one eligible order in the selected period | `DISTINCTCOUNT(Orders[CustomerID])` | orders.csv | Core |
-| Revenue per Customer | Net sales per distinct buying customer | `DIVIDE([Net Sales], [Distinct Customers])` | orders.csv, order_items.csv | Core |
-| Customer Segments | Compare customers, orders, units, and net sales by acquisition channel, age group, and gender | Reuse the corresponding measures by customer attributes; acquisition channel remains distinct from order channel | customers.csv, orders.csv | Core |
-| Customer Geography | Compare customers, orders, and net sales by mapped region and city | Use `Geography` for ZIP attributes and report unmatched ZIPs separately | geography.csv, customers.csv, orders.csv | Core |
-| New Customers | Customers whose first eligible order occurs in the selected period | Identify the minimum eligible order date per customer, then count customers whose first date is in the period | customers.csv, orders.csv | Planned |
-| Signup Cohort | Customers whose signup date falls in the selected period; do not label this as new purchasing customers | `DISTINCTCOUNT(Customers[CustomerID])` by `SignupDate`, where a signup date is available | customers.csv | Planned |
-| Orders by Sales Channel | Eligible order count split by order source and device type | `[Total Orders]` by `Orders[OrderSource]` / `Orders[DeviceType]` | orders.csv | Core |
-| Repeat Customer / Order Frequency | Distinguish first-time from returning purchasing customers | Classify customers by first eligible order date; calculate `DIVIDE([Total Orders], [Distinct Customers])` | orders.csv | Planned |
+| Distinct Customers | Unique customers with at least one order in context | `DISTINCTCOUNT(Orders[CustomerID])`, all statuses | orders.csv | Built `Distinct Customers`: CM |
+| Revenue per Customer | Net sales per distinct customer | `DIVIDE([Net Sales], [Distinct Customers])` | orders.csv, order_items.csv | Built `Revenue per Customer`: CM |
+| Customer Segments | Customers, orders, and net sales by acquisition channel, age group, and gender | Existing measures by `Customers[AcquisitionChannel]`, `[AgeGroup]`, `[Gender]`. "Customers by Acquisition Channel / Age Group" count `Customers[CustomerID]` rows, so date, category, and region filters don't reach them | customers.csv, orders.csv | Built as visuals: CM |
+| Customer Geography | Net sales by region | `[Net Sales]` by `Geography[Region]` through `Orders[Zip]`. No city view and no unmatched-ZIP report | geography.csv, orders.csv | Built (partial): CM |
+| New Customers | Customers whose first order falls in the selected period | First `Orders[OrderDate]` per customer (all dates, all statuses) falls inside the current Date range | customers.csv, orders.csv | Built `New Customers`. Model only |
+| Repeat Customers (period) | Customers in the period whose first order came earlier | First order date < `MIN('Date'[Date])` | orders.csv | Built `Repeat Customers`. Model only |
+| First-Time / Repeat Rate (all-time) | Share of customers with exactly one order, or more than one, across all dates | Order count per customer under `ALL('Date')`, divided by `Distinct Customers` under `ALL('Date')` | orders.csv | Built `All-Time First-Time Customer Rate` (CM) and `All-Time Repeat Customer Rate` (EO, CM). These ignore the period slicer |
+| Order Frequency | Orders per customer | `DIVIDE([Total Orders], [Distinct Customers])` | orders.csv | Built `Order Frequency`: CM |
+| Signup Cohort | Customers by signup date | – | customers.csv | Not built. `SignupDate` is linked only to an auto date table |
+| Orders by Sales Channel | Order count by order source and device type | `[Total Orders]` by `Orders[OrderSource]` / `Orders[DeviceType]` | orders.csv | Built as visuals: CM |
 
 ## 2.5. Inventory Performance Metrics
 
-Inventory measures use the product-by-month-end snapshot grain. They must not be
-interpreted as daily balances or summed across snapshot dates. “Current” means the
-latest available snapshot in the selected context; if no snapshot is selected, use the
-latest snapshot date and display that date.
+Inventory measures use the product-by-month-end snapshot grain. Stock balances take the latest snapshot in context (`VAR LatestSnapshot = MAX(Inventory[SnapshotDate])`) and never sum across dates. Inventory is related only to `Products` (see section 4), so the Reporting-period and Region slicers don't filter it. "Current" therefore means the latest snapshot in the data unless a visual puts `SnapshotDate` in context. The model doesn't display the snapshot date it used.
 
-| Metric | Definition | Formula / logic | Source | Status |
+| Metric | Definition | Formula / logic (as built) | Source | Status |
 | --- | --- | --- | --- | --- |
-| Stock on Hand | Units on hand at the selected/latest snapshot | Sum `StockOnHand` for one snapshot date per product | inventory.csv | Core |
-| Inventory Value | Selected-snapshot stock valued at catalog price | `SUMX(Inventory, StockOnHand * RELATED(Products[Price]))` at one snapshot date | inventory.csv, products.csv | Core |
-| Stock In / Stock Out | Units received / recorded as sold in the snapshot record | Sum the relevant snapshot fields; do not describe them as daily flows | inventory.csv | Core |
-| Low-Stock / Out-of-Stock Products | Products at or below 20 units / at zero units in one snapshot | Distinct products filtered by `StockOnHand <= 20` or `= 0` | inventory.csv | Core |
-| Stockout Days | Recorded stockout days in the snapshot period | `AVERAGE(Inventory[StockoutDays])`; state that it is an average of source values | inventory.csv | Planned |
-| Stockout / Overstock Rate | Share of product snapshots flagged stockout / overstock | Flagged snapshot rows divided by all valid snapshot rows in the same context | inventory.csv | Planned |
-| Reorder Candidates | Products flagged for reorder in one snapshot | Distinct products where `ReorderFlag = 1` | inventory.csv | Planned |
-| Days of Supply | Recorded expected days of supply at the snapshot | `AVERAGE(Inventory[DaysOfSupply])`; do not derive without a confirmed demand-rate rule | inventory.csv | Planned |
-| Fill Rate / Sell-Through Rate | Source-provided fulfillment and movement ratios | Prefer aggregated numerator/denominator measures; use averages only when source denominators are unavailable and label them as simple averages | inventory.csv | Planned |
-| Average Stock on Hand | Average snapshot balance across product-date rows | `AVERAGE(Inventory[StockOnHand])`; not a daily average and not a days-of-inventory measure | inventory.csv | Core |
+| Current Stock | Units on hand at the latest snapshot | Sum of `StockOnHand` where `SnapshotDate = LatestSnapshot` | inventory.csv | Built `Current Stock`: EO, IP |
+| Inventory Value | Latest-snapshot stock valued at catalog price | `SUMX` of `StockOnHand * RELATED(Products[Price])` at `LatestSnapshot` | inventory.csv, products.csv | Built `Inventory Value`: IP |
+| Stock In / Stock Out | Units received / sold in the snapshot records | `SUM(Inventory[UnitsReceived])` / `SUM(Inventory[UnitsSold])` across the rows in context | inventory.csv | Built `Stock In`, `Stock Out`: IP |
+| Low-Stock / Out-of-Stock Products | Products with ≤ 20 / 0 units at the latest snapshot | Distinct products at `LatestSnapshot` with `StockOnHand <= 20` / `= 0` | inventory.csv | Built `Low-Stock Products`, `Out-of-Stock Products`: IP |
+| Reorder Candidates | Products flagged for reorder at the latest snapshot | Distinct products at `LatestSnapshot` with `ReorderFlag = 1` | inventory.csv | Built `Reorder Candidates`. Model only |
+| Stockout / Overstock Rate | Share of snapshot rows flagged stockout / overstock | `DIVIDE(SUM(flag), COUNTROWS(Inventory))` over **all snapshot rows in context**, not the latest snapshot only | inventory.csv | Built `Stockout Rate` (EO), `Overstock Rate` (model only) |
+| Stockout Days | Recorded stockout days | `AVERAGE(Inventory[StockoutDays])` (simple average of source values) | inventory.csv | Built `Stockout Days`. Model only; IP's detail table shows the raw column |
+| Days of Supply | Recorded days of supply | `AVERAGE(Inventory[DaysOfSupply])` | inventory.csv | Built `Days of Supply`. Model only; raw column on IP |
+| Fill Rate / Sell-Through Rate | Source-provided ratios | `AVERAGE(Inventory[FillRate])` / `AVERAGE(Inventory[SellThroughRate])` (simple averages) | inventory.csv | Built `Fill Rate` (model only; raw column on IP), `Sell-Through Rate` (IP) |
+| Average Stock on Hand | Average balance across product-snapshot rows | `AVERAGE(Inventory[StockOnHand])` | inventory.csv | Built `Average Stock on Hand`. Model only |
+| Snapshot Dates | Number of snapshot dates in context | `DISTINCTCOUNT(Inventory[SnapshotDate])` | inventory.csv | Built `Snapshot Dates`. Model only |
 
 ## 2.6. Delivery and Logistics Performance Metrics
 
-Transit time is a measured elapsed duration. It is not, by itself, proof that an
-order was late. A true late-delivery KPI requires a promised delivery date or an
-approved service-level target. The 3-day rule below is therefore a diagnostic
-threshold unless the business explicitly approves it as the service level.
+Transit time is a measured elapsed duration. It is not, by itself, proof that an order was late. A true late-delivery KPI requires a promised delivery date or an approved service-level target. The 3-day rule below is therefore a diagnostic threshold, and the report labels it "(Diagnostic)".
 
-| Metric | Definition / requirement | Formula / logic | Source | Status |
+`Shipments` has no active relationship (section 4). Shipment measures without a "by Ship Date" or "Product-Linked" variant therefore ignore every slicer and every row/axis dimension.
+
+| Metric | Definition / requirement | Formula / logic (as built) | Source | Status |
 | --- | --- | --- | --- | --- |
-| Shipment Cost | Total recorded shipping fees for the selected shipment population | `SUM(Shipments[ShippingFee])` | shipments.csv | Core |
-| Average Transit Time | Average elapsed days from ship to delivery for valid delivered shipments | Average `DATEDIFF(ShipDate, DeliveryDate, DAY)` after excluding missing or negative intervals | shipments.csv | Core |
-| Transit Within 3 Days | Delivered shipments completed within the current 3-day diagnostic threshold | Delivered shipments with `DATEDIFF(ShipDate, DeliveryDate, DAY) <= 3` divided by delivered shipments | shipments.csv | Core |
-| Late Delivery Rate | Shipments delivered after the approved promise or service-level target | Delivered shipments with `DeliveryDate > PromisedDate` (or above approved target) divided by delivered shipments | shipments.csv, confirmed SLA field | Conditional |
-| Order-to-Delivery Lead Time | Elapsed days from order date to delivery for valid delivered orders | Average `DATEDIFF(OrderDate, DeliveryDate, DAY)` with one order-to-shipment record per order | orders.csv, shipments.csv | Planned |
-| Order Status Counts / Mix | Counts and shares by the source order status | `[Total Orders]` by `OrderStatus`; mix uses the same denominator with only status filtering removed | orders.csv | Core |
-| Fulfillment Rate | Share of eligible orders whose source status is delivered | `DIVIDE([Delivered Orders], [Total Orders])`; do not infer delivery from a nonblank shipment alone | orders.csv | Core |
+| Shipment Cost | Total recorded shipping fees | `SUM(Shipments[ShippingFee])`. Date-aware variant: `Shipment Cost by Ship Date` (`USERELATIONSHIP` on ShipDate + `CROSSFILTER(..., OrderDate, NONE)`) | shipments.csv | Built: DL (card, region table); by-ship-date variant on DL trend |
+| Shipment Records | Distinct orders with a shipment row | `DISTINCTCOUNT(Shipments[OrderID])` | shipments.csv | Built `Shipment Records`: DL |
+| Shipment Coverage Rate | Shipment records as a share of orders | `DIVIDE([Shipment Records], [Total Orders])`. Only the denominator responds to filters | shipments.csv, orders.csv | Built (differs: unfiltered numerator) `Shipment Coverage Rate`: EO |
+| Average Transit Time | Average days from ship to delivery for valid delivered shipments | `AVERAGEX` of `DATEDIFF(ShipDate, DeliveryDate, DAY)` where both dates are present and delivery ≥ ship | shipments.csv | Built `Average Delivery Time`, plus the alias `Average Transit Time`: DL |
+| Transit Within 3 Days | Delivered shipments completed within 3 days (diagnostic) | Shipments with transit ≤ 3 days divided by `Delivered Shipments`. Date-aware variant: `Transit Within 3 Days by Ship Date` | shipments.csv | Built: DL |
+| Product-Linked Shipment Measures | Shipment measures restricted to orders in the current product context | `TREATAS(VALUES(OrderItems[OrderID]), Shipments[OrderID])` | shipments.csv, order_items.csv | Built `Product-Linked Shipment Orders`, `Product-Linked Average Transit Time`: EO |
+| Late Delivery Rate | Shipments delivered after a promised date | – | needs a promised-date / SLA field | Not built (no promised date in source) |
+| Order-to-Delivery Lead Time | Days from order date to delivery | – | orders.csv, shipments.csv | Not built |
+| Order Status Counts / Mix | Counts and shares by source order status | `[Total Orders]` by `Orders[OrderStatus]`. Mix: `DIVIDE([Total Orders], CALCULATE([Total Orders], ALL(Orders[OrderStatus])))` | orders.csv | Built: EO, DL (counts). `Order Status Mix` is model only |
+| Fulfillment Rate | Share of orders with status delivered | `DIVIDE([Delivered Orders], [Total Orders])` | orders.csv | Built `Fulfillment Rate`: DL |
 
-Use ship date for shipment trends, delivery date for delivery trends, and order date
-for order-status trends. Missing dates and unmatched orders must be reported.
+No measure uses the delivery-date role yet (`Shipments[DeliveryDate]` → `Date` is inactive and unused).
 
 ## 2.7. Returns and Product Quality Metrics
 
-Return activity uses return date. Reconciliation to sales uses the associated order
-cohort, and must not be interpreted as same-period profitability unless the periods are
-explicitly aligned. Return-rate denominators must use the corresponding eligible-order
-population; for a delivered-order diagnostic, state that denominator separately.
+Return trends use the return date through `… by Return Date` measures. The other return measures follow the order-date path through `Returns[OrderID] → Orders`.
 
-| Metric | Definition | Formula / logic | Source | Status |
+| Metric | Definition | Formula / logic (as built) | Source | Status |
 | --- | --- | --- | --- | --- |
-| Returned Orders | Distinct eligible orders with at least one recorded return | `DISTINCTCOUNT(Returns[OrderID])` | returns.csv, orders.csv | Core |
-| Return Quantity | Total units recorded as returned | `SUM(Returns[ReturnQuantity])` | returns.csv | Core |
-| Refund Amount | Total recorded refund value | `SUM(Returns[RefundAmount])`; do not treat as a sales reversal unless the data rule confirms it | returns.csv | Core |
-| Return Rate | Share of eligible orders with at least one return | `DIVIDE([Returned Orders], [Total Orders])` with matching order context | returns.csv, orders.csv | Core |
-| Net Sales After Returns | Net sales less recorded refunds for the aligned order cohort | `[Net Sales] - [Refund Amount]`; label the cohort and period basis | order_items.csv, returns.csv | Planned |
-| Returns by Reason | Returned quantity and refund value by recorded reason | `[Return Quantity]` / `[Refund Amount]` by `ReturnReason`; retain unknown reasons | returns.csv | Core |
-| Returns by Product / Category | Returns split by SKU or product category | Apply the product relationship and show quantity, refund value, and returned orders | returns.csv, products.csv | Core |
-
-Show return measures by return period, product/category, customer segment, linked
-promotion, and reason. Use reasons to distinguish potential quality issues, delivery
-problems, customer preference, and other causes; do not infer cause from the reason alone.
+| Returned Orders | Distinct orders with at least one return | `DISTINCTCOUNT(Returns[OrderID])` | returns.csv | Built `Returned Orders`: RQ |
+| Return Quantity | Units recorded as returned | `SUM(Returns[ReturnQuantity])`. Date-aware variant: `Return Quantity by Return Date` | returns.csv | Built: RQ |
+| Refund Amount | Recorded refund value | `SUM(Returns[RefundAmount])`. Date-aware variant: `Refund Amount by Return Date` | returns.csv | Built twice, identically: `Refund Amount` (RQ) and `Return Amount` (RQ reason donut and category table) |
+| Return Rate | Share of orders with at least one return | `DIVIDE([Returned Orders], [Total Orders])`, all-status denominator. Product filters don't reach the denominator | returns.csv, orders.csv | Built `Return Rate`: EO, RQ |
+| Return Rate for Product Orders | Return rate with a denominator that respects product filters | `DIVIDE([Returned Orders], DISTINCTCOUNT(OrderItems[OrderID]))` | returns.csv, order_items.csv | Built: EO, RQ, CS |
+| Return Reason Share | Share of returned orders by reason | Returned orders with `ALL(Returns[ReturnReason])` as the denominator | returns.csv | Built `Return Reason Share`: RQ |
+| Net Sales After Returns | Net sales less refunds | `[Net Sales] - [Refund Amount]`; no cohort alignment | order_items.csv, returns.csv | Built. Model only |
+| Returns by Reason | Return values by recorded reason | Existing measures by `Returns[ReturnReason]` | returns.csv | Built as visuals: RQ |
+| Returns by Product / Category | Returns by product or category | Existing measures by `Products[Category]` / `[ProductName]` | returns.csv, products.csv | Built as visuals: RQ |
 
 ## 2.8. Customer Satisfaction Metrics
 
-Review measures use review date for trends and count submitted reviews, not customers,
-unless explicitly labelled otherwise. Product comparisons should include review count so
-small samples are not presented as equally representative.
+Review trends use the review date through `… by Review Date` measures. Review measures count submitted reviews, not customers.
 
-| Metric | Definition | Formula / logic | Source | Status |
+| Metric | Definition | Formula / logic (as built) | Source | Status |
 | --- | --- | --- | --- | --- |
-| Average Rating | Mean valid star rating across submitted reviews | `AVERAGE(Reviews[Rating])` after validating the rating range | reviews.csv | Core |
-| Review Count | Number of submitted reviews | `COUNTROWS(Reviews)` or distinct `ReviewID` where duplicates are possible | reviews.csv | Core |
-| Positive / Negative Review Rate | Share of valid reviews rated 4–5 / 1–2 | Numerator filtered by rating band divided by `[Review Count]` | reviews.csv | Core |
-| Rating by Product / Category | Average rating and review count by product or category | `[Average Rating]` and `[Review Count]` by product/category | reviews.csv, products.csv | Core |
-| Rating and Return Diagnostic | Compare rating and return measures for the same product/category and aligned context | `[Average Rating]`, `[Review Count]`, and `[Return Rate]`; suppress or flag low-review samples | reviews.csv, returns.csv, products.csv | Planned |
-
-Use ratings with delivery, returns, and sales to identify patterns for investigation.
-Written review text can support qualitative inspection but is not a numeric KPI.
+| Average Rating | Mean star rating | `AVERAGE(Reviews[Rating])`; no range validation. Date-aware variant: `Average Rating by Review Date` | reviews.csv | Built: EO, CS |
+| Review Count | Number of submitted reviews | `COUNTROWS(Reviews)`. Date-aware variant: `Review Count by Review Date` | reviews.csv | Built: CS |
+| Reviewed Orders / Coverage | Orders with a review, and their share of orders | `DISTINCTCOUNT(Reviews[OrderID])`; `DIVIDE(..., [Total Orders])` | reviews.csv, orders.csv | Built `Reviewed Orders`, `Review Order Coverage Rate`. Model only |
+| Positive / Negative Review Rate | Share of reviews rated ≥ 4 / ≤ 2 | Rating-band count divided by `[Review Count]` | reviews.csv | Built `Positive Review Rate`, `Negative Review Rate`: CS |
+| Low Rating Products | Products with an average rating < 3 | Count of products whose `[Average Rating] < 3` | reviews.csv, products.csv | Built `Low Rating Products`. Model only |
+| Rating by Product / Category | Average rating and review count by product or category | Existing measures by `Products[Category]` / `[ProductName]` | reviews.csv, products.csv | Built as visuals: EO, CS |
+| Rating and Return Diagnostic | Rating and return measures side by side | CS "Product Satisfaction Detail" shows rating, review count, positive rate, and product-order return rate. Low-review samples aren't suppressed or flagged | reviews.csv, returns.csv, products.csv | Built (partial): CS |
 
 ## 2.9. Cross-Domain Diagnostics
 
-Cross-domain views are exploratory comparisons, not causal models. They must disclose
-the date basis, denominator, sample size, and any incomplete or unmatched data.
+Cross-domain views are exploratory comparisons, not causal models. The report has no scatter charts. Cross-domain comparisons appear as side-by-side columns in tables.
 
-| Diagnostic | Requirement / definition | Formula or view | Source | Status |
-| --- | --- | --- | --- | --- |
-| Sales and Order Trend | Compare value, volume, and units over equivalent weekly, monthly, or yearly periods | `[Net Sales]`, `[Total Orders]`, `[Units Sold]`, and `[AOV]` by the selected Date period | orders.csv, order_items.csv | Core |
-| Stock Availability and Sales Movement | Compare stock flags or stockout days with observed units and net sales | Inventory snapshot measures alongside `[Units Sold]` / `[Net Sales]` by product and aligned period; no lost-sales estimate | inventory.csv, order_items.csv, products.csv | Planned |
-| Delivery and Returns | Compare return outcomes across transit-time or approved late-delivery groups | Return rate by derived transit group, using a clearly stated delivered-order denominator | shipments.csv, returns.csv, orders.csv | Planned |
-| Promotion Performance | Compare order lines with and without a promotion reference | `[Net Sales]`, `[Units Sold]`, `[Discount Amount]`, and return measures by promotion presence; blank references are an unknown group, not proof of no promotion | order_items.csv, promotions.csv, returns.csv | Planned |
-| Rating and Operational Experience | Compare ratings with transit, return, and fulfillment measures | Product/category-level view including review count and aligned date context; interpret as association only | reviews.csv, shipments.csv, returns.csv | Planned |
+| Diagnostic | Requirement / definition | As built | Status |
+| --- | --- | --- | --- |
+| Sales and Order Trend | Value, volume, and units over equivalent periods | Net Sales trend by Year-Month on EO (with Gross Sales and Gross Profit) and SP. No orders, units, or AOV trend | Built (partial) |
+| Stock Availability and Sales Movement | Stock flags alongside units and net sales | Not built. IP compares Stock In with Stock Out only | Not built |
+| Delivery and Returns | Return outcomes by transit group | – | Not built |
+| Promotion Performance | Lines with vs without a promotion reference | – (`Promotions` isn't related to any fact) | Not built |
+| Rating and Operational Experience | Ratings next to transit, return, and stock measures | EO "Category Health Signals" and "Product Exception Detail" tables: stockout rate, product-order return rate, average rating, product-linked transit time | Built (partial) |
+
+## 2.10. Other Measures in the Model (not on any page)
+
+| Area | Measures | Notes |
+| --- | --- | --- |
+| Web traffic | `Total Sessions`, `Users or Visitors`, `Page Views`, `Average Session Duration`, `Conversion Rate` = `DIVIDE([Total Orders], [Total Sessions])` | `WebTraffic` begins 2013-01-01 |
+| Sales benchmark | `Benchmark Revenue`, `Benchmark COGS`, `Benchmark Gross Profit` | Separate daily series; not blended with order revenue |
+| Payments | `Total Payment Value` | |
 
 # 3. PREPARE THE DATA
 
@@ -269,82 +270,94 @@ unless its grain supports that interpretation.
 | Dimension | products.csv | 2,412 | One row per SKU | `product_id` | Product attributes, catalog price, and COGS. |
 | Dimension | promotions.csv | 50 | One row per promotion | `promo_id` | Promotion dates, type, value, channel, applicability, and minimum order value. |
 
-## 3.2. Power BI Preparation Rules
+## 3.2. Power BI Preparation (as built)
 
-- Import identifier columns such as `order_id`, `customer_id`, `product_id`, `zip`,
-  and `promo_id` as text where leading zeros or nonnumeric values must be preserved.
-- Convert all source date columns to Date types. Use one marked Date table with a
-  continuous date column and Year, Month Number, Month, Quarter, and Year-Month
-  attributes. Sort Year-Month by `Year * 100 + Month Number`.
-- Keep numeric amounts as decimal numbers and quantities, flags, installments, and
-  ratings as appropriate whole-number types. Do not round source amounts before
-  aggregation.
-- Preserve blanks in `promo_id`, `promo_id_2`, and
-  `promotions[applicable_category]`. A blank promotion reference is an unknown or
-  unrecorded promotion state, not evidence that no promotion applied.
-- Do not remove the 16 repeated `order_id + product_id` combinations in
-  `order_items.csv` without a business rule. Treat each source row as a separate
-  line unless the source owner confirms that they are duplicates to be merged.
-- Validate nonnegative quantities, prices, costs, refunds, fees, and rates. Do not
-  silently coerce invalid values to zero; expose rejected or anomalous rows in a
-  data-quality view.
-- Keep `sales.csv` separate from `order_items.csv`. Use it as a daily benchmark and
-  reconcile differences rather than combining both tables into one revenue fact.
-- Treat `inventory.csv` as a snapshot fact. Select one snapshot date for stock
-  balances and do not sum `stock_on_hand` across dates.
-- Treat `web_traffic.csv` as a date-and-source aggregate. It can support traffic
-  trends and source comparisons, but it cannot attribute sessions to orders without
-  a session or campaign key.
+Each of the 13 tables is an import partition with the same three Power Query steps:
+
+```m
+Source = Csv.Document(File.Contents("D:\projects\vintelligence2026_ai_agent_powerbi_dashboard\data\<file>.csv"),
+                      [Delimiter = ",", Columns = n, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+#"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+#"Changed Type"     = Table.TransformColumnTypes(#"Promoted Headers", { ... })
+```
+
+- **Paths are absolute.** There is no shared folder parameter. Moving the repository means editing every partition.
+- **No row-level cleaning.** Power Query doesn't filter, deduplicate, or replace values. Blank promotion IDs and the 16 repeated `order_id + product_id` rows in `order_items.csv` are kept as they are.
+- **Identifier columns** (`order_id`, `customer_id`, `product_id`, `zip`) are typed `Int64`, not text. Promotion IDs (`promo_id`, `promo_id_2`) are text.
+- **Dates** are typed `date`. Amounts and rates are decimal numbers. Quantities, flags, and ratings are whole numbers. Source amounts aren't rounded.
+- **`Date` table** is a calculated table:
+  `ADDCOLUMNS(CALENDAR(DATE(2012,1,1), DATE(2023,12,31)), "Year", …, "Month Number", …, "Month Name", …, "Quarter", "Q" & …, "Year-Month", FORMAT(…, "YYYY-MM"), "Year-Month Sort", Year * 100 + Month)`.
+  It isn't marked as a date table and has no week column.
+- **Auto date/time is on** (`__PBI_TimeIntelligenceEnabled = 1`). Desktop creates hidden `LocalDateTable_*` tables for date columns without a relationship to `Date`. These are `Customers[SignupDate]`, `Promotions[StartDate]`, and `Promotions[EndDate]`.
+- `sales.csv` is loaded as its own table (`Sales`) and isn't combined with `OrderItems`. `inventory.csv` is loaded at snapshot grain. Its own product attributes (`ProductName`, `Category`, `Segment`) are kept as columns and are used by some IP visuals.
+
+Rules for future changes: keep blanks blank. Don't coerce invalid values to zero. Don't merge the repeated order-item rows. Don't blend `Sales` into order revenue.
 
 ## 3.3. Data-Quality Checks
 
-- Confirm uniqueness of the declared keys: all checked dimension and transaction
-  keys are unique except the documented order-item composite. Do not declare
-  `order_id + product_id` a primary key.
-- Confirm that all checked child keys match their parents: order items, payments,
-  shipments, returns, and reviews match orders; product references match products;
-  customer references match customers; and order/customer ZIPs match geography.
-- Record coverage counts in the model documentation. Shipments cover 566,067 of
-  646,945 orders, so missing shipment rows are not equivalent to undelivered
-  orders. Reviews cover a subset of orders and customers.
-- Validate date ordering: shipment delivery must not precede shipment, and shipment
-  must not precede the order when both dates are present. Exclude invalid intervals
-  from lead-time measures and report them.
-- Validate the monthly snapshot calendar and display the selected snapshot date.
-  Do not interpolate monthly inventory into weekly or daily balances.
-- Preserve the distinct order statuses found in the source: `delivered`,
-  `cancelled`, `returned`, `shipped`, `paid`, and `created`. Grouping statuses for
-  a KPI requires an explicit business rule.
+The checks below were run against the CSVs when the model was designed. The report has **no data-quality page or exception visuals**, and measures don't exclude invalid rows. The only exception is the transit measures, which skip missing or negative intervals.
+
+- Declared keys are unique, except the documented order-item composite. `order_id + product_id` isn't a primary key.
+- Child keys match their parents: order items, payments, shipments, returns, and reviews match orders. Product references match products. Customer references match customers. Order and customer ZIPs match geography.
+- Shipments cover 566,067 of 646,945 orders, so a missing shipment row isn't the same as an undelivered order. Reviews cover a subset of orders and customers.
+- A delivery must not precede its shipment. The transit measures enforce this; nothing else does.
+- Inventory has 126 monthly snapshot dates. It must not be interpolated into weekly or daily balances.
+- The source order statuses are `delivered`, `cancelled`, `returned`, `shipped`, `paid`, and `created`. The status-group measures (`Shipped Orders`, `Pending Orders`) are the only groupings in the model.
 
 # 4. RELATIONSHIPS
 
-Use single-direction dimension-to-fact filtering unless a specific diagnostic requires
-another design. Avoid direct relationships that create ambiguous paths.
+All relationships are many-to-one, single direction (dimension filters fact), as defined in `relationships.tmdl`. None is bidirectional.
 
-- Customers[CustomerID] -> Orders[CustomerID]
-- Geography[Zip] -> Orders[Zip]
-- Geography[Zip] -> Customers[Zip]
-- Orders[OrderID] -> OrderItems[OrderID]
-- Orders[OrderID] -> Payments[OrderID]
-- Orders[OrderID] -> Shipments[OrderID]
-- Orders[OrderID] -> Returns[OrderID]
-- Orders[OrderID] -> Reviews[OrderID]
-- Products[ProductID] -> OrderItems[ProductID]
-- Products[ProductID] -> Returns[ProductID]
-- Products[ProductID] -> Reviews[ProductID]
-- Products[ProductID] -> Inventory[ProductID]
-- Date[Date] -> Orders[OrderDate] (active)
-- Date[Date] -> Sales[Date] (active benchmark date)
-- Date[Date] -> WebTraffic[Date] (active)
-- Date[Date] -> Shipments[ShipDate] (inactive role)
-- Date[Date] -> Shipments[DeliveryDate] (inactive role)
-- Date[Date] -> Returns[ReturnDate] (inactive role)
-- Date[Date] -> Reviews[ReviewDate] (inactive role)
-- Date[Date] -> Inventory[SnapshotDate] (inactive role)
+**Active**
 
-Use the appropriate inactive date role explicitly for shipment, delivery, return,
-review, and inventory trends. Do not create a direct Reviews-to-Customers relationship
-because Reviews already connect to customers through Orders.
+| From (many) | To (one) |
+| --- | --- |
+| Orders[CustomerID] | Customers[CustomerID] |
+| Orders[Zip] | Geography[Zip] |
+| OrderItems[OrderID] | Orders[OrderID] |
+| OrderItems[ProductID] | Products[ProductID] |
+| Payments[OrderID] | Orders[OrderID] |
+| Returns[OrderID] | Orders[OrderID] |
+| Returns[ProductID] | Products[ProductID] |
+| Reviews[OrderID] | Orders[OrderID] |
+| Reviews[ProductID] | Products[ProductID] |
+| Inventory[ProductID] | Products[ProductID] |
+| Orders[OrderDate] | Date[Date] |
+| Sales[Date] | Date[Date] |
+| WebTraffic[Date] | Date[Date] |
+
+**Inactive** (turned on inside measures with `USERELATIONSHIP`)
+
+| From (many) | To (one) | Used by |
+| --- | --- | --- |
+| Shipments[OrderID] | Orders[OrderID] | – (the Product-Linked measures use `TREATAS` instead) |
+| Shipments[ShipDate] | Date[Date] | `Shipment Cost by Ship Date`, `Transit Within 3 Days by Ship Date` |
+| Shipments[DeliveryDate] | Date[Date] | – |
+| Returns[ReturnDate] | Date[Date] | `Return Quantity by Return Date`, `Refund Amount by Return Date` |
+| Reviews[ReviewDate] | Date[Date] | `Review Count by Review Date`, `Average Rating by Review Date` |
+| Inventory[SnapshotDate] | Date[Date] | – |
+
+**Not related:** Customers → Geography (customer ZIP isn't linked), Reviews → Customers (omitted on purpose), and `Promotions` (not linked to any fact).
+
+Date-role measures follow one pattern. They activate the role-playing relationship and switch off the order-date path, so that order date doesn't filter the result as well:
+
+```dax
+CALCULATE(
+    [Shipment Cost],
+    USERELATIONSHIP('Date'[Date], Shipments[ShipDate]),
+    CROSSFILTER('Date'[Date], Orders[OrderDate], NONE)
+)
+```
+
+**Resulting filter behaviour** (the four report slicers are `Date[Year-Month]`, `Products[Category]`, `Products[ProductName]`, `Geography[Region]`):
+
+| Slicer | Orders, OrderItems, Payments, Returns, Reviews | Inventory | Shipments | Customers |
+| --- | --- | --- | --- | --- |
+| Reporting period | Yes, by order date | No | Only "by Ship Date" measures | No |
+| Product category / Product | OrderItems, Returns, Reviews: yes. Orders and Payments: **no** (`Total Orders`, `Distinct Customers`, order status, and `Fulfillment Rate` don't change) | Yes | Only "Product-Linked" measures | No |
+| Region | Yes, through Orders[Zip] | No | No | No |
+
+Use the appropriate inactive date role explicitly for shipment, delivery, return, review, and inventory trends. Don't create a direct Reviews-to-Customers relationship, because Reviews already connect to customers through Orders.
 
 # 5. ASSUMPTIONS AND CAVEATS
 
@@ -373,266 +386,187 @@ because Reviews already connect to customers through Orders.
   intentionally omitted to avoid an ambiguous filter path. Use the order relationship
   or a deliberate bridge only if the model design requires it.
 
-# 6. DASHBOARD DESIGN
+# 6. DASHBOARD DESIGN (AS BUILT)
 
-## 6.1. Design Objective and Page Count
+## 6.1. Report Structure
 
-Build **seven report pages**. The report must use a consistent top-down reading order:
-context and controls first, headline results second, trends and comparisons third,
-and diagnostic detail last. Do not compress content to fit a default canvas. Use a
-custom page size of approximately **1,920 x 1,400 pixels** and allow additional
-vertical space when a page needs more detail. Every page must remain readable at
-normal browser zoom without overlapping visuals.
+- **Pages:** 8 in `pageOrder`. There are seven analytical pages plus a blank leftover `Page 1` (1920×1080, Fit to page, no visuals). Executive Overview is the active (opening) page.
+- **Canvas:** analytical pages are **1920×1570**, display option **Fit to width**.
+- **Theme:** `purple-slicer`, registered as both the base theme and the custom theme. Colours come from the theme, not from per-visual formatting.
+- **Navigation:** none. There are no page-navigator buttons, bookmarks, or drill-through pages. Users move between pages with the page tabs.
+- **Reset filters:** not built. No page has a reset button or bookmark.
+- **Alt text:** not set on any visual.
+- **Subtitles:** empty on every visual. The date basis is stated in the title instead (for example "by Ship Month" or "by Return Month").
+- **Report-level filters:** none.
+- **Not built from the original design:** a Diagnostics page, a Data Quality page, scatter-chart cross-domain views, and a sixth KPI card per page.
 
-The page sequence is:
+## 6.2. Shared Layout
 
-1. Executive Overview
-2. Sales and Profitability
-3. Customers and Market Performance
-4. Inventory Performance
-5. Delivery and Logistics
-6. Returns and Product Quality
-7. Customer Satisfaction
+Every analytical page uses the same grid. The x positions run from 40 to 1880.
 
-Cross-domain diagnostics and data-quality caveats are embedded in the seven analytical
-pages. Each page must expose relevant sample sizes, date-basis notes, source-coverage
-warnings, and interpretation guidance so users do not need a separate definitions page.
+| Row | y | Height | Contents |
+| --- | --- | --- | --- |
+| Header | 16 | – | `hdr-band` (background band), `hdr-brand`, `hdr-title` (page title and a one-line purpose) |
+| Slicers | 110 | – | Four dropdown slicers, left to right (below) |
+| KPI cards | 254 | 132 | 4 cards (5 on Executive Overview), named `kpi-*` |
+| Row 2 | 406 | 430 | Main trend, plus one or two comparison visuals |
+| Row 3 | 856 | ≈314 | Breakdown visuals and a summary table |
+| Row 4 | 1200 | 280 | Detail table (wide, left) and a ranked bar chart (right). Ends at y = 1480 |
 
-## 6.2. Common Page Structure
+**Slicers.** All four are dropdowns. Each has its own sync group, so a selection carries across all seven analytical pages.
 
-Use the following top-down structure on every analytical page unless a page-specific
-layout below states otherwise:
+| Visual | Title | Field |
+| --- | --- | --- |
+| `filter-1-year-month` | Reporting period | `Date[Year-Month]` |
+| `filter-2-category` | Product category | `Products[Category]` |
+| `filter-3-productname` | Product | `Products[ProductName]` |
+| `filter-4-region` | Region | `Geography[Region]` |
 
-### Row 1: Page context
+Section 4 shows which tables each slicer reaches.
 
-- Page title on the left, using the same title as the navigation label.
-- One-sentence purpose statement below the title.
-- Selected reporting period, last data date, and refresh timestamp on the right.
-- A small status note when the page uses a special date role, snapshot date, cohort,
-  or incomplete source population.
+**Naming.** Visual folder names were copied between pages and often don't match the content. For example, `kpi-net-sales` on Executive Overview shows Shipment Coverage. The tables below give each folder name next to its displayed title.
 
-### Row 2: Filters and navigation
+## 6.3. Pages
 
-- Persistent page navigation: Executive Overview, Sales, Customers, Inventory,
-  Delivery, Returns, Satisfaction, Diagnostics, and Data Quality.
-- Report-level slicers: reporting period, year, month, product category, product,
-  customer segment, sales channel, and geography where relevant.
-- Page-specific slicers beside the common slicers rather than in a separate hidden
-  area.
-- Use dropdown slicers for high-cardinality fields and horizontal button slicers for
-  short status or category lists.
-- Display the active filter state clearly and provide a Reset Filters action.
+### 6.3.1. Executive Overview (`9f7b1d2d-…f712`)
 
-### Row 3: Headline KPIs
+Purpose: a one-page health check across sales, stock, returns, delivery, and satisfaction.
 
-- Use four to six KPI cards, ordered from the most important business outcome to
-  supporting operational measures.
-- Each card must show the current value, unit, comparison period where meaningful,
-  and a clear blank or unavailable state when its denominator is invalid.
-- Use consistent number formats: currency for monetary values, whole numbers for
-  units and orders, one decimal place for durations, and percentages for rates.
-- Do not use colour as the only indication of status; pair it with text, an icon, or
-  a reference line.
+| Row | Visual (folder) | Type | Title | Content |
+| --- | --- | --- | --- | --- |
+| KPI | `kpi-net-sales` | Card | Shipment Coverage | `Shipment Coverage Rate` |
+| KPI | `kpi-total-orders` | Card | Stockout Rate | `Stockout Rate` |
+| KPI | `kpi-distinct-customers` | Card | Return Rate | `Return Rate` |
+| KPI | `kpi-aov` | Card | Average Rating | `Average Rating` |
+| KPI | `kpi-otd` | Card | Repeat Customer Rate | `All-Time Repeat Customer Rate` |
+| 2 | `p1-trend-net-sales` | Line (w 1180) | Portfolio Net Sales Trend by Month | Net Sales, Gross Sales, Gross Profit by `Date[Year-Month]` |
+| 2 | `p1-col-orderstatus` | Column | Orders by Status | `Total Orders` by `Orders[OrderStatus]` |
+| 3 | `p1-signal-map` | Bar | Average Rating by Category | `Average Rating` by Category |
+| 3 | `p1-bar-region` | Bar | Stockout Risk by Category | `Stockout Rate` by Category |
+| 3 | `p1-table-segment` | Table | Category Health Signals | Category; Stockout Rate, Return Rate for Product Orders, Average Rating, Product-Linked Average Transit Time |
+| 4 | `p1-detail-product` | Table | Product Exception Detail: Stock, Returns, Rating, and Transit | Product-level version of the category health table |
+| 4 | `p1-bar-gross-profit` | Bar | Return Rate by Category | `Return Rate for Product Orders` by Category |
 
-### Row 4: Main time trend
+### 6.3.2. Sales and Profitability (`2d466881-…34d5`)
 
-- Place the primary weekly, monthly, or yearly trend across most of the canvas width.
-- Use line or clustered-column charts for trends and show the selected period against
-  an equivalent comparison period when the comparison is valid.
-- Label the date basis in the visual subtitle, such as “by Order Date,” “by Return
-  Date,” or “by Snapshot Date.”
-- Do not mix incompatible date roles in one trend.
+Purpose: revenue, discounting, and margin by channel and category (order date).
 
-### Row 5: Comparisons and drivers
+| Row | Visual (folder) | Type | Title | Content |
+| --- | --- | --- | --- | --- |
+| KPI | `kpi-*` | Cards | Net Sales · Gross Sales · Total Orders · Average Order Value | Measures of the same names |
+| 2 | `p2-trend-net-sales` | Line (full width) | Net Sales Trend by Month | `Net Sales` by `Date[Year-Month]` |
+| 3 | `p2-col-device` | Column | Net Sales by Device Type | by `Orders[DeviceType]` |
+| 3 | `p2-col-source` | Column | Net Sales by Order Source | by `Orders[OrderSource]` |
+| 3 | `p2-bar-payment` | Bar | Net Sales by Payment Method | by `Payments[PaymentMethod]` |
+| 3 | `p2-table-category` | Table | Category Performance | Category; Net Sales, Units Sold, Average Order Value |
+| 4 | `p2-detail-profitability` | Table | Catalog-Cost Profitability Estimate (Not Historical Cost) | Category, ProductName; Gross Sales, Discount Amount, Net Sales, COGS, Gross Profit, Gross Margin % |
+| 4 | `p2-bar-discount-rate` | Bar | Discount Rate by Category | `Discount Rate` by Category |
 
-- Use two or three aligned visuals for product, category, channel, customer, region,
-  status, reason, or threshold comparisons.
-- Prefer sorted horizontal bars, column charts, decomposition trees, or diagnostic
-  comparison charts
-  over crowded legends.
-- Keep the same measure, unit, and filter context within a visual.
-- Show the denominator or sample size when a rate, average, or rating could be
-  misleading.
+### 6.3.3. Customers and Market Performance (`a1f2c3d4-…5d6e`)
 
-### Row 6: Detail and action
+Purpose: customer base, buyer behaviour, channels, and regional sales. This page has no time trend.
 
-- Place a matrix or detail table at the bottom with the dimensions most useful for
-  investigation.
-- Use conditional formatting only when the rule is defined and the underlying
-  measure is valid.
-- Use clear chart subtitles, caveat notes, and detail-table labels to describe
-  observed patterns without claiming causation.
-- Use drillthrough from summary visuals to the relevant detail page or table where
-  the model supports it.
+| Row | Visual (folder) | Type | Title | Content |
+| --- | --- | --- | --- | --- |
+| KPI | `kpi-distinct-customers` | Card | Distinct Customers | `Distinct Customers` |
+| KPI | `kpi-revenue-per-customer` | Card | Revenue per Customer | `Revenue per Customer` |
+| KPI | `kpi-avg-rating` | Card | First-Time Buyer Rate (All-Time) | `All-Time First-Time Customer Rate` |
+| KPI | `kpi-positive-review-rate` | Card | Repeat Buyer Rate (All-Time) | `All-Time Repeat Customer Rate` |
+| 2 | `p5-col-channel` | Column | Customers by Acquisition Channel | Customer count by `Customers[AcquisitionChannel]` |
+| 2 | `p5-donut-age` | Donut | Customers by Age Group | Customer count by `Customers[AgeGroup]` |
+| 2 | `p5-donut-rating` | Donut | Orders by Device Type | `Total Orders` by `Orders[DeviceType]` |
+| 3 | `p5-bar-rating-category` | Bar | Orders by Sales Source | `Total Orders` by `Orders[OrderSource]` |
+| 3 | `p3-segment-map` | Bar | Revenue per Customer by Segment | by `Products[Segment]` |
+| 3 | `p5-table-agegroup` | Table | Customer Segment Summary | Customer measures by segment |
+| 4 | `p3-detail-customer` | Table | Customer Segment Detail | AcquisitionChannel, AgeGroup, Gender; Distinct Customers, Total Orders, Order Frequency, Net Sales |
+| 4 | `p3-bar-region-sales` | Bar | Net Sales by Region | `Net Sales` by `Geography[Region]` |
 
-## 6.3. Page Specifications
+The `p5-*` folders were copied from Customer Satisfaction and repurposed for customer visuals. Their names still refer to ratings.
 
-### Page 1: Executive Overview
+### 6.3.4. Inventory Performance (`5c7bc72d-…68d16b1ac7af`)
 
-**Purpose:** Give the Supply Chain Manager a single starting point for the selected
-period and identify where deeper investigation is required.
+Purpose: stock position, movement, and risk (latest snapshot; see section 2.5).
 
-Top-down content:
+| Row | Visual (folder) | Type | Title | Content |
+| --- | --- | --- | --- | --- |
+| KPI | `kpi-*` | Cards | Current Stock · Inventory Value · Low-Stock Products · Out-of-Stock Products | Measures of the same names |
+| 2 | `p4-trend-stock` | Line | Stock In vs Stock Out Trend | `Stock In`, `Stock Out` by `Inventory[SnapshotDate]` |
+| 2 | `p4-inventory-map` | Bar | Sell-Through Rate by Category | `Sell-Through Rate` by Category |
+| 3 | `p4-bar-segment` | Bar | Inventory Value by Segment | `Inventory Value` by Segment |
+| 3 | `p4-col-lowstock` | Column | Low & Out-of-Stock Products by Category | `Low-Stock Products`, `Out-of-Stock Products` |
+| 3 | `p4-table-category` | Table | Inventory Summary by Category | Current Stock, Inventory Value, Stock In, Stock Out |
+| 4 | `p4-detail-stock` | Table | Inventory Exception Detail | Raw columns: ProductName, SnapshotDate, StockOnHand, StockoutDays, DaysOfSupply, FillRate, ReorderFlag |
+| 4 | `p4-bar-stock-category` | Bar | Current Stock by Category | `Current Stock` by Category |
 
-1. Filters: period, year/month, category, sales channel, and region.
-2. KPI cards: Net Sales, Total Orders, Units Sold, AOV, Gross Profit or COGS when
-   available, and Fulfillment Rate.
-3. Main trend: Net Sales and Total Orders by month, with separate axes only when
-   clearly labelled.
-4. Business balance: a row of compact visuals for category sales, stockout products,
-   transit within three days, return rate, and average rating.
-5. Action table: top products or categories requiring attention, including sales,
-   stock status, delivery, returns, and rating indicators.
+The trend axis uses `Inventory[SnapshotDate]` directly, not the `Date` table.
 
-Do not present a combined health score unless its weights and thresholds are approved.
+### 6.3.5. Delivery and Logistics (`fcd9a8b8-…183f6a`)
 
-### Page 2: Sales and Profitability
+Purpose: fulfilment, transit time, and shipping cost. The trends use ship date. The 3-day split is labelled "(Diagnostic)".
 
-**Purpose:** Explain changes in sales value, order volume, discounting, and
-profitability.
+| Row | Visual (folder) | Type | Title | Content |
+| --- | --- | --- | --- | --- |
+| KPI | `kpi-shipment-cost` | Card | Shipment Cost | `Shipment Cost` |
+| KPI | `kpi-otd` | Card | Fulfillment Rate | `Fulfillment Rate` |
+| KPI | `kpi-return-rate` | Card | Transit Within 3 Days (Diagnostic) | `Transit Within 3 Days` |
+| KPI | `kpi-refund-amount` | Card | Average Transit Time | `Average Transit Time` |
+| 2 | `p3-trend-shipcost` | Line | Shipment Cost by Ship Month | `Shipment Cost by Ship Date` by Year-Month |
+| 2 | `p3-trend-otd` | Line | Transit Within 3 Days by Ship Month (Diagnostic) | `Transit Within 3 Days by Ship Date` by Year-Month |
+| 3 | `p3-donut-reason` | Bar | Transit Within 3 Days by Region (Diagnostic) | by `Geography[Region]` |
+| 3 | `p3-col-orderstatus` | Column | Orders by Status | `Total Orders` by `Orders[OrderStatus]` |
+| 3 | `p3-table-returns-category` | Table | Shipment Volume, Transit, and Cost by Region | Region; Shipment Records, Average Transit Time, Shipment Cost |
+| 4 | `p5-detail-delivery` | Table | Delivery Status Detail | OrderStatus; Total Orders, Fulfillment Rate, Shipment Records, Average Transit Time, Transit Within 3 Days |
+| 4 | `p5-logistics-map` | Bar | Average Transit Time by Region | by `Geography[Region]` |
 
-Top-down content:
+Shipment measures don't respond to Region or Status (section 4), so the region and status breakdowns repeat the same shipment value on every row.
 
-1. Filters: period, product/category, customer segment, sales channel, order status,
-   and promotion presence.
-2. KPI cards: Gross Sales, Discount Amount, Net Sales, Total Orders, Units Sold, and
-   AOV. Add COGS, Gross Profit, and Gross Margin only when the cost basis is confirmed.
-3. Main trend: Net Sales, Orders, Units, and AOV by the selected period using separate
-   visuals when scales would obscure the trend.
-4. Driver visuals: sales and gross profit by category/product, sales by order source
-   and device, and discount rate by category or period.
-5. Detail matrix: product, category, units, orders, gross sales, discounts, net
-   sales, COGS, profit, and margin, with unavailable measures clearly marked.
+### 6.3.6. Returns and Product Quality (`b2f3c4d5-…5d6e7f`)
 
-Keep catalog price and COGS benchmarks visually separate from realized sales measures.
+Purpose: return volume, value, reasons, and category exposure. The trends use return date.
 
-### Page 3: Customers and Market Performance
+| Row | Visual (folder) | Type | Title | Content |
+| --- | --- | --- | --- | --- |
+| KPI | `kpi-shipment-cost` | Card | Return Quantity | `Return Quantity` |
+| KPI | `kpi-otd` | Card | Returned Orders | `Returned Orders` |
+| KPI | `kpi-return-rate` | Card | Return Rate | `Return Rate` |
+| KPI | `kpi-refund-amount` | Card | Refund Amount | `Refund Amount` |
+| 2 | `p3-trend-shipcost` | Line | Refund Amount by Return Month | `Refund Amount by Return Date` by Year-Month |
+| 2 | `p3-trend-otd` | Line | Returned Quantity by Return Month | `Return Quantity by Return Date` by Year-Month |
+| 3 | `p3-donut-reason` | Donut | Returns by Reason | `Return Amount` by `Returns[ReturnReason]` |
+| 3 | `p3-col-orderstatus` | Column | Returned Orders by Product Category | `Returned Orders` by Category |
+| 3 | `p3-table-returns-category` | Table | Returns by Product Category | Returned Orders, Return Quantity, Return Amount |
+| 4 | `p6-detail-returns` | Table | Return Detail by Reason | ReturnReason; Returned Orders, Return Quantity, Refund Amount, Return Reason Share |
+| 4 | `p6-quality-map` | Bar | Return Rate by Category | `Return Rate for Product Orders` by Category |
 
-**Purpose:** Show who purchases, where purchasing occurs, and how customer segments
-perform.
+This page and Delivery and Logistics share folder names (`p3-*`, `kpi-shipment-cost`, …) because one was copied from the other.
 
-Top-down content:
+### 6.3.7. Customer Satisfaction (`cb86d456-…1ef3`)
 
-1. Filters: period, acquisition channel, age group, gender, region, city, order
-   source, and device type.
-2. KPI cards: Distinct Customers, New Customers, Repeat Customers or Repeat Rate,
-   Total Orders, Revenue per Customer, and AOV.
-3. Main trend: Distinct Customers, Orders, and Net Sales by month.
-4. Segment visuals: customers and revenue by acquisition channel, age group, gender,
-   region, and city. Use a map only when geographic density is readable; otherwise
-   use ranked bars.
-5. Cohort/detail matrix: first eligible order period, customer count, orders, net
-   sales, revenue per customer, and order frequency.
+Purpose: rating levels, rating mix, and weak categories and products. The trends use review date.
 
-Keep acquisition channel and order sales channel in separate visuals and labels.
+| Row | Visual (folder) | Type | Title | Content |
+| --- | --- | --- | --- | --- |
+| KPI | `kpi-distinct-customers` | Card | Review Count | `Review Count` |
+| KPI | `kpi-revenue-per-customer` | Card | Negative Review Rate | `Negative Review Rate` |
+| KPI | `kpi-avg-rating` | Card | Average Rating | `Average Rating` |
+| KPI | `kpi-positive-review-rate` | Card | Positive Review Rate | `Positive Review Rate` |
+| 2 | `p5-col-channel` | Column | Review Count by Review Month | `Review Count by Review Date` by Year-Month |
+| 2 | `p5-donut-age` | Donut | Review Count by Customer Age Group | by `Customers[AgeGroup]` |
+| 2 | `p5-donut-rating` | Donut | Rating Distribution | Review Count by `Reviews[Rating]` |
+| 3 | `p5-bar-rating-category` | Bar | Negative Review Rate by Category | `Negative Review Rate` by Category |
+| 3 | `p5-col-gender` | **Line** | Average Rating by Review Month | `Average Rating by Review Date` by Year-Month |
+| 3 | `p5-table-agegroup` | Table | Satisfaction by Customer Age Group | Rating measures by `Customers[AgeGroup]` |
+| 4 | `p7-detail-rating` | Table | Product Satisfaction Detail | Category, ProductName; Average Rating, Review Count, Positive Review Rate, Return Rate for Product Orders |
+| 4 | `p7-experience-map` | Bar | Average Rating by Category | `Average Rating` by Category |
 
-### Page 4: Inventory Performance
+## 6.4. Design Rules for Future Changes
 
-**Purpose:** Monitor stock availability and movement at the supported monthly
-snapshot grain.
+These rules come from the original design. New and edited visuals should follow them:
 
-Top-down content:
+- Titles take the form "Measure by Dimension". Put the date basis (order, ship, return, review, or snapshot date) in the subtitle.
+- Never use colour alone to carry meaning. Pair it with labels, icons, or text.
+- Don't use 3D charts, gauges without a target, or pies or donuts with many slices.
+- Give every visual alt text, and add a reset-filters action to every page.
+- Keep the shared header and slicer positions identical across pages. Copy an existing visual of the same type rather than writing new JSON.
+- Label the 3-day transit threshold as diagnostic, never as an SLA or "on-time".
 
-1. Snapshot selector: snapshot date, year/month, category, segment, and product.
-   Display the selected snapshot date prominently.
-2. KPI cards: Stock on Hand, Inventory Value, Stock In, Stock Out, Low-Stock
-   Products, and Out-of-Stock Products.
-3. Main trend: Stock on Hand, Stockout Days, and flagged-product counts by monthly
-   snapshot date. Do not interpolate snapshots into daily or weekly values.
-4. Driver visuals: stock status by category, reorder candidates, days of supply,
-   fill rate, and sell-through rate.
-5. Action table: product, category, snapshot date, stock on hand, stockout days,
-   days of supply, fill rate, reorder flag, and overstock flag.
-
-Use one snapshot balance per product in totals. Do not sum stock balances across
-multiple snapshot dates.
-
-### Page 5: Delivery and Logistics
-
-**Purpose:** Monitor shipment progress, transit duration, shipping cost, and order
-status without confusing transit time with a contractual late-delivery result.
-
-Top-down content:
-
-1. Filters: order date, ship date, delivery date, order status, device, order source,
-   product/category, and geography.
-2. KPI cards: Shipment Cost, Shipped Orders, Delivered Orders, Average Transit Time,
-   Transit Within 3 Days, and Fulfillment Rate.
-3. Main trend: shipment count, delivery count, and average transit time by ship or
-   delivery month, with the selected date basis stated.
-4. Driver visuals: order-status mix, transit-time distribution, transit threshold by
-   region/channel, and shipping cost by channel or product category.
-5. Detail table: order, order date, ship date, delivery date, transit days, status,
-   shipping fee, customer geography, and return indicator.
-
-Do not label the three-day threshold as “on time” or “late” unless an approved
-service-level rule exists.
-
-### Page 6: Returns and Product Quality
-
-**Purpose:** Identify the products, reasons, and segments associated with returns and
-refunds.
-
-Top-down content:
-
-1. Filters: return date, order cohort, product/category, customer segment, promotion
-   presence, return reason, and geography.
-2. KPI cards: Returned Orders, Return Quantity, Refund Amount, Return Rate, and Net
-   Sales After Returns when the cohort is aligned.
-3. Main trend: returned orders, return quantity, and refund amount by return month.
-4. Driver visuals: return rate by product/category, return quantity and refund amount
-   by reason, and return rate by customer segment or channel.
-5. Action table: product, category, return reason, returned orders, return quantity,
-   refund amount, return rate, and linked delivery or rating indicators.
-
-Keep return-date activity trends separate from order-cohort reconciliation visuals.
-Use return reasons as investigation categories, not as proof of causation.
-
-### Page 7: Customer Satisfaction
-
-**Purpose:** Evaluate ratings and review volume alongside sales, delivery, and return
-patterns.
-
-Top-down content:
-
-1. Filters: review date, product/category, customer segment, region, order source,
-   and rating band.
-2. KPI cards: Average Rating, Review Count, Positive Review Rate, Negative Review
-   Rate, and the share of products below the approved rating threshold.
-3. Main trend: Average Rating and Review Count by review month.
-4. Driver visuals: rating distribution, average rating by product/category, review
-   volume by category, and rating versus return rate or transit time.
-5. Detail table: product, category, average rating, review count, positive rate,
-   negative rate, return rate, and delivery indicators.
-
-Flag low-review samples and avoid ranking products by rating alone. Written review
-titles may be shown for qualitative inspection but must not be treated as a numeric KPI.
-
-### Integrated cross-domain and data-quality perspectives
-
-Cross-domain comparisons and data-quality caveats are distributed across the seven
-analytical pages. Use scatter views for relationships such as product value versus
-rating, stock availability versus sell-through, transit versus shipping cost, and
-return rate versus refund impact. Surface sample counts, date roles, missing-record
-warnings, and metric assumptions in chart subtitles, caveat notes, and detail tables.
-
-## 6.4. Visual and Interaction Standards
-
-- Use a restrained colour system: one primary colour for current performance, one
-  comparison colour, and semantic warning colours only for defined thresholds.
-- Use consistent titles in the form “Measure by Dimension” and include the date basis
-  or snapshot basis in the subtitle.
-- Place legends above or inside the visual only when they remain readable. Prefer
-  direct labels for two-series comparisons.
-- Avoid decorative visuals, three-dimensional charts, gauges without an approved
-  target, and pie charts with many categories.
-- Enable cross-highlighting only when the interaction preserves the denominator and
-  date context. Use drillthrough for detailed order, product, or exception analysis.
-- Add accessible alt text, meaningful tab order, keyboard-accessible navigation, and
-  sufficient contrast. Do not communicate a result through colour alone.
-- Keep slicers and visual interactions synchronized across pages only when they have
-  the same semantic meaning. A return date filter must not silently behave as an
-  order date filter.
-- Every page must include a visible reset-filters action and a clear indication when
-  a metric is unavailable because its required field, denominator, or business rule
-  has not been confirmed.
