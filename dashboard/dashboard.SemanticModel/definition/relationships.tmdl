@@ -19,7 +19,6 @@ relationship 2e8f7cb0-5b48-4110-b5ef-5d514c40d611
 	toColumn: Orders.OrderID
 
 relationship 82db7f02-9328-4b40-94ad-fec8ddb6db13
-	isActive: false
 	fromColumn: Shipments.OrderID
 	toColumn: Orders.OrderID
 
@@ -68,7 +67,6 @@ relationship f98ce7ca-4758-4453-93ce-d375f1da3647
 	toColumn: Date.Date
 
 relationship 70e7e93a-56fc-4b4d-bb5c-9f770330f5b6
-	isActive: false
 	fromColumn: Inventory.SnapshotDate
 	toColumn: Date.Date
 

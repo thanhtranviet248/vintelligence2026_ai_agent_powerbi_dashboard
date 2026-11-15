@@ -85,7 +85,7 @@ A star schema with a single conformed **`Date`** table.
 | WebTraffic | daily — 3,652 (from 2013-01-01) | |
 | Customers / Geography / Products / Promotions | dimensions — 121,930 / 39,948 / 2,412 / 50 | Blank promo IDs are valid: keep them |
 
-**Date relationships:** the active ones are `Orders[OrderDate]`, `Sales[Date]`, and `WebTraffic[Date]`. The inactive role-playing ones are ShipDate, DeliveryDate, ReturnDate, ReviewDate, and SnapshotDate. Measures that analyse by any other date use this pattern (the `… by Ship Date`, `… by Return Date`, and `… by Review Date` variants):
+**Date relationships:** the active ones are `Orders[OrderDate]`, `Inventory[SnapshotDate]`, `Sales[Date]`, and `WebTraffic[Date]`. The inactive role-playing ones are ShipDate, DeliveryDate, ReturnDate, and ReviewDate. Measures that analyse by any other date use this pattern (the `… by Ship Date`, `… by Return Date`, and `… by Review Date` variants):
 
 ```dax
 measure 'Shipment Cost by Ship Date' =
@@ -97,7 +97,8 @@ measure 'Shipment Cost by Ship Date' =
 ```
 
 How the build differs from the spec (these are deliberate as-built facts):
-- `Shipments[OrderID] → Orders[OrderID]` is **inactive**.
+- `Shipments[OrderID] → Orders[OrderID]` is **active**, so shipment measures follow order date, Region, and status.
+- Order-level measures (`Total Orders`, `Distinct Customers`, the customer counts, `Total Payment Value`, and the base shipment measures) wrap their aggregation in `CALCULATE(..., CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH))` so product slicers reach them. The relationship stays single-direction in the model. Follow the same pattern for new order-level measures.
 - There is **no** Customers → Geography relationship.
 - ID columns are typed `Int64` in Power Query (the spec says text).
 
@@ -131,8 +132,8 @@ How the build differs from the spec (these are deliberate as-built facts):
   - Delivery and Logistics and Returns and Product Quality share the folder names `kpi-shipment-cost`, `kpi-otd`, `kpi-return-rate`, `kpi-refund-amount`, and `p3-*`.
   - On Customer Satisfaction, `p5-col-gender` is a line chart, "Average Rating by Review Month".
   - Always check a visual's title and projections, not its folder name.
-- **Filter paths:** `Shipments` has no active relationship, so shipment measures ignore every slicer except through the "by Ship Date" and "Product-Linked" variants. `Inventory` is reached only through `Products`. The category and product slicers don't filter order-level measures such as `Total Orders`.
-- No visual has alt text or a subtitle, and no page has a reset-filters action.
+- **Filter paths:** the Region slicer doesn't reach `Inventory`, which connects only to `Products` and the snapshot date. The "Product-Linked" shipment measures now duplicate the base measures.
+- No page has a reset-filters action. Every non-header, non-slicer visual has alt text and a date-basis subtitle, and new visuals need both.
 - There are duplicate measures: `Return Amount` / `Refund Amount`, `Revenue Growth` / `Year-over-Year Growth`, and `Average Transit Time` (an alias of `Average Delivery Time`).
 
 ## Git

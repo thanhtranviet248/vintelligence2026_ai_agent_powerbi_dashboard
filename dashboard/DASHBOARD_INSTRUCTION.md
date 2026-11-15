@@ -128,7 +128,7 @@ The sales measures don't apply an order-status filter. They count every order li
 | Net Sales | Gross sales less discounts, before refunds | `SUMX(OrderItems, Quantity * (UnitPrice - DiscountAmount))` | order_items.csv | Built `Net Sales`: EO, SP, CM |
 | Discount Rate | Discount value as a share of gross sales | `DIVIDE([Discount Amount], [Gross Sales])` | order_items.csv | Built `Discount Rate`: SP |
 | Units Sold | Quantity on order lines | `SUM(OrderItems[Quantity])` | order_items.csv | Built `Units Sold`: SP |
-| Total Orders | Distinct orders | `DISTINCTCOUNT(Orders[OrderID])`, all statuses, no eligibility filter. Status-specific counts: `Delivered Orders`, `Shipped Orders` (shipped + delivered), `Pending Orders` (created + paid), `Cancelled Orders`, `Returned Status Orders` | orders.csv | Built (differs): no eligible-order rule. SP, CM, DL |
+| Total Orders | Distinct orders | `DISTINCTCOUNT(Orders[OrderID])` with `CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH)`, so product filters reach it. All statuses, no eligibility filter. Status-specific counts: `Delivered Orders`, `Shipped Orders` (shipped + delivered), `Pending Orders` (created + paid), `Cancelled Orders`, `Returned Status Orders` | orders.csv | Built (differs): no eligible-order rule. SP, CM, DL |
 | Average Order Value (AOV) | Net sales per order | `DIVIDE([Net Sales], [Total Orders])` | orders.csv, order_items.csv | Built `Average Order Value`: SP |
 | COGS | Cost of units sold at **current catalog cost** | `SUMX(OrderItems, Quantity * RELATED(Products[COGS]))` | order_items.csv, products.csv | Built `COGS`: SP (titled as a catalog-cost estimate) |
 | Gross Profit | Net sales less COGS | `[Net Sales] - [COGS]` | order_items.csv, products.csv | Built `Gross Profit`: EO, SP |
@@ -146,9 +146,9 @@ Growth measures should compare complete, equivalent periods. The built growth me
 
 | Metric | Definition / requirement | Formula / logic (as built) | Source | Status |
 | --- | --- | --- | --- | --- |
-| Distinct Customers | Unique customers with at least one order in context | `DISTINCTCOUNT(Orders[CustomerID])`, all statuses | orders.csv | Built `Distinct Customers`: CM |
+| Distinct Customers | Unique customers with at least one order in context | `DISTINCTCOUNT(Orders[CustomerID])` with `CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH)`, all statuses. `New Customers`, `Repeat Customers`, and the all-time rates build their customer list the same way | orders.csv | Built `Distinct Customers`: CM |
 | Revenue per Customer | Net sales per distinct customer | `DIVIDE([Net Sales], [Distinct Customers])` | orders.csv, order_items.csv | Built `Revenue per Customer`: CM |
-| Customer Segments | Customers, orders, and net sales by acquisition channel, age group, and gender | Existing measures by `Customers[AcquisitionChannel]`, `[AgeGroup]`, `[Gender]`. "Customers by Acquisition Channel / Age Group" count `Customers[CustomerID]` rows, so date, category, and region filters don't reach them | customers.csv, orders.csv | Built as visuals: CM |
+| Customer Segments | Customers, orders, and net sales by acquisition channel, age group, and gender | Existing measures by `Customers[AcquisitionChannel]`, `[AgeGroup]`, `[Gender]`. "Customers by Acquisition Channel / Age Group" use `Distinct Customers`, so they count customers who ordered in the filtered context | customers.csv, orders.csv | Built as visuals: CM |
 | Customer Geography | Net sales by region | `[Net Sales]` by `Geography[Region]` through `Orders[Zip]`. No city view and no unmatched-ZIP report | geography.csv, orders.csv | Built (partial): CM |
 | New Customers | Customers whose first order falls in the selected period | First `Orders[OrderDate]` per customer (all dates, all statuses) falls inside the current Date range | customers.csv, orders.csv | Built `New Customers`. Model only |
 | Repeat Customers (period) | Customers in the period whose first order came earlier | First order date < `MIN('Date'[Date])` | orders.csv | Built `Repeat Customers`. Model only |
@@ -159,7 +159,7 @@ Growth measures should compare complete, equivalent periods. The built growth me
 
 ## 2.5. Inventory Performance Metrics
 
-Inventory measures use the product-by-month-end snapshot grain. Stock balances take the latest snapshot in context (`VAR LatestSnapshot = MAX(Inventory[SnapshotDate])`) and never sum across dates. Inventory is related only to `Products` (see section 4), so the Reporting-period and Region slicers don't filter it. "Current" therefore means the latest snapshot in the data unless a visual puts `SnapshotDate` in context. The model doesn't display the snapshot date it used.
+Inventory measures use the product-by-month-end snapshot grain. Stock balances take the latest snapshot in context (`VAR LatestSnapshot = MAX(Inventory[SnapshotDate])`) and never sum across dates. Inventory is related to `Products` and, through `Inventory[SnapshotDate]`, to `Date` (see section 4). The Reporting-period slicer filters it by snapshot date. The Region slicer doesn't reach it. "Current" therefore means the latest snapshot inside the selected period. The model doesn't display the snapshot date it used.
 
 | Metric | Definition | Formula / logic (as built) | Source | Status |
 | --- | --- | --- | --- | --- |
@@ -168,7 +168,7 @@ Inventory measures use the product-by-month-end snapshot grain. Stock balances t
 | Stock In / Stock Out | Units received / sold in the snapshot records | `SUM(Inventory[UnitsReceived])` / `SUM(Inventory[UnitsSold])` across the rows in context | inventory.csv | Built `Stock In`, `Stock Out`: IP |
 | Low-Stock / Out-of-Stock Products | Products with ≤ 20 / 0 units at the latest snapshot | Distinct products at `LatestSnapshot` with `StockOnHand <= 20` / `= 0` | inventory.csv | Built `Low-Stock Products`, `Out-of-Stock Products`: IP |
 | Reorder Candidates | Products flagged for reorder at the latest snapshot | Distinct products at `LatestSnapshot` with `ReorderFlag = 1` | inventory.csv | Built `Reorder Candidates`. Model only |
-| Stockout / Overstock Rate | Share of snapshot rows flagged stockout / overstock | `DIVIDE(SUM(flag), COUNTROWS(Inventory))` over **all snapshot rows in context**, not the latest snapshot only | inventory.csv | Built `Stockout Rate` (EO), `Overstock Rate` (model only) |
+| Stockout / Overstock Rate | Share of products flagged stockout / overstock at the latest snapshot | `DIVIDE(SUM(flag), COUNTROWS(Inventory))` where `SnapshotDate = LatestSnapshot` | inventory.csv | Built `Stockout Rate` (EO), `Overstock Rate` (model only) |
 | Stockout Days | Recorded stockout days | `AVERAGE(Inventory[StockoutDays])` (simple average of source values) | inventory.csv | Built `Stockout Days`. Model only; IP's detail table shows the raw column |
 | Days of Supply | Recorded days of supply | `AVERAGE(Inventory[DaysOfSupply])` | inventory.csv | Built `Days of Supply`. Model only; raw column on IP |
 | Fill Rate / Sell-Through Rate | Source-provided ratios | `AVERAGE(Inventory[FillRate])` / `AVERAGE(Inventory[SellThroughRate])` (simple averages) | inventory.csv | Built `Fill Rate` (model only; raw column on IP), `Sell-Through Rate` (IP) |
@@ -179,16 +179,16 @@ Inventory measures use the product-by-month-end snapshot grain. Stock balances t
 
 Transit time is a measured elapsed duration. It is not, by itself, proof that an order was late. A true late-delivery KPI requires a promised delivery date or an approved service-level target. The 3-day rule below is therefore a diagnostic threshold, and the report labels it "(Diagnostic)".
 
-`Shipments` has no active relationship (section 4). Shipment measures without a "by Ship Date" or "Product-Linked" variant therefore ignore every slicer and every row/axis dimension.
+`Shipments` is related to `Orders` (section 4), and the base shipment measures add `CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH)`. They therefore follow order date, Region, order status, and product filters. The "by Ship Date" variants follow ship date instead. Under a product filter, a shipment measure covers every order that contains the product, and `Shipment Cost` is the full order fee, not an allocated share.
 
 | Metric | Definition / requirement | Formula / logic (as built) | Source | Status |
 | --- | --- | --- | --- | --- |
 | Shipment Cost | Total recorded shipping fees | `SUM(Shipments[ShippingFee])`. Date-aware variant: `Shipment Cost by Ship Date` (`USERELATIONSHIP` on ShipDate + `CROSSFILTER(..., OrderDate, NONE)`) | shipments.csv | Built: DL (card, region table); by-ship-date variant on DL trend |
 | Shipment Records | Distinct orders with a shipment row | `DISTINCTCOUNT(Shipments[OrderID])` | shipments.csv | Built `Shipment Records`: DL |
-| Shipment Coverage Rate | Shipment records as a share of orders | `DIVIDE([Shipment Records], [Total Orders])`. Only the denominator responds to filters | shipments.csv, orders.csv | Built (differs: unfiltered numerator) `Shipment Coverage Rate`: EO |
+| Shipment Coverage Rate | Shipment records as a share of orders | `DIVIDE([Shipment Records], [Total Orders])`, with both parts on the same filtered orders | shipments.csv, orders.csv | Built `Shipment Coverage Rate`: EO |
 | Average Transit Time | Average days from ship to delivery for valid delivered shipments | `AVERAGEX` of `DATEDIFF(ShipDate, DeliveryDate, DAY)` where both dates are present and delivery ≥ ship | shipments.csv | Built `Average Delivery Time`, plus the alias `Average Transit Time`: DL |
 | Transit Within 3 Days | Delivered shipments completed within 3 days (diagnostic) | Shipments with transit ≤ 3 days divided by `Delivered Shipments`. Date-aware variant: `Transit Within 3 Days by Ship Date` | shipments.csv | Built: DL |
-| Product-Linked Shipment Measures | Shipment measures restricted to orders in the current product context | `TREATAS(VALUES(OrderItems[OrderID]), Shipments[OrderID])` | shipments.csv, order_items.csv | Built `Product-Linked Shipment Orders`, `Product-Linked Average Transit Time`: EO |
+| Product-Linked Shipment Measures | Shipment measures restricted to orders in the current product context | `TREATAS(VALUES(OrderItems[OrderID]), Shipments[OrderID])`. These now return the same values as the base measures | shipments.csv, order_items.csv | Built `Product-Linked Shipment Orders`, `Product-Linked Average Transit Time`: EO |
 | Late Delivery Rate | Shipments delivered after a promised date | – | needs a promised-date / SLA field | Not built (no promised date in source) |
 | Order-to-Delivery Lead Time | Days from order date to delivery | – | orders.csv, shipments.csv | Not built |
 | Order Status Counts / Mix | Counts and shares by source order status | `[Total Orders]` by `Orders[OrderStatus]`. Mix: `DIVIDE([Total Orders], CALCULATE([Total Orders], ALL(Orders[OrderStatus])))` | orders.csv | Built: EO, DL (counts). `Order Status Mix` is model only |
@@ -205,7 +205,7 @@ Return trends use the return date through `… by Return Date` measures. The oth
 | Returned Orders | Distinct orders with at least one return | `DISTINCTCOUNT(Returns[OrderID])` | returns.csv | Built `Returned Orders`: RQ |
 | Return Quantity | Units recorded as returned | `SUM(Returns[ReturnQuantity])`. Date-aware variant: `Return Quantity by Return Date` | returns.csv | Built: RQ |
 | Refund Amount | Recorded refund value | `SUM(Returns[RefundAmount])`. Date-aware variant: `Refund Amount by Return Date` | returns.csv | Built twice, identically: `Refund Amount` (RQ) and `Return Amount` (RQ reason donut and category table) |
-| Return Rate | Share of orders with at least one return | `DIVIDE([Returned Orders], [Total Orders])`, all-status denominator. Product filters don't reach the denominator | returns.csv, orders.csv | Built `Return Rate`: EO, RQ |
+| Return Rate | Share of orders with at least one return | `DIVIDE([Returned Orders], [Total Orders])`, all-status denominator. Product filters reach both parts | returns.csv, orders.csv | Built `Return Rate`: EO, RQ |
 | Return Rate for Product Orders | Return rate with a denominator that respects product filters | `DIVIDE([Returned Orders], DISTINCTCOUNT(OrderItems[OrderID]))` | returns.csv, order_items.csv | Built: EO, RQ, CS |
 | Return Reason Share | Share of returned orders by reason | Returned orders with `ALL(Returns[ReturnReason])` as the denominator | returns.csv | Built `Return Reason Share`: RQ |
 | Net Sales After Returns | Net sales less refunds | `[Net Sales] - [Refund Amount]`; no cohort alignment | order_items.csv, returns.csv | Built. Model only |
@@ -306,7 +306,7 @@ The checks below were run against the CSVs when the model was designed. The repo
 
 # 4. RELATIONSHIPS
 
-All relationships are many-to-one, single direction (dimension filters fact), as defined in `relationships.tmdl`. None is bidirectional.
+All relationships are many-to-one, single direction (dimension filters fact), as defined in `relationships.tmdl`. None is bidirectional in the model. Order-level measures switch `OrderItems[OrderID] → Orders[OrderID]` to both directions inside the measure with `CROSSFILTER(..., BOTH)`.
 
 **Active**
 
@@ -321,7 +321,9 @@ All relationships are many-to-one, single direction (dimension filters fact), as
 | Returns[ProductID] | Products[ProductID] |
 | Reviews[OrderID] | Orders[OrderID] |
 | Reviews[ProductID] | Products[ProductID] |
+| Shipments[OrderID] | Orders[OrderID] |
 | Inventory[ProductID] | Products[ProductID] |
+| Inventory[SnapshotDate] | Date[Date] |
 | Orders[OrderDate] | Date[Date] |
 | Sales[Date] | Date[Date] |
 | WebTraffic[Date] | Date[Date] |
@@ -330,12 +332,10 @@ All relationships are many-to-one, single direction (dimension filters fact), as
 
 | From (many) | To (one) | Used by |
 | --- | --- | --- |
-| Shipments[OrderID] | Orders[OrderID] | – (the Product-Linked measures use `TREATAS` instead) |
 | Shipments[ShipDate] | Date[Date] | `Shipment Cost by Ship Date`, `Transit Within 3 Days by Ship Date` |
 | Shipments[DeliveryDate] | Date[Date] | – |
 | Returns[ReturnDate] | Date[Date] | `Return Quantity by Return Date`, `Refund Amount by Return Date` |
 | Reviews[ReviewDate] | Date[Date] | `Review Count by Review Date`, `Average Rating by Review Date` |
-| Inventory[SnapshotDate] | Date[Date] | – |
 
 **Not related:** Customers → Geography (customer ZIP isn't linked), Reviews → Customers (omitted on purpose), and `Promotions` (not linked to any fact).
 
@@ -353,11 +353,11 @@ CALCULATE(
 
 | Slicer | Orders, OrderItems, Payments, Returns, Reviews | Inventory | Shipments | Customers |
 | --- | --- | --- | --- | --- |
-| Reporting period | Yes, by order date | No | Only "by Ship Date" measures | No |
-| Product category / Product | OrderItems, Returns, Reviews: yes. Orders and Payments: **no** (`Total Orders`, `Distinct Customers`, order status, and `Fulfillment Rate` don't change) | Yes | Only "Product-Linked" measures | No |
-| Region | Yes, through Orders[Zip] | No | No | No |
+| Reporting period | Yes, by order date | Yes, by snapshot date | Yes, by order date ("by Ship Date" measures use ship date) | No |
+| Product category / Product | Yes. Orders and Payments measures count the orders that contain the selected products (`CROSSFILTER ... BOTH` in the measure) | Yes | Yes (orders containing the products) | No |
+| Region | Yes, through Orders[Zip] | No | Yes, through Orders | No |
 
-Use the appropriate inactive date role explicitly for shipment, delivery, return, review, and inventory trends. Don't create a direct Reviews-to-Customers relationship, because Reviews already connect to customers through Orders.
+Use the appropriate inactive date role explicitly for shipment, delivery, return, and review trends. Don't create a direct Reviews-to-Customers relationship, because Reviews already connect to customers through Orders.
 
 # 5. ASSUMPTIONS AND CAVEATS
 
@@ -395,8 +395,8 @@ Use the appropriate inactive date role explicitly for shipment, delivery, return
 - **Theme:** `purple-slicer`, registered as both the base theme and the custom theme. Colours come from the theme, not from per-visual formatting.
 - **Navigation:** none. There are no page-navigator buttons, bookmarks, or drill-through pages. Users move between pages with the page tabs.
 - **Reset filters:** not built. No page has a reset button or bookmark.
-- **Alt text:** not set on any visual.
-- **Subtitles:** empty on every visual. The date basis is stated in the title instead (for example "by Ship Month" or "by Return Month").
+- **Alt text:** set on every visual except the shared header and slicers. It describes the chart type, the measure, and the dimension.
+- **Subtitles:** set on every visual except the header and slicers, in grey 10 pt. Each one states the date basis: "By order date", "Monthly, by ship date", "Monthly, by return date", "Monthly, by review date", "All-time", or "Latest snapshot · Region not applied" for inventory. The 3-day transit visuals add "diagnostic, not an SLA".
 - **Report-level filters:** none.
 - **Not built from the original design:** a Diagnostics page, a Data Quality page, scatter-chart cross-domain views, and a sixth KPI card per page.
 
@@ -518,7 +518,7 @@ Purpose: fulfilment, transit time, and shipping cost. The trends use ship date. 
 | 4 | `p5-detail-delivery` | Table | Delivery Status Detail | OrderStatus; Total Orders, Fulfillment Rate, Shipment Records, Average Transit Time, Transit Within 3 Days |
 | 4 | `p5-logistics-map` | Bar | Average Transit Time by Region | by `Geography[Region]` |
 
-Shipment measures don't respond to Region or Status (section 4), so the region and status breakdowns repeat the same shipment value on every row.
+The cards, region breakdowns, and status table use order date. Shipment measures respond to Region, status, and product through the order (section 4). The two trends use ship date.
 
 ### 6.3.6. Returns and Product Quality (`b2f3c4d5-…5d6e7f`)
 

@@ -79,17 +79,15 @@ Some measures exist in the model but no page uses them yet:
 - Sales and order metrics come from `orders.csv` and `order_items.csv`. **Net Sales** is after discounts and before refunds. *Net Sales After Returns* subtracts refunds.
 - Profitability uses the current catalog COGS from `products.csv`, not historical cost.
 - The `Sales` table is a separate benchmark series and isn't blended with order revenue.
-- The model is a star schema with one conformed `Date` table. The order date is the active date. The ship, delivery, return, review, and snapshot dates connect through inactive relationships, which a measure turns on when it needs them.
+- The model is a star schema with one conformed `Date` table. The order date is the active date for orders and everything linked to them, and the inventory snapshot date is active for `Inventory`. The ship, delivery, return, and review dates connect through inactive relationships, which a measure turns on when it needs them.
+- Order-level measures (Total Orders, Distinct Customers, order status, payments, shipments) respond to the Product category and Product slicers. They do this through `CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH)` inside each measure, and they count the orders that contain the selected products. The model relationship itself stays single-direction.
+- Every visual has alt text, and its subtitle states its date basis (order, ship, return, or review date, or the latest inventory snapshot).
 
 ## Known limitations
 These describe the current build. Improvements will be discussed separately.
-- **Shipments has no active relationship to the rest of the model.** Shipment Cost, Average Transit Time, and Transit Within 3 Days ignore the slicers, so the region breakdowns show the same value on every row. There are three exceptions:
-  - The "by Ship Date" trend measures respond to the date slicer.
-  - The "Product-Linked" measures respond to product filters.
-  - Shipment Coverage Rate's denominator (Total Orders) does respond to filters.
-- **Inventory is related only to Products.** The Reporting-period and Region slicers don't filter it, so Current Stock always shows the latest snapshot overall.
-- **The Product category and Product slicers don't filter order-level measures** such as Total Orders, Distinct Customers, Fulfillment Rate, and order status. The "Return Rate for Product Orders" measure exists for that reason.
-- Customer counts by acquisition channel and age group count customer records, so the date, category, and region slicers don't filter them.
+- **Shipment measures follow the order.** Shipment Cost, Average Transit Time, and Transit Within 3 Days are filtered by order date, Region, and product, except for the "by Ship Date" trends. Under a product filter, Shipment Cost is the full shipping fee of each order that contains the product. It isn't split across the products in the order.
+- **The Region slicer doesn't apply to inventory.** Inventory connects to Products and to the snapshot date only. Inventory measures show the latest snapshot inside the selected period.
+- Stock In and Stock Out add up the monthly flows of every snapshot in the period.
 - Promotion attribution is limited: many `promo_id` values are blank, and `Promotions` isn't related to any fact table.
-- Visuals have no alt text, and pages have no reset-filters button.
+- Pages have no reset-filters button yet.
 - The data is synthetic and may not represent a deployed ERP environment.

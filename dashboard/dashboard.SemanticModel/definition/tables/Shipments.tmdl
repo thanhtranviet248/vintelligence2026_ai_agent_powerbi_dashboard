@@ -1,20 +1,20 @@
 table Shipments
 	lineageTag: 7d4de668-25fe-4ad2-b8d2-9c0d54004531
 
-	measure 'Shipment Cost' = SUM(Shipments[ShippingFee])
+	measure 'Shipment Cost' = CALCULATE(SUM(Shipments[ShippingFee]), CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH))
 		lineageTag: f2661db0-496c-498f-9b9a-f4740583c483
 
-	measure 'Shipment Records' = DISTINCTCOUNT(Shipments[OrderID])
+	measure 'Shipment Records' = CALCULATE(DISTINCTCOUNT(Shipments[OrderID]), CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH))
 		lineageTag: 80cefb9b-08ad-4776-8c8e-ffb2beae3009
 
 	measure 'Shipment Coverage Rate' = DIVIDE([Shipment Records], [Total Orders])
 		formatString: 0.0%
 		lineageTag: a9274e62-e6e3-41b6-bd51-87c5045f234d
 
-	measure 'Delivered Shipments' = CALCULATE(DISTINCTCOUNT(Shipments[OrderID]), NOT ISBLANK(Shipments[ShipDate]), NOT ISBLANK(Shipments[DeliveryDate]), Shipments[DeliveryDate] >= Shipments[ShipDate])
+	measure 'Delivered Shipments' = CALCULATE(DISTINCTCOUNT(Shipments[OrderID]), NOT ISBLANK(Shipments[ShipDate]), NOT ISBLANK(Shipments[DeliveryDate]), Shipments[DeliveryDate] >= Shipments[ShipDate], CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH))
 		lineageTag: a5d9b4d4-9f1f-45a9-b7b0-dfe30268a0ac
 
-	measure 'Transit Within 3 Days' = DIVIDE(CALCULATE(DISTINCTCOUNT(Shipments[OrderID]), NOT ISBLANK(Shipments[ShipDate]), NOT ISBLANK(Shipments[DeliveryDate]), Shipments[DeliveryDate] >= Shipments[ShipDate], DATEDIFF(Shipments[ShipDate], Shipments[DeliveryDate], DAY) <= 3), [Delivered Shipments])
+	measure 'Transit Within 3 Days' = DIVIDE(CALCULATE(DISTINCTCOUNT(Shipments[OrderID]), NOT ISBLANK(Shipments[ShipDate]), NOT ISBLANK(Shipments[DeliveryDate]), Shipments[DeliveryDate] >= Shipments[ShipDate], DATEDIFF(Shipments[ShipDate], Shipments[DeliveryDate], DAY) <= 3, CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH)), [Delivered Shipments])
 		formatString: 0.0%
 		lineageTag: 64322fb3-742b-4247-8d7e-c4d7bc6cb5a3
 
@@ -26,7 +26,7 @@ table Shipments
 		formatString: 0.0%
 		lineageTag: ccd4246e-e815-4fb9-bd08-7bffbf90d4e1
 
-	measure 'Average Delivery Time' = AVERAGEX(FILTER(Shipments, NOT ISBLANK(Shipments[ShipDate]) && NOT ISBLANK(Shipments[DeliveryDate]) && Shipments[DeliveryDate] >= Shipments[ShipDate]), DATEDIFF(Shipments[ShipDate], Shipments[DeliveryDate], DAY))
+	measure 'Average Delivery Time' = CALCULATE(AVERAGEX(FILTER(Shipments, NOT ISBLANK(Shipments[ShipDate]) && NOT ISBLANK(Shipments[DeliveryDate]) && Shipments[DeliveryDate] >= Shipments[ShipDate]), DATEDIFF(Shipments[ShipDate], Shipments[DeliveryDate], DAY)), CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH))
 		lineageTag: 530c60db-d662-4004-88e7-f2cdadc5da14
 
 	measure 'Average Transit Time' = [Average Delivery Time]

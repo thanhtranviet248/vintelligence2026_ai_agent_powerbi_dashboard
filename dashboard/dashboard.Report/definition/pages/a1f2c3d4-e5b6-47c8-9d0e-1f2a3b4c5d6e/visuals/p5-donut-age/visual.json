@@ -36,21 +36,16 @@
           "projections": [
             {
               "field": {
-                "Aggregation": {
+                "Measure": {
                   "Expression": {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "Customers"
-                        }
-                      },
-                      "Property": "CustomerID"
+                    "SourceRef": {
+                      "Entity": "Orders"
                     }
                   },
-                  "Function": 2
+                  "Property": "Distinct Customers"
                 }
               },
-              "queryRef": "Customers.CustomerID",
+              "queryRef": "Orders.Distinct Customers",
               "nativeQueryRef": "Distinct Customers"
             }
           ]
@@ -232,6 +227,57 @@
               "expr": {
                 "Literal": {
                   "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'By order date · customers with an order in the period'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#667085'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Donut chart of distinct ordering customers by age group. Each slice is labelled with its age group and value.'"
                 }
               }
             }

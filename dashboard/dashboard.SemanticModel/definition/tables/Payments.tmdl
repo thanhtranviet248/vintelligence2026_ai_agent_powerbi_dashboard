@@ -1,7 +1,7 @@
 table Payments
 	lineageTag: a725eb32-3b90-4f02-869d-79af156a4d0e
 
-	measure 'Total Payment Value' = SUM(Payments[PaymentValue])
+	measure 'Total Payment Value' = CALCULATE(SUM(Payments[PaymentValue]), CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH))
 		lineageTag: 94f3f920-44b7-4437-98a7-2f7f3d0ebec9
 
 	column OrderID

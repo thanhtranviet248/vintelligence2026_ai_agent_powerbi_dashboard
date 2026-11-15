@@ -35,11 +35,11 @@ table Inventory
 	measure 'Reorder Candidates' = VAR LatestSnapshot = MAX(Inventory[SnapshotDate]) RETURN CALCULATE(DISTINCTCOUNT(Inventory[ProductID]), Inventory[SnapshotDate] = LatestSnapshot, Inventory[ReorderFlag] = 1)
 		lineageTag: 5a71c040-2fac-4f47-aefc-b089db4583e8
 
-	measure 'Stockout Rate' = DIVIDE(SUM(Inventory[StockoutFlag]), COUNTROWS(Inventory))
+	measure 'Stockout Rate' = VAR LatestSnapshot = MAX(Inventory[SnapshotDate]) RETURN CALCULATE(DIVIDE(SUM(Inventory[StockoutFlag]), COUNTROWS(Inventory)), Inventory[SnapshotDate] = LatestSnapshot)
 		formatString: 0.0%
 		lineageTag: e655a24b-f3e7-4e4a-91e9-c40a75d3c15c
 
-	measure 'Overstock Rate' = DIVIDE(SUM(Inventory[OverstockFlag]), COUNTROWS(Inventory))
+	measure 'Overstock Rate' = VAR LatestSnapshot = MAX(Inventory[SnapshotDate]) RETURN CALCULATE(DIVIDE(SUM(Inventory[OverstockFlag]), COUNTROWS(Inventory)), Inventory[SnapshotDate] = LatestSnapshot)
 		formatString: 0.0%
 		lineageTag: 67ad1ff0-51b3-41d7-965c-d242eb95feb0
 

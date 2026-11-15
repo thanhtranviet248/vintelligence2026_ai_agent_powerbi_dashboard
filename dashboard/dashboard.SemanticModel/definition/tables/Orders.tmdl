@@ -1,10 +1,10 @@
 table Orders
 	lineageTag: 96ce3597-5dc5-418f-a932-8f8efcb791d2
 
-	measure 'Total Orders' = DISTINCTCOUNT(Orders[OrderID])
+	measure 'Total Orders' = CALCULATE(DISTINCTCOUNT(Orders[OrderID]), CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH))
 		lineageTag: a35029f5-bc5c-43e8-ac8f-80defd964c81
 
-	measure 'Distinct Customers' = DISTINCTCOUNT(Orders[CustomerID])
+	measure 'Distinct Customers' = CALCULATE(DISTINCTCOUNT(Orders[CustomerID]), CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH))
 		lineageTag: 60ff5ca2-1d41-4d10-912a-14e5f8d49ccd
 
 	measure 'Shipped Orders' = CALCULATE([Total Orders], OR(Orders[OrderStatus]="shipped", Orders[OrderStatus]="delivered"))
@@ -22,19 +22,19 @@ table Orders
 	measure 'Returned Status Orders' = CALCULATE([Total Orders], Orders[OrderStatus]="returned")
 		lineageTag: 47a09bcd-60f8-4ae2-9eb9-f7661308d088
 
-	measure 'New Customers' = COUNTROWS(FILTER(VALUES(Orders[CustomerID]), VAR FirstOrderDate = CALCULATE(MIN(Orders[OrderDate]), ALL(Orders[OrderDate])) RETURN FirstOrderDate >= MIN(Date[Date]) && FirstOrderDate <= MAX(Date[Date])))
+	measure 'New Customers' = COUNTROWS(FILTER(CALCULATETABLE(VALUES(Orders[CustomerID]), CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH)), VAR FirstOrderDate = CALCULATE(MIN(Orders[OrderDate]), ALL(Orders[OrderDate])) RETURN FirstOrderDate >= MIN(Date[Date]) && FirstOrderDate <= MAX(Date[Date])))
 		lineageTag: a240c9d6-4c3b-4d42-b0f5-6bb86362a131
 
-	measure 'Repeat Customers' = COUNTROWS(FILTER(VALUES(Orders[CustomerID]), VAR FirstOrderDate = CALCULATE(MIN(Orders[OrderDate]), ALL(Orders[OrderDate])) RETURN FirstOrderDate < MIN(Date[Date])))
+	measure 'Repeat Customers' = COUNTROWS(FILTER(CALCULATETABLE(VALUES(Orders[CustomerID]), CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH)), VAR FirstOrderDate = CALCULATE(MIN(Orders[OrderDate]), ALL(Orders[OrderDate])) RETURN FirstOrderDate < MIN(Date[Date])))
 		lineageTag: f7992051-8df5-4fcc-a62a-c7e66cc6debe
 
 	measure 'Order Frequency' = DIVIDE([Total Orders], [Distinct Customers])
 		lineageTag: 96573a9b-4256-42dd-92af-f003af1ecdf9
 
-	measure 'All-Time First-Time Customers' = COUNTROWS(FILTER(CALCULATETABLE(VALUES(Orders[CustomerID]), ALL('Date')), CALCULATE(DISTINCTCOUNT(Orders[OrderID]), ALL('Date')) = 1))
+	measure 'All-Time First-Time Customers' = COUNTROWS(FILTER(CALCULATETABLE(VALUES(Orders[CustomerID]), ALL('Date'), CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH)), CALCULATE(DISTINCTCOUNT(Orders[OrderID]), ALL('Date')) = 1))
 		lineageTag: a4e75259-922a-4823-b92e-b7f5c95f0ac6
 
-	measure 'All-Time Repeat Customers' = COUNTROWS(FILTER(CALCULATETABLE(VALUES(Orders[CustomerID]), ALL('Date')), CALCULATE(DISTINCTCOUNT(Orders[OrderID]), ALL('Date')) > 1))
+	measure 'All-Time Repeat Customers' = COUNTROWS(FILTER(CALCULATETABLE(VALUES(Orders[CustomerID]), ALL('Date'), CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH)), CALCULATE(DISTINCTCOUNT(Orders[OrderID]), ALL('Date')) > 1))
 		lineageTag: 2ca954ff-6ce3-4e7d-ad98-189d3957877a
 
 	measure 'All-Time First-Time Customer Rate' = DIVIDE([All-Time First-Time Customers], CALCULATE([Distinct Customers], ALL('Date')))
