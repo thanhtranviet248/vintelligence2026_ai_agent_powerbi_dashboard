@@ -1,7 +1,5 @@
 # VinTelligence · E-commerce Performance Dashboard
 
-A Power BI dashboard that brings sales, customers, inventory, shipment, returns and customer satisfaction for an online retailer into one report.
-
 ## 1. Project overview
 
 **Goal.** Give one integrated view of how the e-commerce business performs and how the supply chain behind it (stock, delivery, returns) affects sales and customer outcomes. The dashboard should help its user:
