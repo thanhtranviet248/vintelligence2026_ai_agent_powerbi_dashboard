@@ -39,7 +39,7 @@ The data is 13 CSV files covering orders from 2012 to 2022. Ten of them are load
 | sales.csv | – | Not loaded (separate daily benchmark revenue series) | – |
 | web_traffic.csv | – | Not loaded (daily traffic) | – |
 
-**Model.** A star schema with one shared **Date** table (2012–2022). Order date drives orders, sales, shipments, returns and reviews; the snapshot date drives inventory. Ship, delivery, return and review dates are also linked, and a measure switches to one of them only when it needs that date. Products and Promotions filter the order lines; Customers and Geography filter the orders.
+**Model.** A star schema with one shared **Date** table (2012–2022). Order date drives orders, sales, shipments, returns and reviews; the snapshot date drives inventory. Ship, delivery, return and review dates are also linked but inactive; only the review-sentiment trend switches to review date. Products and Promotions filter the order lines; Customers and Geography filter the orders.
 
 **Key definitions.**
 - Net Sales is after discounts and before refunds.
@@ -156,7 +156,7 @@ Is sentiment improving, and which products and categories disappoint customers?
 - **Reviews:** negative review rate by transit days is a comparison, not proof that slow delivery causes bad ratings.
 
 **Report**
-- Several KPI cards have no subtitle; the comparison-to-last-year labels exist in the model but aren't shown on them.
-- The low-stock threshold (20 units), transit threshold (3 days), return-reduction scenario (0%) and minimum review count (10) have no slicer, so they always run at these defaults.
-- Some measures stay in the model without a visual; they are listed in `DASHBOARD_INSTRUCTION.md` §2.10.
+- Several KPI cards have no subtitle and no comparison to last year.
+- The low-stock threshold (20 units) and minimum review count (10) have no slicer, so they always run at these defaults. The transit threshold is fixed at 3 days, and there is no return-reduction scenario.
+- Every measure in the model feeds a visual or another measure; unused measures were removed (see `DASHBOARD_INSTRUCTION.md` §2.10).
 - Navigation is by page tabs only. There are no drill-through pages or bookmarks.

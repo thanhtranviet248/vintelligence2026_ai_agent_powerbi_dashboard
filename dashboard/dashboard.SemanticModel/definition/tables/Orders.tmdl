@@ -17,17 +17,9 @@ table Orders
 		formatString: 0.00
 		lineageTag: 96573a9b-4256-42dd-92af-f003af1ecdf9
 
-	measure 'All-Time First-Time Customers' = COUNTROWS(FILTER(CALCULATETABLE(VALUES(Orders[CustomerID]), ALL('Date'), CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH)), CALCULATE(DISTINCTCOUNT(Orders[OrderID]), ALL('Date')) = 1))
-		formatString: #,0
-		lineageTag: a4e75259-922a-4823-b92e-b7f5c95f0ac6
-
 	measure 'All-Time Repeat Customers' = COUNTROWS(FILTER(CALCULATETABLE(VALUES(Orders[CustomerID]), ALL('Date'), CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH)), CALCULATE(DISTINCTCOUNT(Orders[OrderID]), ALL('Date')) > 1))
 		formatString: #,0
 		lineageTag: 2ca954ff-6ce3-4e7d-ad98-189d3957877a
-
-	measure 'All-Time First-Time Customer Rate' = DIVIDE([All-Time First-Time Customers], CALCULATE([Distinct Customers], ALL('Date')))
-		formatString: 0.0%
-		lineageTag: 96155264-530a-45d5-859c-3ead2eb4552f
 
 	measure 'All-Time Repeat Customer Rate' = DIVIDE([All-Time Repeat Customers], CALCULATE([Distinct Customers], ALL('Date')))
 		formatString: 0.0%

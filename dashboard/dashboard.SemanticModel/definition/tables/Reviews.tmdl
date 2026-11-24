@@ -17,14 +17,6 @@ table Reviews
 		formatString: 0.0%
 		lineageTag: 32569c6a-e120-40c6-b87f-189f04e8617e
 
-	measure 'Review Count by Review Date' = CALCULATE([Review Count], USERELATIONSHIP('Date'[Date], Reviews[ReviewDate]), CROSSFILTER('Date'[Date], Orders[OrderDate], NONE))
-		formatString: #,0
-		lineageTag: 53ba8692-a87a-48d4-b13b-6669c9fb6f53
-
-	measure 'Average Rating by Review Date' = CALCULATE([Average Rating], USERELATIONSHIP('Date'[Date], Reviews[ReviewDate]), CROSSFILTER('Date'[Date], Orders[OrderDate], NONE))
-		formatString: 0.0
-		lineageTag: b8d3df91-f41c-4a74-9cf1-bb446b9f3de5
-
 	/// Average rating, shown only when the review count reaches the Minimum Reviews setting (10 unless the slicer is changed), so thinly reviewed items do not rank on one or two ratings.
 	measure 'Average Rating (Min Reviews)' = IF([Review Count] >= [Minimum Reviews Value], [Average Rating])
 		formatString: 0.00

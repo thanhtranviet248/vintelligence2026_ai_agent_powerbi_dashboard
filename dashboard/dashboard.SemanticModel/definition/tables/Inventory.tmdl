@@ -19,23 +19,6 @@ table Inventory
 		formatString: #,0
 		lineageTag: 6f9e2557-beb6-47c8-9c5f-af88f6d61118
 
-	/// Products at or below the Low Stock Threshold (20 units unless the slicer is changed) at the latest snapshot.
-	measure 'Low-Stock Products' =
-			VAR LatestSnapshot = MAX(Inventory[SnapshotDate])
-			VAR Threshold = [Low Stock Threshold Value]
-			RETURN
-				CALCULATE(DISTINCTCOUNT(Inventory[ProductID]), Inventory[SnapshotDate] = LatestSnapshot, Inventory[StockOnHand] <= Threshold)
-		formatString: #,0
-		lineageTag: 283265a7-a696-4292-a5f0-2664d01ce213
-
-	/// Units sold in the month of the latest snapshot divided by units sold plus closing stock (the source definition, applied to totals).
-	measure 'Sell-Through Rate' =
-			VAR LatestSnapshot = MAX(Inventory[SnapshotDate])
-			RETURN
-				CALCULATE(DIVIDE(SUM(Inventory[UnitsSold]), SUM(Inventory[StockOnHand]) + SUM(Inventory[UnitsSold])), Inventory[SnapshotDate] = LatestSnapshot)
-		formatString: 0.0%
-		lineageTag: 53362be0-94ea-4bc1-9127-e61f0b61d788
-
 	/// Share of products that had at least one stockout day in the month of the latest snapshot (StockoutFlag = StockoutDays > 0). It is not the share of products at zero stock.
 	measure 'Stockout Rate' = VAR LatestSnapshot = MAX(Inventory[SnapshotDate]) RETURN CALCULATE(DIVIDE(SUM(Inventory[StockoutFlag]), COUNTROWS(Inventory)), Inventory[SnapshotDate] = LatestSnapshot)
 		formatString: 0.0%
@@ -48,11 +31,6 @@ table Inventory
 				CALCULATE(DISTINCTCOUNT(Inventory[ProductID]), Inventory[SnapshotDate] = LatestSnapshot)
 		formatString: #,0
 		lineageTag: dc966b0c-b402-484f-87fb-b17e6cf7faab
-
-	/// Share of stocked products at or below the Low Stock Threshold (20 units unless the slicer is changed) at the latest snapshot.
-	measure 'Low-Stock Product Share' = DIVIDE([Low-Stock Products], [Products in Snapshot])
-		formatString: 0.0%
-		lineageTag: fb457c84-2be3-467e-b73d-10a7010a0df9
 
 	/// Annualised inventory turnover at cost: cost of units sold over the snapshot months in context, divided by the average month-end stock at cost, scaled to 12 months. Stock is averaged across snapshots, never summed. Region does not filter Inventory.
 	measure 'Inventory Turnover' =
@@ -122,19 +100,6 @@ table Inventory
 		isHidden
 		lineageTag: 2fe66c56-e763-40fe-83dd-2691fdcd1663
 
-	/// Products flagged as overstock (source overstock_flag) at the latest snapshot in context. Region does not filter Inventory.
-	measure 'Overstock Products' =
-			VAR LatestSnapshot = MAX(Inventory[SnapshotDate])
-			RETURN
-				CALCULATE(DISTINCTCOUNT(Inventory[ProductID]), Inventory[SnapshotDate] = LatestSnapshot, Inventory[OverstockFlag] = 1)
-		formatString: #,0
-		lineageTag: 42605162-5d84-45f5-81ef-c63ee11f3306
-
-	/// Share of stocked products flagged as overstock at the latest snapshot.
-	measure 'Overstock Product Share' = DIVIDE([Overstock Products], [Products in Snapshot])
-		formatString: 0.0%
-		lineageTag: 693ca137-e100-46d4-9da9-3ac66f88566d
-
 	/// Excess units at the latest snapshot: stock above 90 days of cover (StockOnHand - 3 x monthly UnitsSold), counted only for products carrying the source overstock flag (flag = days of supply > 90). Blank for products not flagged.
 	measure 'Excess Units' =
 			VAR LatestSnapshot = MAX(Inventory[SnapshotDate])
@@ -171,11 +136,6 @@ table Inventory
 				CALCULATE(SUM(Inventory[UnitsSold]), Inventory[SnapshotDate] = LatestSnapshot)
 		formatString: #,0
 		lineageTag: ad30fef0-849d-435d-8504-aaf4376fedb9
-
-	/// Card subtitle for Inventory Value: units on hand at the latest snapshot.
-	measure 'Units on Hand Label' = IF(ISBLANK([Current Stock]), "No stock in the latest snapshot", FORMAT([Current Stock], "#,0") & " units on hand · at list price · latest snapshot")
-		isHidden
-		lineageTag: 12a32176-e07b-44ea-ac40-9c306bfa345c
 
 	/// Card subtitle for Excess Stock Value: share of inventory value above 90 days of cover.
 	measure 'Excess Value Share Label' = IF(ISBLANK([Excess Value Share]), "No excess stock at the latest snapshot", FORMAT([Excess Value Share], "0.0%") & " of inventory value is above 90 days of cover")

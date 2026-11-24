@@ -37,14 +37,6 @@ table Shipments
 		formatString: 0.0%
 		lineageTag: 64322fb3-742b-4247-8d7e-c4d7bc6cb5a3
 
-	measure 'Shipment Cost by Ship Date' = CALCULATE([Shipment Cost], USERELATIONSHIP('Date'[Date], Shipments[ShipDate]), CROSSFILTER('Date'[Date], Orders[OrderDate], NONE))
-		formatString: $#,0.00;($#,0.00);$#,0.00
-		lineageTag: 9cf8d11d-7964-4933-83d3-fd861ef25485
-
-	measure 'Transit Within 3 Days by Ship Date' = CALCULATE([Transit Within 3 Days], USERELATIONSHIP('Date'[Date], Shipments[ShipDate]), CROSSFILTER('Date'[Date], Orders[OrderDate], NONE))
-		formatString: 0.0%
-		lineageTag: ccd4246e-e815-4fb9-bd08-7bffbf90d4e1
-
 	/// Average transit days from ship date to delivery date. Shipments with a missing or out-of-order date are left out.
 	measure 'Average Delivery Time' = CALCULATE(AVERAGEX(FILTER(Shipments, NOT ISBLANK(Shipments[ShipDate]) && NOT ISBLANK(Shipments[DeliveryDate]) && Shipments[DeliveryDate] >= Shipments[ShipDate]), DATEDIFF(Shipments[ShipDate], Shipments[DeliveryDate], DAY)), CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH))
 		formatString: 0.0
@@ -72,15 +64,6 @@ table Shipments
 				DIVIDE([Shipment Cost], ShippedOrderSales)
 		formatString: 0.00%
 		lineageTag: ff5b730b-c241-4889-94ea-ac3153e1b607
-
-	/// Diagnostic only, not a service level: share of delivered shipments whose transit time is at or under the Transit Day Threshold (3 days unless the slicer is changed). Same population as Transit Within 3 Days.
-	measure 'Transit Within Threshold' =
-			VAR Threshold = [Transit Day Threshold Value]
-			VAR WithinThreshold = CALCULATE(DISTINCTCOUNT(Shipments[OrderID]), KEEPFILTERS(FILTER(ALL(Shipments[Transit Days]), NOT ISBLANK(Shipments[Transit Days]) && Shipments[Transit Days] <= Threshold)), CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH))
-			RETURN
-				DIVIDE(WithinThreshold, [Delivered Shipments])
-		formatString: 0.0%
-		lineageTag: 87641690-4bbf-466e-8aa0-93d0152ee9c4
 
 	/// Share of shipments that paid the premium fee tier (shipping fee of $10 or more). Fees fall into two tiers, about $0-3 and $20-32, so $10 separates them.
 	measure 'Premium-Fee Shipment Share' = DIVIDE(CALCULATE([Shipment Records], KEEPFILTERS(Shipments[ShippingFee] >= 10)), [Shipment Records])

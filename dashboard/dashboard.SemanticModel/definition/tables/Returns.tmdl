@@ -9,10 +9,6 @@ table Returns
 		formatString: #,0
 		lineageTag: 890b7584-34c2-4a5d-ac6e-5c4fb9eee8ba
 
-	measure 'Return Rate' = DIVIDE([Returned Orders], [Total Orders])
-		formatString: 0.0%
-		lineageTag: ee358c2d-0b1e-4f0f-b732-d66bb9bd0da9
-
 	measure 'Return Rate for Product Orders' = DIVIDE([Returned Orders], DISTINCTCOUNT(OrderItems[OrderID]))
 		formatString: 0.0%
 		lineageTag: 3a692559-cddb-4854-b365-9d0eb1d948a6
@@ -24,34 +20,6 @@ table Returns
 	measure 'Refund Amount' = SUM(Returns[RefundAmount])
 		formatString: $#,0.00;($#,0.00);$#,0.00
 		lineageTag: 52a919f0-abb3-462c-8716-b4cd48dba7d5
-
-	measure 'Return Quantity by Return Date' = CALCULATE([Return Quantity], USERELATIONSHIP('Date'[Date], Returns[ReturnDate]), CROSSFILTER('Date'[Date], Orders[OrderDate], NONE))
-		formatString: #,0
-		lineageTag: 70e98b4a-8f2b-4899-99d8-0829c40d6ad7
-
-	measure 'Refund Amount by Return Date' = CALCULATE([Refund Amount], USERELATIONSHIP('Date'[Date], Returns[ReturnDate]), CROSSFILTER('Date'[Date], Orders[OrderDate], NONE))
-		formatString: $#,0.00;($#,0.00);$#,0.00
-		lineageTag: 1faa4ef2-8332-490f-aac8-255c265e34b0
-
-	/// Refund amount as a share of net sales, both by order date.
-	measure 'Refund Rate' = DIVIDE([Refund Amount], [Net Sales])
-		formatString: 0.0%
-		lineageTag: d386a7d1-0698-4011-bee1-5cd3ab800227
-
-	/// Returned orders as a share of orders that reached the customer (status delivered or returned). Cancelled and in-progress orders cannot be returned, so they are left out of the base.
-	measure 'Return Rate (Received Orders)' = DIVIDE([Returned Orders], CALCULATE([Total Orders], KEEPFILTERS(Orders[OrderStatus] IN {"delivered", "returned"})))
-		formatString: 0.0%
-		lineageTag: c1fde13d-cd4d-433e-8678-6ab5067ea9c9
-
-	/// What-if: refund amount avoided if refunds fell by the Return Reduction percentage. Assumes refunds fall in proportion; zero at the default setting.
-	measure 'Refund Saved (Scenario)' = [Refund Amount] * [Return Reduction Value]
-		formatString: $#,0.00;($#,0.00);$#,0.00
-		lineageTag: 7f4fc1b9-4873-4c07-a0fa-ed07ce0132df
-
-	/// What-if: net sales after returns if refunds fell by the Return Reduction percentage. Equals Net Sales After Returns at the default setting of 0%.
-	measure 'Net Sales After Returns (Scenario)' = [Net Sales] - [Refund Amount] * (1 - [Return Reduction Value])
-		formatString: $#,0.00;($#,0.00);$#,0.00
-		lineageTag: 1a00f98b-21e6-4226-898e-4bc06c6fafe4
 
 	/// Hex colour for the scorecard: dark red when a category's return rate for product orders is above the rate for all selected categories. Paired with the Watch column text.
 	measure 'Return Rate Color' =
