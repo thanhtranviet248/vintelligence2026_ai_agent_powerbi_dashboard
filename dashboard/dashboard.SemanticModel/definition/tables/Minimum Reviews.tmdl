@@ -1,0 +1,24 @@
+table 'Minimum Reviews'
+	lineageTag: 9c9cf2e6-b888-448d-95de-d2255cf1842b
+
+	measure 'Minimum Reviews Value' = SELECTEDVALUE('Minimum Reviews'[Minimum Reviews], 10)
+		formatString: 0
+		lineageTag: 56ad1b81-67f2-4690-99bf-979e95871dcf
+
+	column 'Minimum Reviews'
+		formatString: 0
+		lineageTag: d2512ac1-d7f3-4cec-bb43-0c7ec80bfead
+		summarizeBy: none
+		sourceColumn: [Value]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 0
+				}
+
+		annotation SummarizationSetBy = User
+
+	partition 'Minimum Reviews' = calculated
+		mode: import
+		source = GENERATESERIES(1, 50, 1)
+

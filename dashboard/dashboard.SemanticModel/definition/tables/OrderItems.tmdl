@@ -2,40 +2,116 @@ table OrderItems
 	lineageTag: 5e071dd1-6201-4d9d-b6d6-854b7b2ef2ad
 
 	measure 'Gross Sales' = SUMX(OrderItems, OrderItems[Quantity] * OrderItems[UnitPrice])
+		formatString: $#,0;($#,0);$#,0
 		lineageTag: 44510809-5d18-4290-b397-3eba005b8c5c
 
-	measure 'Discount Amount' = SUMX(OrderItems, OrderItems[Quantity] * OrderItems[DiscountAmount])
+	/// DiscountAmount is a line total, not a per-unit value: Quantity x UnitPrice - DiscountAmount equals the order's payment value. Do not multiply it by Quantity.
+	measure 'Discount Amount' = SUM(OrderItems[DiscountAmount])
+		formatString: $#,0;($#,0);$#,0
 		lineageTag: 079152f3-ec6c-4b48-b0d5-f55a05c45a49
 
-	measure 'Net Sales' = SUMX(OrderItems, OrderItems[Quantity] * (OrderItems[UnitPrice] - OrderItems[DiscountAmount]))
+	/// Gross sales less line discounts, before refunds. Reconciles to Total Payment Value.
+	measure 'Net Sales' = [Gross Sales] - [Discount Amount]
+		formatString: $#,0;($#,0);$#,0
 		lineageTag: b22c417c-3ab8-4f86-a329-0c9299b5c8df
 
 	measure 'Discount Rate' = DIVIDE([Discount Amount], [Gross Sales])
+		formatString: 0.0%
 		lineageTag: a2c91505-4617-4906-b5f1-24e08dcaa6ed
 
 	measure 'Units Sold' = SUM(OrderItems[Quantity])
+		formatString: #,0
 		lineageTag: d9459fd1-e6db-460e-8f3e-86902fa24873
 
 	measure 'Average Order Value' = DIVIDE([Net Sales], [Total Orders])
+		formatString: $#,0.00;($#,0.00);$#,0.00
 		lineageTag: b270b75c-3102-43d2-b8dc-42b908b324ce
 
 	measure 'Revenue per Customer' = DIVIDE([Net Sales], [Distinct Customers])
+		formatString: $#,0.00;($#,0.00);$#,0.00
 		lineageTag: 867ddd5b-df29-48b3-a9fd-719a769abc4f
 
 	measure COGS = SUMX(OrderItems, OrderItems[Quantity] * RELATED(Products[COGS]))
+		formatString: $#,0;($#,0);$#,0
 		lineageTag: 78697382-ed02-4234-8da3-534e432f9778
 
 	measure 'Gross Profit' = [Net Sales] - [COGS]
+		formatString: $#,0;($#,0);$#,0
 		lineageTag: cf5151c7-dd5a-47ba-a1ce-18c5b947d1e1
 
 	measure 'Gross Margin %' = DIVIDE([Gross Profit], [Net Sales])
+		formatString: 0.0%
 		lineageTag: ab2ffd9d-65a7-4da9-8abc-8877c8a6e477
 
-	measure 'Contribution %' = DIVIDE([Net Sales], CALCULATE([Net Sales], ALL(Products[Category])))
-		lineageTag: 49ec5ac3-e469-43ed-8840-f5ee45fca280
+	/// Net sales on order lines that carry a primary promotion ID. Lines without one (about 61% of lines) are excluded.
+	measure 'Promoted Net Sales' = CALCULATE([Net Sales], KEEPFILTERS(OrderItems[PromoID] <> ""))
+		formatString: $#,0;($#,0);$#,0
+		lineageTag: 7e1abefc-dbdb-4903-b59a-183b5902e72f
+
+	/// Share of net sales that came from order lines with a primary promotion ID.
+	measure 'Promoted Sales Share' = DIVIDE([Promoted Net Sales], [Net Sales])
+		formatString: 0.0%
+		lineageTag: 3d87c098-d9a0-4213-b3b0-bf88f980fc78
+
+	/// Share of net sales earned by the top 20% of selling products in the current filters (products with no sales are left out; the product count is rounded up and ties at the cut-off are included). Blank when nothing sold.
+	measure 'Top 20% Product Sales Share' =
+			
+			VAR ProductSales =
+			    FILTER (
+			        ADDCOLUMNS (
+			            VALUES ( Products[ProductID] ),
+			            "@Sales", [Net Sales]
+			        ),
+			        [@Sales] > 0
+			    )
+			VAR ProductCount =
+			    COUNTROWS ( ProductSales )
+			VAR TopProductCount =
+			    ROUNDUP ( ProductCount * 0.2, 0 )
+			VAR TopSales =
+			    SUMX (
+			        TOPN (
+			            TopProductCount,
+			            ProductSales,
+			            [@Sales], DESC
+			        ),
+			        [@Sales]
+			    )
+			RETURN
+			    IF (
+			        ProductCount > 0,
+			        DIVIDE (
+			            TopSales,
+			            SUMX ( ProductSales, [@Sales] )
+			        )
+			    )
+		formatString: 0.0%
+		lineageTag: bb089056-95bc-4c07-9103-f04c1bf1f82f
+
+	/// Hex colour for Gross Profit and Gross Margin % cells: red when gross profit is negative (the value is also shown in parentheses or with a minus sign), dark grey otherwise.
+	measure 'Gross Profit Color' =
+			VAR Profit = [Gross Profit]
+			RETURN
+				IF(ISBLANK(Profit), BLANK(), IF(Profit < 0, "#B42318", "#344054"))
+		isHidden
+		lineageTag: a2f9e9c9-9d3e-45ad-bd32-7ab2c5f104a7
+
+	/// KPI card value: net sales per customer with an order in the selected period; when no date is filtered, the latest 12 months of data instead of all time (order date). All-time customer counts make New Customers equal every customer and the repeat rate blank, so the card uses a rolling year by default.
+	measure 'Revenue per Active Customer KPI' =
+			VAR LastOrderDate = [Data End Date]
+			VAR DefaultStart = EDATE(LastOrderDate, -12) + 1
+			RETURN
+				IF(
+					ISFILTERED('Date'),
+					[Revenue per Customer],
+					CALCULATE([Revenue per Customer], DATESBETWEEN('Date'[Date], DefaultStart, LastOrderDate))
+				)
+		formatString: $#,0.00;($#,0.00);$#,0.00
+		lineageTag: f1efd635-afc6-4f90-99e1-5aeee21e69d4
 
 	column OrderID
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: 2dac4407-c5f5-4d8d-b4f7-6f7a7911b2b2
 		summarizeBy: none
@@ -45,6 +121,7 @@ table OrderItems
 
 	column ProductID
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: 75414f14-9567-485c-81ec-ee123cb45d6d
 		summarizeBy: none
@@ -54,6 +131,7 @@ table OrderItems
 
 	column Quantity
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: d459c6cb-1968-4b8b-98b1-32b50ef99816
 		summarizeBy: sum
@@ -63,6 +141,7 @@ table OrderItems
 
 	column UnitPrice
 		dataType: double
+		isHidden
 		formatString: $#,0.00;($#,0.00);$#,0.00
 		lineageTag: 6645180a-74e5-4165-97a1-d379ad18e872
 		summarizeBy: sum
@@ -72,6 +151,7 @@ table OrderItems
 
 	column DiscountAmount
 		dataType: double
+		isHidden
 		formatString: $#,0.00;($#,0.00);$#,0.00
 		lineageTag: 3a1dbb2d-c048-480c-b6ff-a622622cfe97
 		summarizeBy: sum
@@ -81,19 +161,10 @@ table OrderItems
 
 	column PromoID
 		dataType: string
+		isHidden
 		lineageTag: 2e9ae75e-17e7-4d9d-bd02-0d4a1e87a54b
 		summarizeBy: none
 		sourceColumn: promo_id
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isText":true}
-
-	column PromoID2
-		dataType: string
-		lineageTag: 8de55e0d-c1ef-4d5a-a0ec-8f79413031b3
-		summarizeBy: none
-		sourceColumn: promo_id_2
 
 		annotation SummarizationSetBy = Automatic
 
@@ -105,7 +176,8 @@ table OrderItems
 				let
 				    Source = Csv.Document(File.Contents("D:\projects\vintelligence2026_ai_agent_powerbi_dashboard\data\order_items.csv"), [Delimiter = ",", Columns = 7, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
 				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
-				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"order_id", Int64.Type}, {"product_id", Int64.Type}, {"quantity", Int64.Type}, {"unit_price", type number}, {"discount_amount", type number}, {"promo_id", type text}, {"promo_id_2", type text}})
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"order_id", Int64.Type}, {"product_id", Int64.Type}, {"quantity", Int64.Type}, {"unit_price", type number}, {"discount_amount", type number}, {"promo_id", type text}, {"promo_id_2", type text}}),
+				    #"Removed Unused Columns" = Table.RemoveColumns(#"Changed Type", {"promo_id_2"})
 				in
-				    #"Changed Type"
+				    #"Removed Unused Columns"
 

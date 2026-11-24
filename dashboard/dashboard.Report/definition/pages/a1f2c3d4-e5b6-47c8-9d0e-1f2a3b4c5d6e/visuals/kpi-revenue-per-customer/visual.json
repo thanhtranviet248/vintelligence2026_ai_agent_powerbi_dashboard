@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
   "name": "kpi-revenue-per-customer",
   "position": {
-    "x": 506,
+    "x": 1156,
     "y": 254,
-    "z": 1000,
+    "z": 13000,
     "height": 132,
-    "width": 442,
-    "tabOrder": 31
+    "width": 352,
+    "tabOrder": 13000
   },
   "visual": {
     "visualType": "card",
@@ -23,11 +23,11 @@
                       "Entity": "OrderItems"
                     }
                   },
-                  "Property": "Revenue per Customer"
+                  "Property": "Revenue per Active Customer KPI"
                 }
               },
-              "queryRef": "OrderItems.Revenue per Customer",
-              "nativeQueryRef": "Revenue per Customer"
+              "queryRef": "OrderItems.Revenue per Active Customer KPI",
+              "nativeQueryRef": "Revenue per Active Customer KPI"
             }
           ]
         }
@@ -42,7 +42,7 @@
                     "Entity": "OrderItems"
                   }
                 },
-                "Property": "Revenue per Customer"
+                "Property": "Revenue per Active Customer KPI"
               }
             },
             "direction": "Descending"
@@ -107,7 +107,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Revenue per Customer'"
+                  "Value": "'Revenue per Active Customer'"
                 }
               }
             },
@@ -234,7 +234,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'By order date'"
+                  "Value": "'Net sales ÷ active customers; latest 12 months if no period (order date)'"
                 }
               }
             },
@@ -265,7 +265,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Card showing revenue per customer: net sales divided by distinct customers in the selected period.'"
+                  "Value": "'Card showing net sales divided by active customers in the selected period, or in the latest 12 months when no period is picked.'"
                 }
               }
             }

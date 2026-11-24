@@ -2,16 +2,35 @@ table Shipments
 	lineageTag: 7d4de668-25fe-4ad2-b8d2-9c0d54004531
 
 	measure 'Shipment Cost' = CALCULATE(SUM(Shipments[ShippingFee]), CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH))
+		formatString: $#,0.00;($#,0.00);$#,0.00
 		lineageTag: f2661db0-496c-498f-9b9a-f4740583c483
 
 	measure 'Shipment Records' = CALCULATE(DISTINCTCOUNT(Shipments[OrderID]), CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH))
+		formatString: #,0
 		lineageTag: 80cefb9b-08ad-4776-8c8e-ffb2beae3009
 
-	measure 'Shipment Coverage Rate' = DIVIDE([Shipment Records], [Total Orders])
+	/// Share of non-cancelled orders whose status is delivered, paid or returned. Cancelled orders are left out of both parts.
+	measure 'Fulfilled Rate' =
+			
+			VAR FulfilledOrders =
+			    CALCULATE (
+			        [Total Orders],
+			        KEEPFILTERS (
+			            Orders[OrderStatus] IN { "delivered", "paid", "returned" }
+			        )
+			    )
+			VAR EligibleOrders =
+			    CALCULATE (
+			        [Total Orders],
+			        KEEPFILTERS ( Orders[OrderStatus] <> "cancelled" )
+			    )
+			RETURN
+			    DIVIDE ( FulfilledOrders, EligibleOrders )
 		formatString: 0.0%
 		lineageTag: a9274e62-e6e3-41b6-bd51-87c5045f234d
 
 	measure 'Delivered Shipments' = CALCULATE(DISTINCTCOUNT(Shipments[OrderID]), NOT ISBLANK(Shipments[ShipDate]), NOT ISBLANK(Shipments[DeliveryDate]), Shipments[DeliveryDate] >= Shipments[ShipDate], CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH))
+		formatString: #,0
 		lineageTag: a5d9b4d4-9f1f-45a9-b7b0-dfe30268a0ac
 
 	measure 'Transit Within 3 Days' = DIVIDE(CALCULATE(DISTINCTCOUNT(Shipments[OrderID]), NOT ISBLANK(Shipments[ShipDate]), NOT ISBLANK(Shipments[DeliveryDate]), Shipments[DeliveryDate] >= Shipments[ShipDate], DATEDIFF(Shipments[ShipDate], Shipments[DeliveryDate], DAY) <= 3, CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH)), [Delivered Shipments])
@@ -26,21 +45,55 @@ table Shipments
 		formatString: 0.0%
 		lineageTag: ccd4246e-e815-4fb9-bd08-7bffbf90d4e1
 
+	/// Average transit days from ship date to delivery date. Shipments with a missing or out-of-order date are left out.
 	measure 'Average Delivery Time' = CALCULATE(AVERAGEX(FILTER(Shipments, NOT ISBLANK(Shipments[ShipDate]) && NOT ISBLANK(Shipments[DeliveryDate]) && Shipments[DeliveryDate] >= Shipments[ShipDate]), DATEDIFF(Shipments[ShipDate], Shipments[DeliveryDate], DAY)), CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH))
+		formatString: 0.0
 		lineageTag: 530c60db-d662-4004-88e7-f2cdadc5da14
 
-	measure 'Average Transit Time' = [Average Delivery Time]
-		lineageTag: a8ab7fe8-57a5-4af1-9463-048da5b0fcf6
-
-	measure 'Product-Linked Shipment Orders' = CALCULATE(DISTINCTCOUNT(Shipments[OrderID]), TREATAS(VALUES(OrderItems[OrderID]), Shipments[OrderID]))
-		lineageTag: bfa669f8-c1c4-4cfb-9eb5-eefd242de2a1
-
-	measure 'Product-Linked Average Transit Time' = CALCULATE([Average Transit Time], TREATAS(VALUES(OrderItems[OrderID]), Shipments[OrderID]))
+	/// Average whole days from order date to ship date (warehouse processing). Shipments with a missing or out-of-order date are left out.
+	measure 'Average Days to Ship' = CALCULATE(AVERAGE(Shipments[Days to Ship]), CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH))
 		formatString: 0.0
-		lineageTag: 597f9726-7231-435d-9383-d63778b78b72
+		lineageTag: 8decb9f3-08c6-4844-812c-52c12687119c
+
+	/// Average whole days from order date to delivery date. Only shipments with valid order, ship and delivery dates are counted.
+	measure 'Average Order-to-Delivery Days' = CALCULATE(AVERAGEX(FILTER(Shipments, NOT ISBLANK(Shipments[Days to Ship]) && NOT ISBLANK(Shipments[Transit Days])), Shipments[Days to Ship] + Shipments[Transit Days]), CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH))
+		formatString: 0.0
+		lineageTag: 6befa497-5414-4b89-99ea-e1c6618c06c2
+
+	/// Shipping fee per order with a shipment record.
+	measure 'Shipment Cost per Shipment' = DIVIDE([Shipment Cost], [Shipment Records])
+		formatString: $#,0.00;($#,0.00);$#,0.00
+		lineageTag: 545c3c52-9598-47a0-9ba1-207674c6c3b4
+
+	/// Shipping fees divided by the net sales of the same orders (orders with a shipment record). The fee belongs to the whole order, so under a product or category filter it is compared with only that product share of the order: read it without product filters.
+	measure 'Shipment Cost % of Net Sales' =
+			VAR ShippedOrderSales = CALCULATE([Net Sales], KEEPFILTERS(TREATAS(CALCULATETABLE(VALUES(Shipments[OrderID]), CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH)), Orders[OrderID])))
+			RETURN
+				DIVIDE([Shipment Cost], ShippedOrderSales)
+		formatString: 0.00%
+		lineageTag: ff5b730b-c241-4889-94ea-ac3153e1b607
+
+	/// Diagnostic only, not a service level: share of delivered shipments whose transit time is at or under the Transit Day Threshold (3 days unless the slicer is changed). Same population as Transit Within 3 Days.
+	measure 'Transit Within Threshold' =
+			VAR Threshold = [Transit Day Threshold Value]
+			VAR WithinThreshold = CALCULATE(DISTINCTCOUNT(Shipments[OrderID]), KEEPFILTERS(FILTER(ALL(Shipments[Transit Days]), NOT ISBLANK(Shipments[Transit Days]) && Shipments[Transit Days] <= Threshold)), CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH))
+			RETURN
+				DIVIDE(WithinThreshold, [Delivered Shipments])
+		formatString: 0.0%
+		lineageTag: 87641690-4bbf-466e-8aa0-93d0152ee9c4
+
+	/// Share of shipments that paid the premium fee tier (shipping fee of $10 or more). Fees fall into two tiers, about $0-3 and $20-32, so $10 separates them.
+	measure 'Premium-Fee Shipment Share' = DIVIDE(CALCULATE([Shipment Records], KEEPFILTERS(Shipments[ShippingFee] >= 10)), [Shipment Records])
+		formatString: 0.0%
+		lineageTag: faed3881-4a1e-4901-9846-f85c6938d264
+
+	/// Card subtitle: splits order-to-delivery days into warehouse days (order to ship) and transit days (ship to delivery).
+	measure 'Lead Time Split Label' = IF(NOT ISBLANK([Average Order-to-Delivery Days]), FORMAT([Average Days to Ship], "0.0") & " d to ship + " & FORMAT([Average Delivery Time], "0.0") & " d in transit")
+		lineageTag: 1f868134-9693-47cc-a644-b514d72286c5
 
 	column OrderID
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: 0a49fb8d-7dd9-43c8-9598-886cf5e227ca
 		summarizeBy: none
@@ -50,6 +103,7 @@ table Shipments
 
 	column ShipDate
 		dataType: dateTime
+		isHidden
 		formatString: Short Date
 		lineageTag: d7e7d39e-98d3-4ff9-9a39-95afc9e24355
 		summarizeBy: none
@@ -61,6 +115,7 @@ table Shipments
 
 	column DeliveryDate
 		dataType: dateTime
+		isHidden
 		formatString: Short Date
 		lineageTag: 9bcc4f5d-4f57-4d84-9fb2-46ffcd2b1981
 		summarizeBy: none
@@ -72,10 +127,30 @@ table Shipments
 
 	column ShippingFee
 		dataType: double
+		isHidden
 		formatString: $#,0.00;($#,0.00);$#,0.00
 		lineageTag: 5ad17f39-1f13-471a-b5e4-411d84f5d6d1
 		summarizeBy: sum
 		sourceColumn: shipping_fee
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Whole days from ship date to delivery date. Blank when either date is missing or delivery precedes shipping.
+	column 'Transit Days' = IF(NOT ISBLANK(Shipments[ShipDate]) && NOT ISBLANK(Shipments[DeliveryDate]) && Shipments[DeliveryDate] >= Shipments[ShipDate], DATEDIFF(Shipments[ShipDate], Shipments[DeliveryDate], DAY))
+		dataType: int64
+		formatString: 0
+		lineageTag: 8fce6a67-b9c1-4f05-922f-5de626b34363
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Whole days from order date to ship date (warehouse processing time). Blank when either date is missing or the ship date precedes the order date.
+	column 'Days to Ship' = IF(NOT ISBLANK(RELATED(Orders[OrderDate])) && NOT ISBLANK(Shipments[ShipDate]) && Shipments[ShipDate] >= RELATED(Orders[OrderDate]), DATEDIFF(RELATED(Orders[OrderDate]), Shipments[ShipDate], DAY))
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 87c3e58d-c599-4ee0-85de-72eee4adf9be
+		summarizeBy: none
 
 		annotation SummarizationSetBy = Automatic
 

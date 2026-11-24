@@ -1,8 +1,290 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
   "name": "2d466881-2b4b-4e8e-8b9c-f3c20a7f34d5",
-  "displayName": "Sales and Profitability",
-  "displayOption": "FitToWidth",
-  "height": 1570,
-  "width": 1920
+  "displayName": "Sales & Profitability",
+  "displayOption": "FitToPage",
+  "height": 2780,
+  "width": 1920,
+  "visualInteractions": [
+    {
+      "source": "p2-search-product",
+      "target": "filter-1-year-month",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-product",
+      "target": "filter-2-category",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-product",
+      "target": "filter-3-productname",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-product",
+      "target": "filter-4-region",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-product",
+      "target": "hdr-data-through",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-product",
+      "target": "kpi-aov",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-product",
+      "target": "kpi-discount-rate",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-product",
+      "target": "kpi-gross-margin",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-product",
+      "target": "kpi-gross-profit-yoy",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-product",
+      "target": "kpi-gross-sales",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-product",
+      "target": "kpi-net-sales",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-product",
+      "target": "kpi-net-sales-mom",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-product",
+      "target": "kpi-net-sales-yoy",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-product",
+      "target": "kpi-promoted-sales-share",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-product",
+      "target": "kpi-top20-product-share",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-product",
+      "target": "kpi-total-orders",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-product",
+      "target": "kpi-total-orders-yoy",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-product",
+      "target": "p2-bar-breakdown",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-product",
+      "target": "p2-bar-discount-rate",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-product",
+      "target": "p2-bar-yoy-category",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-product",
+      "target": "p2-col-growth-yoy",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-product",
+      "target": "p2-line-net-sales-vs-py",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-product",
+      "target": "p2-search-promotion",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-product",
+      "target": "p2-slicer-breakdown",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-product",
+      "target": "p2-slicer-trend-metric",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-product",
+      "target": "p2-table-category",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-product",
+      "target": "p2-table-promotion",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-product",
+      "target": "p2-trend-net-sales",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-promotion",
+      "target": "filter-1-year-month",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-promotion",
+      "target": "filter-2-category",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-promotion",
+      "target": "filter-3-productname",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-promotion",
+      "target": "filter-4-region",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-promotion",
+      "target": "hdr-data-through",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-promotion",
+      "target": "kpi-aov",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-promotion",
+      "target": "kpi-discount-rate",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-promotion",
+      "target": "kpi-gross-margin",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-promotion",
+      "target": "kpi-gross-profit-yoy",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-promotion",
+      "target": "kpi-gross-sales",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-promotion",
+      "target": "kpi-net-sales",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-promotion",
+      "target": "kpi-net-sales-mom",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-promotion",
+      "target": "kpi-net-sales-yoy",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-promotion",
+      "target": "kpi-promoted-sales-share",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-promotion",
+      "target": "kpi-top20-product-share",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-promotion",
+      "target": "kpi-total-orders",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-promotion",
+      "target": "kpi-total-orders-yoy",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-promotion",
+      "target": "p2-bar-breakdown",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-promotion",
+      "target": "p2-bar-discount-rate",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-promotion",
+      "target": "p2-bar-yoy-category",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-promotion",
+      "target": "p2-col-growth-yoy",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-promotion",
+      "target": "p2-detail-profitability",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-promotion",
+      "target": "p2-line-net-sales-vs-py",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-promotion",
+      "target": "p2-search-product",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-promotion",
+      "target": "p2-slicer-breakdown",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-promotion",
+      "target": "p2-slicer-trend-metric",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-promotion",
+      "target": "p2-table-category",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p2-search-promotion",
+      "target": "p2-trend-net-sales",
+      "type": "NoFilter"
+    }
+  ]
 }

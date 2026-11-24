@@ -1,17 +1,39 @@
 table Products
 	lineageTag: 8f546b66-4b3a-4075-a6db-a5bfc3cb130a
 
-	measure 'Average Product Price' = AVERAGE(Products[Price])
-		lineageTag: a52ef434-2fc5-4cb2-a391-f83ca66a6b1f
+	/// Scorecard text: names the measures where a category is worse than all selected categories (negative net sales growth, stockout rate or return rate above the overall rate). Blank outside a category row.
+	measure 'Category Watch Flag' =
+			VAR Growth = [Net Sales YoY %]
+			VAR Stockout = [Stockout Rate]
+			VAR StockoutAll = CALCULATE([Stockout Rate], ALLSELECTED(Products[Category]))
+			VAR ReturnRate = [Return Rate for Product Orders]
+			VAR ReturnAll = CALCULATE([Return Rate for Product Orders], ALLSELECTED(Products[Category]))
+			VAR Issues =
+				CONCATENATEX(
+					FILTER(
+						{
+							(1, "Sales falling", NOT ISBLANK(Growth) && Growth < 0),
+							(2, "Stockouts high", NOT ISBLANK(Stockout) && Stockout > StockoutAll),
+							(3, "Returns high", NOT ISBLANK(ReturnRate) && ReturnRate > ReturnAll)
+						},
+						[Value3]
+					),
+					[Value2], ", ", [Value1], ASC
+				)
+			RETURN
+				IF(
+					ISINSCOPE(Products[Category]),
+					IF(Issues = "", "✓ No flags", "⚠ " & Issues)
+				)
+		lineageTag: 691ac6da-f09b-44a5-9b72-a6c8c45f6e66
 
-	measure 'Average COGS' = AVERAGE(Products[COGS])
-		lineageTag: afe7b049-0ec1-43e6-9519-b4d5aebd35be
-
-	measure 'Products in Catalog' = DISTINCTCOUNT(Products[ProductID])
-		lineageTag: 727f4008-bb5d-400d-b318-65fd921b2550
+	/// Heading text for the Category Tooltip: the hovered category, or "All categories" when none or several are in context.
+	measure 'Selected Category' = SELECTEDVALUE(Products[Category], "All categories")
+		lineageTag: 34c5451f-f1f6-496b-b5e4-a8608b7724f5
 
 	column ProductID
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: 116d7e3d-3b4a-4d7d-bf42-4cf4df6d3f7f
 		summarizeBy: none
@@ -71,6 +93,7 @@ table Products
 
 	column Price
 		dataType: double
+		isHidden
 		formatString: $#,0.00;($#,0.00);$#,0.00
 		lineageTag: 8d7f3d51-1d56-489f-8276-0530fd32b6a2
 		summarizeBy: sum
@@ -80,10 +103,19 @@ table Products
 
 	column COGS
 		dataType: double
+		isHidden
 		formatString: $#,0.00;($#,0.00);$#,0.00
 		lineageTag: 3d39d4ea-3249-4c89-8b51-6087e4fcec9f
 		summarizeBy: sum
 		sourceColumn: cogs
+
+		annotation SummarizationSetBy = Automatic
+
+	/// ABC class by annual usage at cost (units sold x COGS over the last 12 snapshot months in the data): A = products making up the first 80% of usage, B = the next 15%, C = the rest. Fixed at refresh; slicers do not change it.
+	column 'ABC Class' = VAR LastSnapshot = MAX(Inventory[SnapshotDate]) VAR Recent = ADDCOLUMNS(FILTER(Inventory, Inventory[SnapshotDate] > EOMONTH(LastSnapshot, -12)), "@Cost", Inventory[UnitsSold] * RELATED(Products[COGS])) VAR ByProduct = GROUPBY(Recent, Inventory[ProductID], "@Usage", SUMX(CURRENTGROUP(), [@Cost])) VAR MyUsage = SUMX(FILTER(ByProduct, Inventory[ProductID] = Products[ProductID]), [@Usage]) VAR TotalUsage = SUMX(ByProduct, [@Usage]) VAR UsageBefore = SUMX(FILTER(ByProduct, [@Usage] > MyUsage), [@Usage]) VAR ShareBefore = DIVIDE(UsageBefore, TotalUsage) RETURN IF(ISBLANK(MyUsage) || MyUsage <= 0, "No recent sales", IF(ShareBefore < 0.8, "A", IF(ShareBefore < 0.95, "B", "C")))
+		dataType: string
+		lineageTag: 42b220da-c8d2-4b16-9dcd-83ce5e2520b2
+		summarizeBy: none
 
 		annotation SummarizationSetBy = Automatic
 

@@ -3,6 +3,7 @@ table Geography
 
 	column Zip
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: d87979fe-60d8-4cc5-93c3-abe63bf18856
 		summarizeBy: none

@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
   "name": "kpi-total-orders",
   "position": {
-    "x": 972,
+    "x": 660,
     "y": 254,
-    "z": 1000,
+    "z": 12000,
     "height": 132,
-    "width": 442,
-    "tabOrder": 32
+    "width": 290,
+    "tabOrder": 12000
   },
   "visual": {
     "visualType": "card",
@@ -234,7 +234,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'By order date'"
+                  "Value": "'Distinct orders placed (order date)'"
                 }
               }
             },

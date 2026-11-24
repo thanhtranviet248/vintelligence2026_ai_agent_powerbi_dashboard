@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
   "name": "p3-bar-region-sales",
   "position": {
-    "x": 980,
-    "y": 1200,
-    "z": 1000,
-    "height": 280,
-    "width": 900,
-    "tabOrder": 61
+    "x": 40,
+    "y": 1346,
+    "z": 23000,
+    "height": 330,
+    "width": 445,
+    "tabOrder": 23000
   },
   "visual": {
     "visualType": "barChart",
@@ -50,6 +50,24 @@
             }
           ]
         }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "OrderItems"
+                  }
+                },
+                "Property": "Net Sales"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
       }
     },
     "objects": {
@@ -139,6 +157,13 @@
                       "Value": "'#344054'"
                     }
                   }
+                }
+              }
+            },
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }
@@ -305,7 +330,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'By order date'"
+                  "Value": "'Customer region; the Region slicer also filters this page (order date)'"
                 }
               }
             },
@@ -336,7 +361,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Bar chart of net sales by region.'"
+                  "Value": "'Bar chart of net sales by region, sorted from highest to lowest, with data labels.'"
                 }
               }
             }

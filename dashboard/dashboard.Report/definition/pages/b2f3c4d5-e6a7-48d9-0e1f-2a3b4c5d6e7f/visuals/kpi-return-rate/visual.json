@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
   "name": "kpi-return-rate",
   "position": {
-    "x": 972,
+    "x": 40,
     "y": 254,
-    "z": 1000,
+    "z": 10000,
     "height": 132,
-    "width": 442,
-    "tabOrder": 32
+    "width": 290,
+    "tabOrder": 10000
   },
   "visual": {
     "visualType": "card",
@@ -23,11 +23,11 @@
                       "Entity": "Returns"
                     }
                   },
-                  "Property": "Return Rate"
+                  "Property": "Return Rate (Closed Window)"
                 }
               },
-              "queryRef": "Returns.Return Rate",
-              "nativeQueryRef": "Return Rate"
+              "queryRef": "Returns.Return Rate (Closed Window)",
+              "nativeQueryRef": "Return Rate (Closed Window)"
             }
           ]
         }
@@ -42,7 +42,7 @@
                     "Entity": "Returns"
                   }
                 },
-                "Property": "Return Rate"
+                "Property": "Return Rate (Closed Window)"
               }
             },
             "direction": "Descending"
@@ -234,7 +234,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'By order date'"
+                  "Value": "'Orders 31+ days old · order date'"
                 }
               }
             },
@@ -265,7 +265,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Card showing the return rate: returned orders as a share of orders placed in the selected period.'"
+                  "Value": "'Card showing returned orders as a share of orders placed in the selected period, counting only orders at least 31 days old so late returns are not missed.'"
                 }
               }
             }

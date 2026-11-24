@@ -1,0 +1,52 @@
+table 'Breakdown Dimension'
+	lineageTag: 1421e6d2-2c5b-4f26-9f46-0fe37966dc24
+
+	column 'Breakdown Dimension'
+		lineageTag: c2dcc3a7-baf6-420a-be6a-11577ea63272
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: 'Breakdown Dimension Order'
+
+		relatedColumnDetails
+			groupByColumn: 'Breakdown Dimension Fields'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Breakdown Dimension Fields'
+		isHidden
+		lineageTag: 1a6d016d-d8fc-437b-b2bd-c7ff69db405f
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: 'Breakdown Dimension Order'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Breakdown Dimension Order'
+		isHidden
+		formatString: 0
+		lineageTag: 37a24bec-facf-497c-911c-83863807b981
+		summarizeBy: sum
+		sourceColumn: [Value3]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Breakdown Dimension' = calculated
+		mode: import
+		source =
+				{
+				    ("Category", NAMEOF('Products'[Category]), 0),
+				    ("Segment", NAMEOF('Products'[Segment]), 1),
+				    ("Size", NAMEOF('Products'[Size]), 2),
+				    ("Color", NAMEOF('Products'[Color]), 3),
+				    ("Region", NAMEOF('Geography'[Region]), 4),
+				    ("City", NAMEOF('Geography'[City]), 5),
+				    ("District", NAMEOF('Geography'[District]), 6),
+				    ("Promotion Type", NAMEOF('Promotions'[PromoType]), 7)
+				}
+

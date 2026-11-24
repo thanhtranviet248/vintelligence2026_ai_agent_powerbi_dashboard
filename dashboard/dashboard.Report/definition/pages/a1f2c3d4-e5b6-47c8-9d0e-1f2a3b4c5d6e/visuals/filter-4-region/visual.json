@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
   "name": "filter-4-region",
   "position": {
     "x": 1420,
     "y": 110,
-    "z": 1000,
+    "z": 6000,
     "height": 110,
     "width": 420,
-    "tabOrder": 23
+    "tabOrder": 6000
   },
   "visual": {
     "visualType": "slicer",
@@ -184,11 +184,11 @@
         }
       ]
     },
-    "drillFilterOtherVisuals": true,
     "syncGroup": {
       "groupName": "d4f0a9c3-1e5b-4164-c0a3-4d8e9f1a5b43",
       "fieldChanges": true,
       "filterChanges": true
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }

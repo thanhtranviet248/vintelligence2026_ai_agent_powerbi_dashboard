@@ -4,10 +4,10 @@
   "position": {
     "x": 40,
     "y": 254,
-    "z": 1000,
+    "z": 10000,
     "height": 132,
-    "width": 348.8,
-    "tabOrder": 30
+    "width": 290,
+    "tabOrder": 10000
   },
   "visual": {
     "visualType": "card",
@@ -20,14 +20,14 @@
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Shipments"
+                      "Entity": "OrderItems"
                     }
                   },
-                  "Property": "Shipment Coverage Rate"
+                  "Property": "Net Sales"
                 }
               },
-              "queryRef": "Shipments.Shipment Coverage Rate",
-              "nativeQueryRef": "Shipment Coverage Rate"
+              "queryRef": "OrderItems.Net Sales",
+              "nativeQueryRef": "Net Sales"
             }
           ]
         }
@@ -107,7 +107,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Shipment Coverage'"
+                  "Value": "'Net Sales'"
                 }
               }
             },
@@ -234,7 +234,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'By order date'"
+                  "Value": "'After discounts, before refunds (order date)'"
                 }
               }
             },
@@ -265,7 +265,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Card showing shipment coverage: the share of orders placed in the selected period that have a shipment record.'"
+                  "Value": "'KPI card showing net sales. After discounts, before refunds (order date).'"
                 }
               }
             }

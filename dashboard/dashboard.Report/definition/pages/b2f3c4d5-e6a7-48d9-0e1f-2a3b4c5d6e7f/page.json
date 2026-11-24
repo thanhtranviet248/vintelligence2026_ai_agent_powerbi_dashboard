@@ -1,8 +1,100 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
   "name": "b2f3c4d5-e6a7-48d9-0e1f-2a3b4c5d6e7f",
-  "displayName": "Returns and Product Quality",
+  "displayName": "Returns & Product Quality",
   "displayOption": "FitToWidth",
-  "height": 1570,
-  "width": 1920
+  "height": 2240,
+  "width": 1920,
+  "visualInteractions": [
+    {
+      "source": "p6-search-product",
+      "target": "filter-1-year-month",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p6-search-product",
+      "target": "filter-2-category",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p6-search-product",
+      "target": "filter-3-productname",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p6-search-product",
+      "target": "filter-4-region",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p6-search-product",
+      "target": "kpi-avg-days-to-return",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p6-search-product",
+      "target": "kpi-refund-amount",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p6-search-product",
+      "target": "kpi-refund-per-return",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p6-search-product",
+      "target": "kpi-refund-rate",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p6-search-product",
+      "target": "kpi-return-rate",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p6-search-product",
+      "target": "kpi-returned-orders",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p6-search-product",
+      "target": "p6-bar-reason-share",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p6-search-product",
+      "target": "p6-bar-refund-category",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p6-search-product",
+      "target": "p6-bar-return-rate-payment",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p6-search-product",
+      "target": "p6-col-days-to-return",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p6-search-product",
+      "target": "p6-col-refund-year",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p6-search-product",
+      "target": "p6-line-return-refund-rate",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p6-search-product",
+      "target": "p6-table-returns-region",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p6-search-product",
+      "target": "hdr-data-through",
+      "type": "NoFilter"
+    }
+  ]
 }

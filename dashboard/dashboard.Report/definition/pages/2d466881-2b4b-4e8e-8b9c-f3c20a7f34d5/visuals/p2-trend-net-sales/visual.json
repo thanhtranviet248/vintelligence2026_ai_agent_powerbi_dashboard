@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
   "name": "p2-trend-net-sales",
   "position": {
     "x": 40,
-    "y": 406,
-    "z": 1000,
-    "height": 430,
-    "width": 1840,
-    "tabOrder": 40
+    "y": 1038,
+    "z": 25000,
+    "height": 380,
+    "width": 1540,
+    "tabOrder": 25000
   },
   "visual": {
     "visualType": "lineChart",
@@ -23,11 +23,11 @@
                       "Entity": "Date"
                     }
                   },
-                  "Property": "Year-Month"
+                  "Property": "Month Start"
                 }
               },
-              "queryRef": "Date.Year-Month",
-              "nativeQueryRef": "Year-Month",
+              "queryRef": "Date.Month Start",
+              "nativeQueryRef": "Month Start",
               "active": true
             }
           ]
@@ -46,10 +46,120 @@
                 }
               },
               "queryRef": "OrderItems.Net Sales",
-              "nativeQueryRef": "Net Sales"
+              "nativeQueryRef": "Net Sales",
+              "displayName": "Net Sales"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "OrderItems"
+                    }
+                  },
+                  "Property": "Gross Sales"
+                }
+              },
+              "queryRef": "OrderItems.Gross Sales",
+              "nativeQueryRef": "Gross Sales",
+              "displayName": "Gross Sales"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "OrderItems"
+                    }
+                  },
+                  "Property": "Gross Profit"
+                }
+              },
+              "queryRef": "OrderItems.Gross Profit",
+              "nativeQueryRef": "Gross Profit",
+              "displayName": "Gross Profit"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "OrderItems"
+                    }
+                  },
+                  "Property": "COGS"
+                }
+              },
+              "queryRef": "OrderItems.COGS",
+              "nativeQueryRef": "COGS",
+              "displayName": "COGS"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "OrderItems"
+                    }
+                  },
+                  "Property": "Discount Amount"
+                }
+              },
+              "queryRef": "OrderItems.Discount Amount",
+              "nativeQueryRef": "Discount Amount",
+              "displayName": "Discount Amount"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Returns"
+                    }
+                  },
+                  "Property": "Refund Amount"
+                }
+              },
+              "queryRef": "Returns.Refund Amount",
+              "nativeQueryRef": "Refund Amount",
+              "displayName": "Refund Amount"
+            }
+          ],
+          "fieldParameters": [
+            {
+              "parameterExpr": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Trend Metric"
+                    }
+                  },
+                  "Property": "Trend Metric"
+                }
+              },
+              "index": 0,
+              "length": 6
             }
           ]
         }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Date"
+                  }
+                },
+                "Property": "Month Start"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
       }
     },
     "objects": {
@@ -79,7 +189,7 @@
             "show": {
               "expr": {
                 "Literal": {
-                  "Value": "false"
+                  "Value": "true"
                 }
               }
             }
@@ -145,6 +255,114 @@
               }
             }
           }
+        },
+        {
+          "properties": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#1F3A70'"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "OrderItems.Net Sales"
+          }
+        },
+        {
+          "properties": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#7A9CD6'"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "OrderItems.Gross Sales"
+          }
+        },
+        {
+          "properties": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#2A9D8F'"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "OrderItems.Gross Profit"
+          }
+        },
+        {
+          "properties": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#98A2B3'"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "OrderItems.COGS"
+          }
+        },
+        {
+          "properties": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#E08A3C'"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "OrderItems.Discount Amount"
+          }
+        },
+        {
+          "properties": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#9E4A9C'"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Returns.Refund Amount"
+          }
         }
       ]
     },
@@ -162,7 +380,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Net Sales Trend by Month'"
+                  "Value": "'Selected Sales Metrics by Month'"
                 }
               }
             },
@@ -289,7 +507,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Monthly, by order date'"
+                  "Value": "'Order date; pick metrics on the right (default Gross Profit and Discount Amount, since net sales is charted above)'"
                 }
               }
             },
@@ -320,7 +538,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Line chart of monthly net sales across the selected period.'"
+                  "Value": "'Line chart of the sales metrics chosen in the Trend Metric list, by month of order date. Net Sales is shown by default.'"
                 }
               }
             }

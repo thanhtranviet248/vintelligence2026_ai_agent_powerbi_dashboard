@@ -1,0 +1,24 @@
+table 'Low Stock Threshold'
+	lineageTag: bd435493-bbeb-429a-8bee-6736f045d9c7
+
+	measure 'Low Stock Threshold Value' = SELECTEDVALUE('Low Stock Threshold'[Low Stock Threshold], 20)
+		formatString: 0
+		lineageTag: 651220b3-1238-403e-8d20-26a1ec5846ce
+
+	column 'Low Stock Threshold'
+		formatString: 0
+		lineageTag: 4e65f79b-4f07-42cc-ad0b-ceb53766b055
+		summarizeBy: none
+		sourceColumn: [Value]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 0
+				}
+
+		annotation SummarizationSetBy = User
+
+	partition 'Low Stock Threshold' = calculated
+		mode: import
+		source = GENERATESERIES(5, 100, 5)
+

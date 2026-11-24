@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
   "name": "p2-bar-discount-rate",
   "position": {
-    "x": 980,
-    "y": 1200,
-    "z": 1000,
-    "height": 280,
-    "width": 900,
-    "tabOrder": 61
+    "x": 1280,
+    "y": 1838,
+    "z": 32000,
+    "height": 320,
+    "width": 600,
+    "tabOrder": 32000
   },
   "visual": {
     "visualType": "barChart",
@@ -139,6 +139,13 @@
                       "Value": "'#344054'"
                     }
                   }
+                }
+              }
+            },
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }
@@ -337,6 +344,33 @@
               "expr": {
                 "Literal": {
                   "Value": "'Bar chart of discount rate by product category: discount amount as a share of gross sales.'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "visualTooltip": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "type": {
+              "expr": {
+                "Literal": {
+                  "Value": "'ReportPage'"
+                }
+              }
+            },
+            "section": {
+              "expr": {
+                "Literal": {
+                  "Value": "'c3e4d5f6-a7b8-49c0-8d1e-2f3a4b5c6d7e'"
                 }
               }
             }

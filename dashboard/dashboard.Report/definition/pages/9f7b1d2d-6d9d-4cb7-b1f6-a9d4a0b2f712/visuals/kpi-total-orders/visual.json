@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
   "name": "kpi-total-orders",
   "position": {
-    "x": 412.8,
+    "x": 1280,
     "y": 254,
-    "z": 1000,
+    "z": 14000,
     "height": 132,
-    "width": 348.8,
-    "tabOrder": 31
+    "width": 290,
+    "tabOrder": 14000
   },
   "visual": {
     "visualType": "card",
@@ -20,14 +20,14 @@
                 "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Inventory"
+                      "Entity": "Orders"
                     }
                   },
-                  "Property": "Stockout Rate"
+                  "Property": "Total Orders"
                 }
               },
-              "queryRef": "Inventory.Stockout Rate",
-              "nativeQueryRef": "Stockout Rate"
+              "queryRef": "Orders.Total Orders",
+              "nativeQueryRef": "Total Orders"
             }
           ]
         }
@@ -107,7 +107,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Stockout Rate'"
+                  "Value": "'Total Orders'"
                 }
               }
             },
@@ -231,13 +231,6 @@
                 }
               }
             },
-            "text": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Latest snapshot · Region not applied'"
-                }
-              }
-            },
             "fontSize": {
               "expr": {
                 "Literal": {
@@ -245,14 +238,10 @@
                 }
               }
             },
-            "fontColor": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#667085'"
-                    }
-                  }
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
                 }
               }
             }
@@ -265,7 +254,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Card showing the stockout rate: the share of products flagged as stocked out in the latest inventory snapshot of the selected period. The Region slicer does not apply.'"
+                  "Value": "'KPI card showing total orders: distinct orders of every status (order date).'"
                 }
               }
             }
@@ -274,5 +263,23 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "1a568ab19e29635d6794",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Orders"
+              }
+            },
+            "Property": "Total Orders"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

@@ -14,10 +14,6 @@ relationship f01d1c8a-c2c3-4906-a4a7-1f4dbff82d4a
 	fromColumn: OrderItems.ProductID
 	toColumn: Products.ProductID
 
-relationship 2e8f7cb0-5b48-4110-b5ef-5d514c40d611
-	fromColumn: Payments.OrderID
-	toColumn: Orders.OrderID
-
 relationship 82db7f02-9328-4b40-94ad-fec8ddb6db13
 	fromColumn: Shipments.OrderID
 	toColumn: Orders.OrderID
@@ -70,14 +66,6 @@ relationship 70e7e93a-56fc-4b4d-bb5c-9f770330f5b6
 	fromColumn: Inventory.SnapshotDate
 	toColumn: Date.Date
 
-relationship 7aa2e166-273d-4d0d-9d1a-38d0db6f4fa5
-	fromColumn: WebTraffic.Date
-	toColumn: Date.Date
-
-relationship 3c4f7f22-1f24-4a80-9f88-5a8bf3ef6a17
-	fromColumn: Sales.Date
-	toColumn: Date.Date
-
 relationship ffdeece2-3019-4689-92cd-05795f70df9e
 	joinOnDateBehavior: datePartOnly
 	fromColumn: Customers.SignupDate
@@ -92,4 +80,8 @@ relationship 8186f0d5-e55a-4caa-87ea-58fc3981084c
 	joinOnDateBehavior: datePartOnly
 	fromColumn: Promotions.EndDate
 	toColumn: LocalDateTable_6e707ba1-3953-4cf9-9d56-ae8a916408d0.Date
+
+relationship 23f0ad41-1eaf-44b9-ae58-24baa50124ea
+	fromColumn: OrderItems.PromoID
+	toColumn: Promotions.PromoID
 

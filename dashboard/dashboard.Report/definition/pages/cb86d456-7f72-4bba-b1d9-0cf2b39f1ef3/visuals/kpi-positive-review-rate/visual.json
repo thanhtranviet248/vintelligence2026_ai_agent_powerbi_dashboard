@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
   "name": "kpi-positive-review-rate",
   "position": {
-    "x": 1438,
+    "x": 350,
     "y": 254,
-    "z": 1000,
+    "z": 11000,
     "height": 132,
-    "width": 442,
-    "tabOrder": 33
+    "width": 290,
+    "tabOrder": 11000
   },
   "visual": {
     "visualType": "card",
@@ -234,7 +234,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'By order date'"
+                  "Value": "'Rated 4–5 stars · order date'"
                 }
               }
             },
@@ -265,7 +265,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Card showing the share of reviews rated 4 or 5.'"
+                  "Value": "'Card showing the share of reviews rated 4 or 5 stars for orders placed in the selected period.'"
                 }
               }
             }

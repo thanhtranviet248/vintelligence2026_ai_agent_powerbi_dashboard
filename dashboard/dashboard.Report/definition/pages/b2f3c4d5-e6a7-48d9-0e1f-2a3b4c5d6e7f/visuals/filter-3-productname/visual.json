@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
   "name": "filter-3-productname",
   "position": {
     "x": 960,
     "y": 110,
-    "z": 1000,
+    "z": 5000,
     "height": 110,
     "width": 420,
-    "tabOrder": 22
+    "tabOrder": 5000
   },
   "visual": {
     "visualType": "slicer",
@@ -184,11 +184,11 @@
         }
       ]
     },
-    "drillFilterOtherVisuals": true,
     "syncGroup": {
       "groupName": "c3e9f8b2-0d4a-4053-b9f2-3c7d8e0f4a32",
       "fieldChanges": true,
       "filterChanges": true
-    }
+    },
+    "drillFilterOtherVisuals": true
   }
 }

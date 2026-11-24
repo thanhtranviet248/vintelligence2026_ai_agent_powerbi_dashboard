@@ -1,0 +1,24 @@
+table 'Return Reduction'
+	lineageTag: 6b23b425-b2b3-43d1-94b4-f6a120f2e5fd
+
+	measure 'Return Reduction Value' = SELECTEDVALUE('Return Reduction'[Return Reduction], 0)
+		formatString: 0%
+		lineageTag: 19312ec1-5fc0-4c8f-87e6-1c84aa300ed2
+
+	column 'Return Reduction'
+		formatString: 0%
+		lineageTag: fbc63ad6-4355-40b4-8037-a99c0103b008
+		summarizeBy: none
+		sourceColumn: [Value]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 0
+				}
+
+		annotation SummarizationSetBy = User
+
+	partition 'Return Reduction' = calculated
+		mode: import
+		source = GENERATESERIES(0, 0.5, 0.05)
+

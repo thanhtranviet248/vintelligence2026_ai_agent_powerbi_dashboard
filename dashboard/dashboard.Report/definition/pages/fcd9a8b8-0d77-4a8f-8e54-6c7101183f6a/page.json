@@ -1,8 +1,105 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
   "name": "fcd9a8b8-0d77-4a8f-8e54-6c7101183f6a",
-  "displayName": "Delivery and Logistics",
+  "displayName": "Shipment",
   "displayOption": "FitToWidth",
-  "height": 1570,
-  "width": 1920
+  "height": 2460,
+  "width": 1920,
+  "visualInteractions": [
+    {
+      "source": "p5-search-city",
+      "target": "filter-1-year-month",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p5-search-city",
+      "target": "filter-2-category",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p5-search-city",
+      "target": "filter-3-productname",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p5-search-city",
+      "target": "filter-4-region",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p5-search-city",
+      "target": "kpi-cancellation-rate",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p5-search-city",
+      "target": "kpi-cost-per-shipment",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p5-search-city",
+      "target": "kpi-fulfillment-rate",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p5-search-city",
+      "target": "kpi-order-to-delivery-days",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p5-search-city",
+      "target": "kpi-premium-fee-share",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p5-search-city",
+      "target": "kpi-shipment-cost",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p5-search-city",
+      "target": "p5-bar-cancel-payment",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p5-search-city",
+      "target": "p5-bar-cost-basket",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p5-search-city",
+      "target": "p5-bar-cost-category",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p5-search-city",
+      "target": "p5-col-status-year",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p5-search-city",
+      "target": "p5-col-transit-days",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p5-search-city",
+      "target": "p5-line-cost-premium",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p5-search-city",
+      "target": "p5-line-lead-time",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p5-search-city",
+      "target": "p5-table-cost-region",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p5-search-city",
+      "target": "hdr-data-through",
+      "type": "NoFilter"
+    }
+  ]
 }

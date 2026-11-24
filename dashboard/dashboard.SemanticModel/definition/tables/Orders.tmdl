@@ -2,39 +2,27 @@ table Orders
 	lineageTag: 96ce3597-5dc5-418f-a932-8f8efcb791d2
 
 	measure 'Total Orders' = CALCULATE(DISTINCTCOUNT(Orders[OrderID]), CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH))
+		formatString: #,0
 		lineageTag: a35029f5-bc5c-43e8-ac8f-80defd964c81
 
 	measure 'Distinct Customers' = CALCULATE(DISTINCTCOUNT(Orders[CustomerID]), CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH))
+		formatString: #,0
 		lineageTag: 60ff5ca2-1d41-4d10-912a-14e5f8d49ccd
 
-	measure 'Shipped Orders' = CALCULATE([Total Orders], OR(Orders[OrderStatus]="shipped", Orders[OrderStatus]="delivered"))
-		lineageTag: b7e306f8-ecee-4672-9f6e-e99b6ada2d2e
-
 	measure 'Delivered Orders' = CALCULATE([Total Orders], Orders[OrderStatus]="delivered")
+		formatString: #,0
 		lineageTag: cff9a99d-2622-45c2-9585-266f4243d62a
 
-	measure 'Pending Orders' = CALCULATE([Total Orders], OR(Orders[OrderStatus]="created", Orders[OrderStatus]="paid"))
-		lineageTag: 19042fa2-6290-4268-b4a3-2cac324bc965
-
-	measure 'Cancelled Orders' = CALCULATE([Total Orders], Orders[OrderStatus]="cancelled")
-		lineageTag: f5259cd5-3630-425c-97c5-7c3c25212f03
-
-	measure 'Returned Status Orders' = CALCULATE([Total Orders], Orders[OrderStatus]="returned")
-		lineageTag: 47a09bcd-60f8-4ae2-9eb9-f7661308d088
-
-	measure 'New Customers' = COUNTROWS(FILTER(CALCULATETABLE(VALUES(Orders[CustomerID]), CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH)), VAR FirstOrderDate = CALCULATE(MIN(Orders[OrderDate]), ALL(Orders[OrderDate])) RETURN FirstOrderDate >= MIN(Date[Date]) && FirstOrderDate <= MAX(Date[Date])))
-		lineageTag: a240c9d6-4c3b-4d42-b0f5-6bb86362a131
-
-	measure 'Repeat Customers' = COUNTROWS(FILTER(CALCULATETABLE(VALUES(Orders[CustomerID]), CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH)), VAR FirstOrderDate = CALCULATE(MIN(Orders[OrderDate]), ALL(Orders[OrderDate])) RETURN FirstOrderDate < MIN(Date[Date])))
-		lineageTag: f7992051-8df5-4fcc-a62a-c7e66cc6debe
-
 	measure 'Order Frequency' = DIVIDE([Total Orders], [Distinct Customers])
+		formatString: 0.00
 		lineageTag: 96573a9b-4256-42dd-92af-f003af1ecdf9
 
 	measure 'All-Time First-Time Customers' = COUNTROWS(FILTER(CALCULATETABLE(VALUES(Orders[CustomerID]), ALL('Date'), CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH)), CALCULATE(DISTINCTCOUNT(Orders[OrderID]), ALL('Date')) = 1))
+		formatString: #,0
 		lineageTag: a4e75259-922a-4823-b92e-b7f5c95f0ac6
 
 	measure 'All-Time Repeat Customers' = COUNTROWS(FILTER(CALCULATETABLE(VALUES(Orders[CustomerID]), ALL('Date'), CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH)), CALCULATE(DISTINCTCOUNT(Orders[OrderID]), ALL('Date')) > 1))
+		formatString: #,0
 		lineageTag: 2ca954ff-6ce3-4e7d-ad98-189d3957877a
 
 	measure 'All-Time First-Time Customer Rate' = DIVIDE([All-Time First-Time Customers], CALCULATE([Distinct Customers], ALL('Date')))
@@ -45,14 +33,103 @@ table Orders
 		formatString: 0.0%
 		lineageTag: db505b65-9042-49bf-a8cb-6d50a569ec29
 
-	measure 'Fulfillment Rate' = DIVIDE([Delivered Orders], [Total Orders])
-		lineageTag: 4f0f781f-a96c-4c41-a445-698f2a6a8ea7
+	/// Customers ordering in the period whose first-ever order (any product, region or status) falls inside the period. New Customers + Repeat Customers = Distinct Customers.
+	measure 'New Customers' =
+			VAR PeriodStart = MIN('Date'[Date])
+			VAR PeriodEnd = MAX('Date'[Date])
+			RETURN
+			    COUNTROWS(
+			        FILTER(
+			            CALCULATETABLE(VALUES(Orders[CustomerID]), CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH)),
+			            VAR FirstOrderDate = CALCULATE(MIN(Orders[OrderDate]), ALLEXCEPT(Orders, Orders[CustomerID]))
+			            RETURN FirstOrderDate >= PeriodStart && FirstOrderDate <= PeriodEnd
+			        )
+			    )
+		formatString: #,0
+		lineageTag: aa17840d-f5c7-44ae-8cdf-cae55a453ae1
 
-	measure 'Order Status Mix' = DIVIDE([Total Orders], CALCULATE([Total Orders], ALL(Orders[OrderStatus])))
-		lineageTag: d5ed3f60-f414-43b9-969f-559b3c157375
+	/// Customers ordering in the period whose first-ever order (any product, region or status) was before the period started.
+	measure 'Repeat Customers' =
+			VAR PeriodStart = MIN('Date'[Date])
+			RETURN
+			    COUNTROWS(
+			        FILTER(
+			            CALCULATETABLE(VALUES(Orders[CustomerID]), CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH)),
+			            CALCULATE(MIN(Orders[OrderDate]), ALLEXCEPT(Orders, Orders[CustomerID])) < PeriodStart
+			        )
+			    )
+		formatString: #,0
+		lineageTag: 3cc5aa85-1dcd-468d-94f4-a590fce0b2ba
+
+	/// Share of customers ordering in the period whose first-ever order was before the period started.
+	measure 'Repeat Customer Rate' = DIVIDE([Repeat Customers], [Distinct Customers])
+		formatString: 0.0%
+		lineageTag: a9fc2eda-9021-4157-9b80-fd38dffc9bad
+
+	/// Share of orders in each order status, out of all statuses in the current filter context (order date).
+	measure 'Order Status Share' = DIVIDE([Total Orders], CALCULATE([Total Orders], ALL(Orders[OrderStatus])))
+		formatString: 0.0%
+		lineageTag: c3ad4806-3dfb-4bd6-98cc-664e07b7b427
+
+	/// KPI card value: customers with at least one order in the selected period; when no date is filtered, the latest 12 months of data instead of all time (order date). All-time customer counts make New Customers equal every customer and the repeat rate blank, so the card uses a rolling year by default.
+	measure 'Active Customers KPI' =
+			VAR LastOrderDate = [Data End Date]
+			VAR DefaultStart = EDATE(LastOrderDate, -12) + 1
+			RETURN
+				IF(
+					ISFILTERED('Date'),
+					[Distinct Customers],
+					CALCULATE([Distinct Customers], DATESBETWEEN('Date'[Date], DefaultStart, LastOrderDate))
+				)
+		formatString: #,0
+		lineageTag: e8bf3c0b-94a7-4f5c-b752-ad056ccd50a8
+
+	/// KPI card value: customers whose first-ever order falls in the period in the selected period; when no date is filtered, the latest 12 months of data instead of all time (order date). All-time customer counts make New Customers equal every customer and the repeat rate blank, so the card uses a rolling year by default.
+	measure 'New Customers KPI' =
+			VAR LastOrderDate = [Data End Date]
+			VAR DefaultStart = EDATE(LastOrderDate, -12) + 1
+			RETURN
+				IF(
+					ISFILTERED('Date'),
+					[New Customers],
+					CALCULATE([New Customers], DATESBETWEEN('Date'[Date], DefaultStart, LastOrderDate))
+				)
+		formatString: #,0
+		lineageTag: 49b37ac3-6e19-4c88-be2b-bfde6e31ae94
+
+	/// KPI card value: share of active customers whose first order came before the period in the selected period; when no date is filtered, the latest 12 months of data instead of all time (order date). All-time customer counts make New Customers equal every customer and the repeat rate blank, so the card uses a rolling year by default.
+	measure 'Repeat Customer Rate KPI' =
+			VAR LastOrderDate = [Data End Date]
+			VAR DefaultStart = EDATE(LastOrderDate, -12) + 1
+			RETURN
+				IF(
+					ISFILTERED('Date'),
+					[Repeat Customer Rate],
+					CALCULATE([Repeat Customer Rate], DATESBETWEEN('Date'[Date], DefaultStart, LastOrderDate))
+				)
+		formatString: 0.0%
+		lineageTag: a6f8167d-036b-480e-8aac-64f7a8950c87
+
+	/// Average of the monthly Repeat Customer Rate over the months in the selected period (order date). Reference line for the monthly repeat-rate trend.
+	measure 'Repeat Customer Rate Period Average' =
+			VAR SelectedMonths = CALCULATETABLE(VALUES('Date'[Month Start]), ALLSELECTED('Date'))
+			RETURN
+				AVERAGEX(
+					SelectedMonths,
+					VAR ThisMonth = 'Date'[Month Start]
+					RETURN CALCULATE([Repeat Customer Rate], REMOVEFILTERS('Date'), 'Date'[Month Start] = ThisMonth)
+				)
+		formatString: 0.0%
+		lineageTag: f8efc100-885c-4084-976f-4ba732de4a83
+
+	/// Cancelled orders as a share of all orders placed (order date). Product slicers reach it through Total Orders.
+	measure 'Cancellation Rate' = DIVIDE(CALCULATE([Total Orders], KEEPFILTERS(Orders[OrderStatus] = "cancelled")), [Total Orders])
+		formatString: 0.0%
+		lineageTag: 0cadb062-75da-4f71-9fc4-75b8d87e5f61
 
 	column OrderID
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: d5d55f2d-1195-4db1-b7c4-33b991fdb66e
 		summarizeBy: none
@@ -62,6 +139,7 @@ table Orders
 
 	column OrderDate
 		dataType: dateTime
+		isHidden
 		formatString: Short Date
 		lineageTag: 2e7fd735-d299-420a-b6ac-5d1dff40a9ff
 		summarizeBy: none
@@ -73,6 +151,7 @@ table Orders
 
 	column CustomerID
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: 8d6c8ac9-aea9-4f83-a1ea-01d270ecf13d
 		summarizeBy: none
@@ -82,6 +161,7 @@ table Orders
 
 	column Zip
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: 00d5f239-d949-4088-a12d-0d93f3ff6f2b
 		summarizeBy: none
@@ -128,6 +208,25 @@ table Orders
 		annotation SummarizationSetBy = Automatic
 
 		annotation PBI_FormatHint = {"isText":true}
+
+	/// Units in the order (sum of OrderItems quantity), banded. Blank for an order without lines. Sorted by Basket Size Order.
+	column 'Basket Size' = SWITCH(Orders[Basket Size Order], 1, "1 unit", 2, "2 units", 3, "3 units", 4, "4–5 units", 5, "6–10 units", 6, "11+ units")
+		dataType: string
+		lineageTag: e6b7705d-ad47-4161-8705-32d02f876308
+		summarizeBy: none
+		sortByColumn: 'Basket Size Order'
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Sort order for Basket Size.
+	column 'Basket Size Order' = VAR Units = CALCULATE(SUM(OrderItems[Quantity]), ALLEXCEPT(Orders, Orders[OrderID])) RETURN SWITCH(TRUE(), ISBLANK(Units), BLANK(), Units = 1, 1, Units = 2, 2, Units = 3, 3, Units <= 5, 4, Units <= 10, 5, 6)
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 5acf8eb1-ab28-48cb-97be-c9707da87441
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
 
 	partition Orders-8ed3cc1d-5bb3-4d3d-bc33-afbebb5f66d7 = m
 		mode: import

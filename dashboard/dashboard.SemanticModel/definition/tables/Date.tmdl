@@ -1,35 +1,620 @@
 table Date
 	lineageTag: 6e5f99d5-5ee3-4d2f-8bce-39d10e7dce7d
+	dataCategory: Time
 
-	measure 'Revenue Growth' =
-			VAR CurrentRevenue = [Net Sales]
-			VAR PreviousRevenue = CALCULATE([Net Sales], DATEADD(Date[Date], -1, YEAR))
-			RETURN
-				DIVIDE(CurrentRevenue - PreviousRevenue, PreviousRevenue)
-		lineageTag: a75b16f6-3ef7-4d09-a723-63bbf6377f04
+	/// First order date in the data, ignoring all filters. Helper for growth measures.
+	measure 'Data Start Date' = CALCULATE(MIN(Orders[OrderDate]), REMOVEFILTERS())
+		formatString: Short Date
+		isHidden
+		lineageTag: 8ed1d8ac-8120-4806-b895-fa95bc17e84e
 
-	measure 'Order Growth' =
-			VAR CurrentOrderCount = [Total Orders]
-			VAR PreviousOrderCount = CALCULATE([Total Orders], DATEADD(Date[Date], -1, YEAR))
-			RETURN
-				DIVIDE(CurrentOrderCount - PreviousOrderCount, PreviousOrderCount)
-		lineageTag: ecf13118-e109-4605-99bf-67a4ab89136e
+	/// Last order date in the data, ignoring all filters. Helper for growth measures.
+	measure 'Data End Date' = CALCULATE(MAX(Orders[OrderDate]), REMOVEFILTERS())
+		formatString: Short Date
+		isHidden
+		lineageTag: 92d993fa-d0f9-4f59-b3c5-5c9a8aae95c2
 
-	measure 'Month-over-Month Growth' =
-			VAR CurrentRevenue = [Net Sales]
-			VAR PreviousRevenue = CALCULATE([Net Sales], DATEADD(Date[Date], -1, MONTH))
+	/// Net Sales on the same dates one year earlier (order date). With no date filter it covers the 12 months before the latest 12 months of data.
+	measure 'Net Sales Prior Year' =
+			VAR FirstOrderDate = [Data Start Date]
+			VAR LastOrderDate = [Data End Date]
+			VAR DateIsFiltered = ISFILTERED('Date')
+			VAR DefaultStart = EDATE(LastOrderDate, -12) + 1
+			VAR PeriodDates =
+				FILTER(
+					VALUES('Date'[Date]),
+					'Date'[Date] <= LastOrderDate
+						&& EDATE('Date'[Date], -12) >= FirstOrderDate
+						&& (DateIsFiltered || 'Date'[Date] >= DefaultStart)
+				)
+			VAR PriorDates = SELECTCOLUMNS(PeriodDates, "PriorDate", EDATE('Date'[Date], -12))
+			VAR CurrentValue = CALCULATE([Net Sales], REMOVEFILTERS('Date'), PeriodDates)
+			VAR PriorValue = CALCULATE([Net Sales], REMOVEFILTERS('Date'), TREATAS(PriorDates, 'Date'[Date]))
 			RETURN
-				DIVIDE(CurrentRevenue - PreviousRevenue, PreviousRevenue)
-		lineageTag: 5dc7872e-b108-4505-9336-8632e11ed067
+				PriorValue
+		formatString: $#,0;($#,0);$#,0
+		lineageTag: 8e8e7947-cf19-421a-af62-4c7472a15d73
 
-	measure 'Year-over-Year Growth' =
-			VAR CurrentRevenue = [Net Sales]
-			VAR PreviousRevenue = CALCULATE([Net Sales], DATEADD(Date[Date], -1, YEAR))
+	/// Growth of Net Sales versus the same dates one year earlier (like-for-like days, order date). With no date filter it compares the latest 12 months of data with the 12 months before. Dates whose prior-year date falls before the first order are excluded, so the first year is blank.
+	measure 'Net Sales YoY %' =
+			VAR FirstOrderDate = [Data Start Date]
+			VAR LastOrderDate = [Data End Date]
+			VAR DateIsFiltered = ISFILTERED('Date')
+			VAR DefaultStart = EDATE(LastOrderDate, -12) + 1
+			VAR PeriodDates =
+				FILTER(
+					VALUES('Date'[Date]),
+					'Date'[Date] <= LastOrderDate
+						&& EDATE('Date'[Date], -12) >= FirstOrderDate
+						&& (DateIsFiltered || 'Date'[Date] >= DefaultStart)
+				)
+			VAR PriorDates = SELECTCOLUMNS(PeriodDates, "PriorDate", EDATE('Date'[Date], -12))
+			VAR CurrentValue = CALCULATE([Net Sales], REMOVEFILTERS('Date'), PeriodDates)
+			VAR PriorValue = CALCULATE([Net Sales], REMOVEFILTERS('Date'), TREATAS(PriorDates, 'Date'[Date]))
 			RETURN
-				DIVIDE(CurrentRevenue - PreviousRevenue, PreviousRevenue)
-		lineageTag: 409049cd-5fa4-40cd-accd-1f3fc59a2dbf
+				DIVIDE(CurrentValue - PriorValue, PriorValue)
+		formatString: ▲ 0.0%;▼ 0.0%;0.0%
+		lineageTag: a75ec843-ac2f-4693-9571-8c4ee295ab86
+
+	/// Growth of Gross Sales versus the same dates one year earlier (like-for-like days, order date). With no date filter it compares the latest 12 months of data with the 12 months before. Dates whose prior-year date falls before the first order are excluded, so the first year is blank.
+	measure 'Gross Sales YoY %' =
+			VAR FirstOrderDate = [Data Start Date]
+			VAR LastOrderDate = [Data End Date]
+			VAR DateIsFiltered = ISFILTERED('Date')
+			VAR DefaultStart = EDATE(LastOrderDate, -12) + 1
+			VAR PeriodDates =
+				FILTER(
+					VALUES('Date'[Date]),
+					'Date'[Date] <= LastOrderDate
+						&& EDATE('Date'[Date], -12) >= FirstOrderDate
+						&& (DateIsFiltered || 'Date'[Date] >= DefaultStart)
+				)
+			VAR PriorDates = SELECTCOLUMNS(PeriodDates, "PriorDate", EDATE('Date'[Date], -12))
+			VAR CurrentValue = CALCULATE([Gross Sales], REMOVEFILTERS('Date'), PeriodDates)
+			VAR PriorValue = CALCULATE([Gross Sales], REMOVEFILTERS('Date'), TREATAS(PriorDates, 'Date'[Date]))
+			RETURN
+				DIVIDE(CurrentValue - PriorValue, PriorValue)
+		formatString: ▲ 0.0%;▼ 0.0%;0.0%
+		lineageTag: 6d478206-1a51-43d3-9e04-fb475108fcbd
+
+	/// Growth of Gross Profit versus the same dates one year earlier (like-for-like days, order date). With no date filter it compares the latest 12 months of data with the 12 months before. Dates whose prior-year date falls before the first order are excluded, so the first year is blank.
+	measure 'Gross Profit YoY %' =
+			VAR FirstOrderDate = [Data Start Date]
+			VAR LastOrderDate = [Data End Date]
+			VAR DateIsFiltered = ISFILTERED('Date')
+			VAR DefaultStart = EDATE(LastOrderDate, -12) + 1
+			VAR PeriodDates =
+				FILTER(
+					VALUES('Date'[Date]),
+					'Date'[Date] <= LastOrderDate
+						&& EDATE('Date'[Date], -12) >= FirstOrderDate
+						&& (DateIsFiltered || 'Date'[Date] >= DefaultStart)
+				)
+			VAR PriorDates = SELECTCOLUMNS(PeriodDates, "PriorDate", EDATE('Date'[Date], -12))
+			VAR CurrentValue = CALCULATE([Gross Profit], REMOVEFILTERS('Date'), PeriodDates)
+			VAR PriorValue = CALCULATE([Gross Profit], REMOVEFILTERS('Date'), TREATAS(PriorDates, 'Date'[Date]))
+			RETURN
+				DIVIDE(CurrentValue - PriorValue, PriorValue)
+		formatString: ▲ 0.0%;▼ 0.0%;0.0%
+		lineageTag: c89b5516-5a45-4d82-aef5-9a465b3425ba
+
+	/// Growth of Total Orders versus the same dates one year earlier (like-for-like days, order date). With no date filter it compares the latest 12 months of data with the 12 months before. Dates whose prior-year date falls before the first order are excluded, so the first year is blank.
+	measure 'Total Orders YoY %' =
+			VAR FirstOrderDate = [Data Start Date]
+			VAR LastOrderDate = [Data End Date]
+			VAR DateIsFiltered = ISFILTERED('Date')
+			VAR DefaultStart = EDATE(LastOrderDate, -12) + 1
+			VAR PeriodDates =
+				FILTER(
+					VALUES('Date'[Date]),
+					'Date'[Date] <= LastOrderDate
+						&& EDATE('Date'[Date], -12) >= FirstOrderDate
+						&& (DateIsFiltered || 'Date'[Date] >= DefaultStart)
+				)
+			VAR PriorDates = SELECTCOLUMNS(PeriodDates, "PriorDate", EDATE('Date'[Date], -12))
+			VAR CurrentValue = CALCULATE([Total Orders], REMOVEFILTERS('Date'), PeriodDates)
+			VAR PriorValue = CALCULATE([Total Orders], REMOVEFILTERS('Date'), TREATAS(PriorDates, 'Date'[Date]))
+			RETURN
+				DIVIDE(CurrentValue - PriorValue, PriorValue)
+		formatString: ▲ 0.0%;▼ 0.0%;0.0%
+		lineageTag: 13684dcd-4927-48cc-a768-5089b299e734
+
+	/// Net Sales of the latest month in context versus the month before it (order date). With no date filter that is the last month of data.
+	measure 'Net Sales MoM %' =
+			VAR FirstOrderDate = [Data Start Date]
+			VAR LastOrderDate = [Data End Date]
+			VAR AnchorDate = MIN(MAX('Date'[Date]), LastOrderDate)
+			VAR MonthStart = DATE(YEAR(AnchorDate), MONTH(AnchorDate), 1)
+			VAR MonthEnd = EOMONTH(AnchorDate, 0)
+			VAR PrevStart = EDATE(MonthStart, -1)
+			VAR PrevEnd = EOMONTH(AnchorDate, -1)
+			VAR CurrentValue = CALCULATE([Net Sales], REMOVEFILTERS('Date'), DATESBETWEEN('Date'[Date], MonthStart, MonthEnd))
+			VAR PriorValue = CALCULATE([Net Sales], REMOVEFILTERS('Date'), DATESBETWEEN('Date'[Date], PrevStart, PrevEnd))
+			RETURN
+				IF(PrevStart >= DATE(YEAR(FirstOrderDate), MONTH(FirstOrderDate), 1), DIVIDE(CurrentValue - PriorValue, PriorValue))
+		formatString: ▲ 0.0%;▼ 0.0%;0.0%
+		lineageTag: 3fa38e02-919e-4085-b052-d671834a94f0
+
+	/// Card subtitle text: change in Total Orders versus the same dates a year earlier, with a ▲/▼ arrow and words so colour is not needed. With no date filter it compares the latest 12 months with the 12 months before (order date).
+	measure 'Total Orders vs PY Label' =
+			VAR FirstOrderDate = [Data Start Date]
+			VAR LastOrderDate = [Data End Date]
+			VAR DateIsFiltered = ISFILTERED('Date')
+			VAR DefaultStart = EDATE(LastOrderDate, -12) + 1
+			VAR PeriodDates =
+				FILTER(
+					VALUES('Date'[Date]),
+					'Date'[Date] <= LastOrderDate
+						&& EDATE('Date'[Date], -12) >= FirstOrderDate
+						&& (DateIsFiltered || 'Date'[Date] >= DefaultStart)
+				)
+			VAR PriorDates = SELECTCOLUMNS(PeriodDates, "PriorDate", EDATE('Date'[Date], -12))
+			VAR CurrentValue = CALCULATE([Total Orders], REMOVEFILTERS('Date'), PeriodDates)
+			VAR PriorValue = CALCULATE([Total Orders], REMOVEFILTERS('Date'), TREATAS(PriorDates, 'Date'[Date]))
+			VAR Change = DIVIDE(CurrentValue - PriorValue, PriorValue)
+			VAR Scope = IF(DateIsFiltered, "vs same dates a year earlier", "last 12 months vs prior year")
+			RETURN
+				IF(
+					ISBLANK(CurrentValue) || ISBLANK(PriorValue) || ISBLANK(Change),
+					"No prior-year comparison (order date)",
+					IF(Change > 0, "▲ ", IF(Change < 0, "▼ ", "■ ")) & FORMAT(ABS(Change), "0.0%") & " " & Scope & " (order date)"
+				)
+		lineageTag: 0bfb7ed4-00e1-4284-99ec-23eed08be135
+
+	/// Card subtitle text: change in Gross Margin % versus the same dates a year earlier, with a ▲/▼ arrow and words so colour is not needed. With no date filter it compares the latest 12 months with the 12 months before (order date).
+	measure 'Gross Margin vs PY Label' =
+			VAR FirstOrderDate = [Data Start Date]
+			VAR LastOrderDate = [Data End Date]
+			VAR DateIsFiltered = ISFILTERED('Date')
+			VAR DefaultStart = EDATE(LastOrderDate, -12) + 1
+			VAR PeriodDates =
+				FILTER(
+					VALUES('Date'[Date]),
+					'Date'[Date] <= LastOrderDate
+						&& EDATE('Date'[Date], -12) >= FirstOrderDate
+						&& (DateIsFiltered || 'Date'[Date] >= DefaultStart)
+				)
+			VAR PriorDates = SELECTCOLUMNS(PeriodDates, "PriorDate", EDATE('Date'[Date], -12))
+			VAR CurrentValue = CALCULATE([Gross Margin %], REMOVEFILTERS('Date'), PeriodDates)
+			VAR PriorValue = CALCULATE([Gross Margin %], REMOVEFILTERS('Date'), TREATAS(PriorDates, 'Date'[Date]))
+			VAR Change = CurrentValue - PriorValue
+			VAR Scope = IF(DateIsFiltered, "vs same dates a year earlier", "last 12 months vs prior year")
+			RETURN
+				IF(
+					ISBLANK(CurrentValue) || ISBLANK(PriorValue) || ISBLANK(Change),
+					"No prior-year comparison (order date)",
+					IF(Change > 0, "▲ ", IF(Change < 0, "▼ ", "■ ")) & FORMAT(ABS(Change) * 100, "0.0") & " pp" & " " & Scope & " (order date)"
+				)
+		lineageTag: 93ba4505-3711-4dc5-b0e5-3ec8739dc905
+
+	/// Card subtitle text: change in Return Rate (Closed Window) versus the same dates a year earlier, with a ▲/▼ arrow and words so colour is not needed. Orders placed in the last 31 days before [Data End Date] are left out because their returns have not arrived yet. With no date filter it compares the latest 12 months with the 12 months before (order date).
+	measure 'Return Rate vs PY Label' =
+			VAR FirstOrderDate = [Data Start Date]
+			VAR LastOrderDate = [Data End Date]
+			VAR DateIsFiltered = ISFILTERED('Date')
+			VAR DefaultStart = EDATE(LastOrderDate, -12) + 1
+			VAR PeriodDates =
+				FILTER(
+					VALUES('Date'[Date]),
+					'Date'[Date] <= LastOrderDate
+						&& EDATE('Date'[Date], -12) >= FirstOrderDate
+						&& (DateIsFiltered || 'Date'[Date] >= DefaultStart)
+				)
+			VAR PriorDates = SELECTCOLUMNS(PeriodDates, "PriorDate", EDATE('Date'[Date], -12))
+			VAR CurrentValue = CALCULATE([Return Rate (Closed Window)], REMOVEFILTERS('Date'), PeriodDates)
+			VAR PriorValue = CALCULATE([Return Rate (Closed Window)], REMOVEFILTERS('Date'), TREATAS(PriorDates, 'Date'[Date]))
+			VAR Change = CurrentValue - PriorValue
+			VAR Scope = IF(DateIsFiltered, "vs same dates a year earlier", "last 12 months vs prior year")
+			RETURN
+				IF(
+					ISBLANK(CurrentValue) || ISBLANK(PriorValue) || ISBLANK(Change),
+					"No prior-year comparison (order date)",
+					IF(Change > 0, "▲ ", IF(Change < 0, "▼ ", "■ ")) & FORMAT(ABS(Change) * 100, "0.0") & " pp" & " " & Scope & " (order date)"
+				)
+		lineageTag: f570ed08-8709-4f9f-8b4c-888153e6ee2e
+
+	/// Card subtitle text: change in Inventory Turnover versus the same dates a year earlier, with a ▲/▼ arrow and words so colour is not needed. With no date filter it compares the latest 12 months with the 12 months before (snapshot date).
+	measure 'Inventory Turnover vs PY Label' =
+			VAR FirstOrderDate = [Data Start Date]
+			VAR LastOrderDate = [Data End Date]
+			VAR DateIsFiltered = ISFILTERED('Date')
+			VAR DefaultStart = EDATE(LastOrderDate, -12) + 1
+			VAR PeriodDates =
+				FILTER(
+					VALUES('Date'[Date]),
+					'Date'[Date] <= LastOrderDate
+						&& EDATE('Date'[Date], -12) >= FirstOrderDate
+						&& (DateIsFiltered || 'Date'[Date] >= DefaultStart)
+				)
+			VAR PriorDates = SELECTCOLUMNS(PeriodDates, "PriorDate", EDATE('Date'[Date], -12))
+			VAR CurrentValue = CALCULATE([Inventory Turnover], REMOVEFILTERS('Date'), PeriodDates)
+			VAR PriorValue = CALCULATE([Inventory Turnover], REMOVEFILTERS('Date'), TREATAS(PriorDates, 'Date'[Date]))
+			VAR Change = CurrentValue - PriorValue
+			VAR Scope = IF(DateIsFiltered, "vs same dates a year earlier", "last 12 months vs prior year")
+			RETURN
+				IF(
+					ISBLANK(CurrentValue) || ISBLANK(PriorValue) || ISBLANK(Change),
+					"No prior-year comparison (snapshot date)",
+					IF(Change > 0, "▲ ", IF(Change < 0, "▼ ", "■ ")) & FORMAT(ABS(Change), "0.00") & "x" & " " & Scope & " (snapshot date)"
+				)
+		lineageTag: 25fc003b-6599-4847-a813-78245077009a
+
+	/// Card subtitle text: change in Stockout Rate versus the same dates a year earlier, with a ▲/▼ arrow and words so colour is not needed. With no date filter it compares the latest 12 months with the 12 months before (snapshot date).
+	measure 'Stockout Rate vs PY Label' =
+			VAR FirstOrderDate = [Data Start Date]
+			VAR LastOrderDate = [Data End Date]
+			VAR DateIsFiltered = ISFILTERED('Date')
+			VAR DefaultStart = EDATE(LastOrderDate, -12) + 1
+			VAR PeriodDates =
+				FILTER(
+					VALUES('Date'[Date]),
+					'Date'[Date] <= LastOrderDate
+						&& EDATE('Date'[Date], -12) >= FirstOrderDate
+						&& (DateIsFiltered || 'Date'[Date] >= DefaultStart)
+				)
+			VAR PriorDates = SELECTCOLUMNS(PeriodDates, "PriorDate", EDATE('Date'[Date], -12))
+			VAR CurrentValue = CALCULATE([Stockout Rate], REMOVEFILTERS('Date'), PeriodDates)
+			VAR PriorValue = CALCULATE([Stockout Rate], REMOVEFILTERS('Date'), TREATAS(PriorDates, 'Date'[Date]))
+			VAR Change = CurrentValue - PriorValue
+			VAR Scope = IF(DateIsFiltered, "vs same dates a year earlier", "last 12 months vs prior year")
+			RETURN
+				IF(
+					ISBLANK(CurrentValue) || ISBLANK(PriorValue) || ISBLANK(Change),
+					"No prior-year comparison (snapshot date)",
+					IF(Change > 0, "▲ ", IF(Change < 0, "▼ ", "■ ")) & FORMAT(ABS(Change) * 100, "0.0") & " pp" & " " & Scope & " (snapshot date)"
+				)
+		lineageTag: 52c2e3be-ac56-46b2-a586-b28a0dd68817
+
+	/// Card subtitle text: change in Fulfilled Rate versus the same dates a year earlier, with a ▲/▼ arrow and words so colour is not needed. With no date filter it compares the latest 12 months with the 12 months before (order date).
+	measure 'Fulfilled Rate vs PY Label' =
+			VAR FirstOrderDate = [Data Start Date]
+			VAR LastOrderDate = [Data End Date]
+			VAR DateIsFiltered = ISFILTERED('Date')
+			VAR DefaultStart = EDATE(LastOrderDate, -12) + 1
+			VAR PeriodDates =
+				FILTER(
+					VALUES('Date'[Date]),
+					'Date'[Date] <= LastOrderDate
+						&& EDATE('Date'[Date], -12) >= FirstOrderDate
+						&& (DateIsFiltered || 'Date'[Date] >= DefaultStart)
+				)
+			VAR PriorDates = SELECTCOLUMNS(PeriodDates, "PriorDate", EDATE('Date'[Date], -12))
+			VAR CurrentValue = CALCULATE([Fulfilled Rate], REMOVEFILTERS('Date'), PeriodDates)
+			VAR PriorValue = CALCULATE([Fulfilled Rate], REMOVEFILTERS('Date'), TREATAS(PriorDates, 'Date'[Date]))
+			VAR Change = CurrentValue - PriorValue
+			VAR Scope = IF(DateIsFiltered, "vs same dates a year earlier", "last 12 months vs prior year")
+			RETURN
+				IF(
+					ISBLANK(CurrentValue) || ISBLANK(PriorValue) || ISBLANK(Change),
+					"No prior-year comparison (order date)",
+					IF(Change > 0, "▲ ", IF(Change < 0, "▼ ", "■ ")) & FORMAT(ABS(Change) * 100, "0.0") & " pp" & " " & Scope & " (order date)"
+				)
+		lineageTag: 48449a73-3e8a-4d44-bca3-cf075e2688c9
+
+	/// Card subtitle text: change in Average Order-to-Delivery Days versus the same dates a year earlier, with a ▲/▼ arrow and words so colour is not needed. With no date filter it compares the latest 12 months with the 12 months before (order date).
+	measure 'Order-to-Delivery Days vs PY Label' =
+			VAR FirstOrderDate = [Data Start Date]
+			VAR LastOrderDate = [Data End Date]
+			VAR DateIsFiltered = ISFILTERED('Date')
+			VAR DefaultStart = EDATE(LastOrderDate, -12) + 1
+			VAR PeriodDates =
+				FILTER(
+					VALUES('Date'[Date]),
+					'Date'[Date] <= LastOrderDate
+						&& EDATE('Date'[Date], -12) >= FirstOrderDate
+						&& (DateIsFiltered || 'Date'[Date] >= DefaultStart)
+				)
+			VAR PriorDates = SELECTCOLUMNS(PeriodDates, "PriorDate", EDATE('Date'[Date], -12))
+			VAR CurrentValue = CALCULATE([Average Order-to-Delivery Days], REMOVEFILTERS('Date'), PeriodDates)
+			VAR PriorValue = CALCULATE([Average Order-to-Delivery Days], REMOVEFILTERS('Date'), TREATAS(PriorDates, 'Date'[Date]))
+			VAR Change = CurrentValue - PriorValue
+			VAR Scope = IF(DateIsFiltered, "vs same dates a year earlier", "last 12 months vs prior year")
+			RETURN
+				IF(
+					ISBLANK(CurrentValue) || ISBLANK(PriorValue) || ISBLANK(Change),
+					"No prior-year comparison (order date)",
+					IF(Change > 0, "▲ ", IF(Change < 0, "▼ ", "■ ")) & FORMAT(ABS(Change), "0.0") & " days" & " " & Scope & " (order date)"
+				)
+		lineageTag: 1dab2d50-3d4a-47fa-88f8-dc1d846556de
+
+	/// Header text: the last order date in the data, ignoring all filters.
+	measure 'Data Through Label' = "Data through " & FORMAT([Data End Date], "d mmm yyyy")
+		lineageTag: 8b514950-21ed-44db-b7b4-16014690944b
+
+	/// Hex colour for Net Sales YoY % (card value, bars, table cells): green when growth is up (▲), red when down (▼), grey when flat. Always paired with the ▲/▼ format string.
+	measure 'Net Sales YoY Color' =
+			VAR Growth = [Net Sales YoY %]
+			RETURN
+				IF(ISBLANK(Growth), BLANK(), IF(Growth > 0, "#067647", IF(Growth < 0, "#B42318", "#667085")))
+		isHidden
+		lineageTag: 3936e61b-35f9-412e-8a1b-1c7d6420a5c6
+
+	/// Hex colour for the Net Sales MoM % card value: green when up (▲), red when down (▼), grey when flat. Paired with the ▲/▼ format string.
+	measure 'Net Sales MoM Color' =
+			VAR Growth = [Net Sales MoM %]
+			RETURN
+				IF(ISBLANK(Growth), BLANK(), IF(Growth > 0, "#067647", IF(Growth < 0, "#B42318", "#667085")))
+		isHidden
+		lineageTag: 11b3160b-316f-42a7-8a92-c26f82520fb4
+
+	/// Hex colour for the card subtitle: green when [Total Orders vs PY Label] starts with ▲ (up), red when it starts with ▼ (down), grey otherwise. The arrow carries the meaning; colour repeats it.
+	measure 'Total Orders vs PY Color' =
+			VAR Arrow = LEFT([Total Orders vs PY Label], 1)
+			RETURN
+				SWITCH(Arrow, "▲", "#067647", "▼", "#B42318", "#667085")
+		isHidden
+		lineageTag: fc18dd84-b093-4e3c-b6a0-3ca5fd87e558
+
+	/// Hex colour for the card subtitle: green when [Gross Margin vs PY Label] starts with ▲ (up), red when it starts with ▼ (down), grey otherwise. The arrow carries the meaning; colour repeats it.
+	measure 'Gross Margin vs PY Color' =
+			VAR Arrow = LEFT([Gross Margin vs PY Label], 1)
+			RETURN
+				SWITCH(Arrow, "▲", "#067647", "▼", "#B42318", "#667085")
+		isHidden
+		lineageTag: bf9bce73-7983-4957-b8e9-e55c2aea5cb2
+
+	/// Hex colour for the card subtitle. Return Rate is a negative metric (lower is better), so colours are inverted: red when [Return Rate vs PY Label] starts with ▲ (up), green when it starts with ▼ (down), grey otherwise. The arrow carries the meaning; colour repeats it.
+	measure 'Return Rate vs PY Color' =
+			VAR Arrow = LEFT([Return Rate vs PY Label], 1)
+			RETURN
+				SWITCH(Arrow, "▲", "#B42318", "▼", "#067647", "#667085")
+		isHidden
+		lineageTag: 6fc8b3e9-dc61-4246-bb42-b9451e7129ad
+
+	/// Hex colour for the card subtitle: green when [Inventory Turnover vs PY Label] starts with ▲ (up), red when it starts with ▼ (down), grey otherwise. The arrow carries the meaning; colour repeats it.
+	measure 'Inventory Turnover vs PY Color' =
+			VAR Arrow = LEFT([Inventory Turnover vs PY Label], 1)
+			RETURN
+				SWITCH(Arrow, "▲", "#067647", "▼", "#B42318", "#667085")
+		isHidden
+		lineageTag: b2856d20-c382-4456-861a-ef84b2074252
+
+	/// Hex colour for the card subtitle. Stockout Rate is a negative metric (lower is better), so colours are inverted: red when [Stockout Rate vs PY Label] starts with ▲ (up), green when it starts with ▼ (down), grey otherwise. The arrow carries the meaning; colour repeats it.
+	measure 'Stockout Rate vs PY Color' =
+			VAR Arrow = LEFT([Stockout Rate vs PY Label], 1)
+			RETURN
+				SWITCH(Arrow, "▲", "#B42318", "▼", "#067647", "#667085")
+		isHidden
+		lineageTag: 13f5a555-6e07-4f3e-b5fe-ca5344b74a4d
+
+	/// Hex colour for the card subtitle: green when [Fulfilled Rate vs PY Label] starts with ▲ (up), red when it starts with ▼ (down), grey otherwise. The arrow carries the meaning; colour repeats it.
+	measure 'Fulfilled Rate vs PY Color' =
+			VAR Arrow = LEFT([Fulfilled Rate vs PY Label], 1)
+			RETURN
+				SWITCH(Arrow, "▲", "#067647", "▼", "#B42318", "#667085")
+		isHidden
+		lineageTag: b88407b5-04d2-49aa-a0c4-c7fe706ddf1c
+
+	/// Hex colour for the card subtitle. Order-to-delivery days is a negative metric (fewer is better), so colours are inverted: red when [Order-to-Delivery Days vs PY Label] starts with ▲ (up), green when it starts with ▼ (down), grey otherwise. The arrow carries the meaning; colour repeats it.
+	measure 'Order-to-Delivery Days vs PY Color' =
+			VAR Arrow = LEFT([Order-to-Delivery Days vs PY Label], 1)
+			RETURN
+				SWITCH(Arrow, "▲", "#B42318", "▼", "#067647", "#667085")
+		isHidden
+		lineageTag: 063088bf-b6ce-4370-8b6d-15ce16101987
+
+	/// Hex colour for the Gross Sales YoY % card value: green when up (▲), red when down (▼), grey when flat. Paired with the ▲/▼ format string.
+	measure 'Gross Sales YoY Color' =
+			VAR Growth = [Gross Sales YoY %]
+			RETURN
+				IF(ISBLANK(Growth), BLANK(), IF(Growth > 0, "#067647", IF(Growth < 0, "#B42318", "#667085")))
+		isHidden
+		lineageTag: c37d0c37-dd6e-4483-b12d-ff99eb0f0159
+
+	/// Hex colour for the Gross Profit YoY % card value: green when up (▲), red when down (▼), grey when flat. Paired with the ▲/▼ format string.
+	measure 'Gross Profit YoY Color' =
+			VAR Growth = [Gross Profit YoY %]
+			RETURN
+				IF(ISBLANK(Growth), BLANK(), IF(Growth > 0, "#067647", IF(Growth < 0, "#B42318", "#667085")))
+		isHidden
+		lineageTag: 1f630f01-1601-4102-89f6-dd3646e7c64f
+
+	/// Hex colour for the Total Orders YoY % card value: green when up (▲), red when down (▼), grey when flat. Paired with the ▲/▼ format string.
+	measure 'Total Orders YoY Color' =
+			VAR Growth = [Total Orders YoY %]
+			RETURN
+				IF(ISBLANK(Growth), BLANK(), IF(Growth > 0, "#067647", IF(Growth < 0, "#B42318", "#667085")))
+		isHidden
+		lineageTag: b2ffa1b8-7241-4ecb-93b8-8f5f218db01f
+
+	/// Card subtitle text: change in active customers versus the same dates a year earlier, with a ▲/▼ arrow and words so colour is not needed. With no date filter it compares the latest 12 months with the 12 months before (order date).
+	measure 'Active Customers vs PY Label' =
+			VAR FirstOrderDate = [Data Start Date]
+			VAR LastOrderDate = [Data End Date]
+			VAR DateIsFiltered = ISFILTERED('Date')
+			VAR DefaultStart = EDATE(LastOrderDate, -12) + 1
+			VAR PeriodDates =
+				FILTER(
+					VALUES('Date'[Date]),
+					'Date'[Date] <= LastOrderDate
+						&& EDATE('Date'[Date], -12) >= FirstOrderDate
+						&& (DateIsFiltered || 'Date'[Date] >= DefaultStart)
+				)
+			VAR PriorDates = SELECTCOLUMNS(PeriodDates, "PriorDate", EDATE('Date'[Date], -12))
+			VAR CurrentValue = CALCULATE([Distinct Customers], REMOVEFILTERS('Date'), PeriodDates)
+			VAR PriorValue = CALCULATE([Distinct Customers], REMOVEFILTERS('Date'), TREATAS(PriorDates, 'Date'[Date]))
+			VAR Change = DIVIDE(CurrentValue - PriorValue, PriorValue)
+			VAR Scope = IF(DateIsFiltered, "vs same dates a year earlier", "last 12 months vs prior year")
+			RETURN
+				IF(
+					ISBLANK(CurrentValue) || ISBLANK(PriorValue) || ISBLANK(Change),
+					"No prior-year comparison (order date)",
+					IF(Change > 0, "▲ ", IF(Change < 0, "▼ ", "■ ")) & FORMAT(ABS(Change), "0.0%") & " " & Scope & " (order date)"
+				)
+		lineageTag: f54f3a3a-447f-4c0b-b5f1-a990fb8533b9
+
+	/// Card subtitle text: change in new customers versus the same dates a year earlier, with a ▲/▼ arrow and words so colour is not needed. With no date filter it compares the latest 12 months with the 12 months before (order date).
+	measure 'New Customers vs PY Label' =
+			VAR FirstOrderDate = [Data Start Date]
+			VAR LastOrderDate = [Data End Date]
+			VAR DateIsFiltered = ISFILTERED('Date')
+			VAR DefaultStart = EDATE(LastOrderDate, -12) + 1
+			VAR PeriodDates =
+				FILTER(
+					VALUES('Date'[Date]),
+					'Date'[Date] <= LastOrderDate
+						&& EDATE('Date'[Date], -12) >= FirstOrderDate
+						&& (DateIsFiltered || 'Date'[Date] >= DefaultStart)
+				)
+			VAR PriorDates = SELECTCOLUMNS(PeriodDates, "PriorDate", EDATE('Date'[Date], -12))
+			VAR CurrentValue = CALCULATE([New Customers], REMOVEFILTERS('Date'), PeriodDates)
+			VAR PriorValue = CALCULATE([New Customers], REMOVEFILTERS('Date'), TREATAS(PriorDates, 'Date'[Date]))
+			VAR Change = DIVIDE(CurrentValue - PriorValue, PriorValue)
+			VAR Scope = IF(DateIsFiltered, "vs same dates a year earlier", "last 12 months vs prior year")
+			RETURN
+				IF(
+					ISBLANK(CurrentValue) || ISBLANK(PriorValue) || ISBLANK(Change),
+					"No prior-year comparison (order date)",
+					IF(Change > 0, "▲ ", IF(Change < 0, "▼ ", "■ ")) & FORMAT(ABS(Change), "0.0%") & " " & Scope & " (order date)"
+				)
+		lineageTag: a0f5e4c0-07be-4f9e-92ff-652f1290a7ed
+
+	/// Card subtitle text: change in Repeat Customer Rate (percentage points) versus the same dates a year earlier, with a ▲/▼ arrow and words so colour is not needed. With no date filter it compares the latest 12 months with the 12 months before (order date).
+	measure 'Repeat Customer Rate vs PY Label' =
+			VAR FirstOrderDate = [Data Start Date]
+			VAR LastOrderDate = [Data End Date]
+			VAR DateIsFiltered = ISFILTERED('Date')
+			VAR DefaultStart = EDATE(LastOrderDate, -12) + 1
+			VAR PeriodDates =
+				FILTER(
+					VALUES('Date'[Date]),
+					'Date'[Date] <= LastOrderDate
+						&& EDATE('Date'[Date], -12) >= FirstOrderDate
+						&& (DateIsFiltered || 'Date'[Date] >= DefaultStart)
+				)
+			VAR PriorDates = SELECTCOLUMNS(PeriodDates, "PriorDate", EDATE('Date'[Date], -12))
+			VAR CurrentValue = CALCULATE([Repeat Customer Rate], REMOVEFILTERS('Date'), PeriodDates)
+			VAR PriorValue = CALCULATE([Repeat Customer Rate], REMOVEFILTERS('Date'), TREATAS(PriorDates, 'Date'[Date]))
+			VAR Change = CurrentValue - PriorValue
+			VAR Scope = IF(DateIsFiltered, "vs same dates a year earlier", "last 12 months vs prior year")
+			RETURN
+				IF(
+					ISBLANK(CurrentValue) || ISBLANK(PriorValue) || ISBLANK(Change),
+					"No prior-year comparison (order date)",
+					IF(Change > 0, "▲ ", IF(Change < 0, "▼ ", "■ ")) & FORMAT(ABS(Change) * 100, "0.0") & " pp" & " " & Scope & " (order date)"
+				)
+		lineageTag: 7687159e-526b-453b-bf13-cf584d13d26c
+
+	/// Hex colour for the card subtitle: green when [Active Customers vs PY Label] starts with ▲ (up), red when it starts with ▼ (down), grey otherwise. The arrow carries the meaning; colour repeats it.
+	measure 'Active Customers vs PY Color' =
+			VAR Arrow = LEFT([Active Customers vs PY Label], 1)
+			RETURN
+				SWITCH(Arrow, "▲", "#067647", "▼", "#B42318", "#667085")
+		isHidden
+		lineageTag: 9654f819-e882-4e1f-be28-8d9bb0169dfd
+
+	/// Hex colour for the card subtitle: green when [New Customers vs PY Label] starts with ▲ (up), red when it starts with ▼ (down), grey otherwise. The arrow carries the meaning; colour repeats it.
+	measure 'New Customers vs PY Color' =
+			VAR Arrow = LEFT([New Customers vs PY Label], 1)
+			RETURN
+				SWITCH(Arrow, "▲", "#067647", "▼", "#B42318", "#667085")
+		isHidden
+		lineageTag: 9417fd4f-b7b1-4e03-8926-f18fa5ea4410
+
+	/// Hex colour for the card subtitle: green when [Repeat Customer Rate vs PY Label] starts with ▲ (up), red when it starts with ▼ (down), grey otherwise. The arrow carries the meaning; colour repeats it.
+	measure 'Repeat Customer Rate vs PY Color' =
+			VAR Arrow = LEFT([Repeat Customer Rate vs PY Label], 1)
+			RETURN
+				SWITCH(Arrow, "▲", "#067647", "▼", "#B42318", "#667085")
+		isHidden
+		lineageTag: e15900b4-fc6a-44e9-83cd-9c0a385440f5
+
+	/// Change in Days of Supply vs the same snapshot dates a year earlier (last 12 months when no date is filtered).
+	measure 'Days of Supply vs PY Label' =
+			VAR FirstOrderDate = [Data Start Date]
+			VAR LastOrderDate = [Data End Date]
+			VAR DateIsFiltered = ISFILTERED('Date')
+			VAR DefaultStart = EDATE(LastOrderDate, -12) + 1
+			VAR PeriodDates =
+				FILTER(
+					VALUES('Date'[Date]),
+					'Date'[Date] <= LastOrderDate
+						&& EDATE('Date'[Date], -12) >= FirstOrderDate
+						&& (DateIsFiltered || 'Date'[Date] >= DefaultStart)
+				)
+			VAR PriorDates = SELECTCOLUMNS(PeriodDates, "PriorDate", EDATE('Date'[Date], -12))
+			VAR CurrentValue = CALCULATE([Days of Supply], REMOVEFILTERS('Date'), PeriodDates)
+			VAR PriorValue = CALCULATE([Days of Supply], REMOVEFILTERS('Date'), TREATAS(PriorDates, 'Date'[Date]))
+			VAR Change = CurrentValue - PriorValue
+			VAR Scope = IF(DateIsFiltered, "vs same dates a year earlier", "last 12 months vs prior year")
+			RETURN
+				IF(
+					ISBLANK(CurrentValue) || ISBLANK(PriorValue) || ISBLANK(Change),
+					"No prior-year comparison (snapshot date)",
+					IF(Change > 0, "▲ ", IF(Change < 0, "▼ ", "■ ")) & FORMAT(ABS(Change), "#,0") & " days" & " " & Scope & " (snapshot date)"
+				)
+		lineageTag: 7eb5f2b1-122b-40d4-a9c4-56be726b5e8a
+
+	/// Change in Fill Rate (Latest) vs the same snapshot dates a year earlier, in percentage points.
+	measure 'Fill Rate vs PY Label' =
+			VAR FirstOrderDate = [Data Start Date]
+			VAR LastOrderDate = [Data End Date]
+			VAR DateIsFiltered = ISFILTERED('Date')
+			VAR DefaultStart = EDATE(LastOrderDate, -12) + 1
+			VAR PeriodDates =
+				FILTER(
+					VALUES('Date'[Date]),
+					'Date'[Date] <= LastOrderDate
+						&& EDATE('Date'[Date], -12) >= FirstOrderDate
+						&& (DateIsFiltered || 'Date'[Date] >= DefaultStart)
+				)
+			VAR PriorDates = SELECTCOLUMNS(PeriodDates, "PriorDate", EDATE('Date'[Date], -12))
+			VAR CurrentValue = CALCULATE([Fill Rate (Latest)], REMOVEFILTERS('Date'), PeriodDates)
+			VAR PriorValue = CALCULATE([Fill Rate (Latest)], REMOVEFILTERS('Date'), TREATAS(PriorDates, 'Date'[Date]))
+			VAR Change = CurrentValue - PriorValue
+			VAR Scope = IF(DateIsFiltered, "vs same dates a year earlier", "last 12 months vs prior year")
+			RETURN
+				IF(
+					ISBLANK(CurrentValue) || ISBLANK(PriorValue) || ISBLANK(Change),
+					"No prior-year comparison (snapshot date)",
+					IF(Change > 0, "▲ ", IF(Change < 0, "▼ ", "■ ")) & FORMAT(ABS(Change) * 100, "0.0") & " pp" & " " & Scope & " (snapshot date)"
+				)
+		lineageTag: e1d13b41-70b1-4dc7-ac80-8718a9e69bb7
+
+	/// Font colour for Days of Supply vs PY Label. More cover means more stock tied up, so ▲ is red and ▼ green.
+	measure 'Days of Supply vs PY Color' =
+			VAR Arrow = LEFT([Days of Supply vs PY Label], 1)
+			RETURN
+				SWITCH(Arrow, "▲", "#B42318", "▼", "#067647", "#667085")
+		isHidden
+		lineageTag: c32a1031-36f5-4c98-bbee-8962515c54db
+
+	/// Change in Inventory Value vs the same snapshot dates a year earlier, in percent (last 12 months when no date is filtered). Neutral colour: more stock is neither good nor bad on its own.
+	measure 'Inventory Value vs PY Label' =
+			VAR FirstOrderDate = [Data Start Date]
+			VAR LastOrderDate = [Data End Date]
+			VAR DateIsFiltered = ISFILTERED('Date')
+			VAR DefaultStart = EDATE(LastOrderDate, -12) + 1
+			VAR PeriodDates =
+				FILTER(
+					VALUES('Date'[Date]),
+					'Date'[Date] <= LastOrderDate
+						&& EDATE('Date'[Date], -12) >= FirstOrderDate
+						&& (DateIsFiltered || 'Date'[Date] >= DefaultStart)
+				)
+			VAR PriorDates = SELECTCOLUMNS(PeriodDates, "PriorDate", EDATE('Date'[Date], -12))
+			VAR CurrentValue = CALCULATE([Inventory Value], REMOVEFILTERS('Date'), PeriodDates)
+			VAR PriorValue = CALCULATE([Inventory Value], REMOVEFILTERS('Date'), TREATAS(PriorDates, 'Date'[Date]))
+			VAR Change = DIVIDE(CurrentValue - PriorValue, PriorValue)
+			VAR Scope = IF(DateIsFiltered, "vs same dates a year earlier", "last 12 months vs prior year")
+			RETURN
+				IF(
+					ISBLANK(CurrentValue) || ISBLANK(PriorValue) || ISBLANK(Change),
+					"No prior-year comparison (snapshot date)",
+					IF(Change > 0, "▲ ", IF(Change < 0, "▼ ", "■ ")) & FORMAT(ABS(Change), "0.0%") & " " & Scope & " (snapshot date)"
+				)
+		lineageTag: d47ec655-ba8d-43f4-84f6-6757dcdb7510
+
+	/// Font colour for Fill Rate vs PY Label: ▲ green, ▼ red.
+	measure 'Fill Rate vs PY Color' =
+			VAR Arrow = LEFT([Fill Rate vs PY Label], 1)
+			RETURN
+				SWITCH(Arrow, "▲", "#067647", "▼", "#B42318", "#667085")
+		isHidden
+		lineageTag: 29e61098-9037-4309-8bd1-713cdaae3fa6
 
 	column Date
+		isKey
 		formatString: Short Date
 		lineageTag: 9a993d1b-e7d1-4df7-bf6d-685fd5e09798
 		summarizeBy: none
@@ -39,46 +624,6 @@ table Date
 		annotation SummarizationSetBy = Automatic
 
 		annotation UnderlyingDateTimeDataType = Date
-
-	column Year
-		formatString: 0
-		lineageTag: 7fb71a06-0fb7-4567-9093-c2d5fc78d1ef
-		summarizeBy: none
-		isNameInferred
-		sourceColumn: [Year]
-
-		annotation SummarizationSetBy = Automatic
-
-	column 'Month Number'
-		isHidden
-		formatString: 0
-		lineageTag: d18d7d1b-7fb7-42cf-a746-c855a7d8d7b9
-		summarizeBy: none
-		isNameInferred
-		sourceColumn: [Month Number]
-
-		annotation SummarizationSetBy = Automatic
-
-	column 'Month Name'
-		lineageTag: 21434bca-ff4e-4017-9831-ca6bcd6d9180
-		summarizeBy: none
-		isNameInferred
-		sourceColumn: [Month Name]
-		sortByColumn: 'Month Number'
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isText":true}
-
-	column Quarter
-		lineageTag: 519ebde5-9c1e-46ef-8f2a-8e1123a001b4
-		summarizeBy: none
-		isNameInferred
-		sourceColumn: [Quarter]
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isText":true}
 
 	column Year-Month
 		lineageTag: 17d0cdf6-91a5-40a0-b6cf-29135b43be9d
@@ -101,16 +646,35 @@ table Date
 
 		annotation SummarizationSetBy = Automatic
 
+	/// First day of the month. Use on continuous time axes (needed for trend lines, forecasts and anomaly detection).
+	column 'Month Start'
+		formatString: Short Date
+		lineageTag: 8950dfe6-408b-4de6-ac6c-3d6e7563c297
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Month Start]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Year
+		formatString: 0
+		lineageTag: 53b89803-3374-451d-bb0c-a768628bb07d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Year]
+
+		annotation SummarizationSetBy = Automatic
+
 	partition Date-b4b5d9c0-c498-41af-8c9a-1296fd53372c = calculated
 		mode: import
 		source =
 				ADDCOLUMNS(
-					CALENDAR(DATE(2012,1,1), DATE(2023,12,31)),
-					"Year", YEAR([Date]),
-					"Month Number", MONTH([Date]),
-					"Month Name", FORMAT([Date], "MMMM"),
-					"Quarter", "Q" & FORMAT([Date], "Q"),
+					CALENDAR(DATE(2012,1,1), DATE(2022,12,31)),
 					"Year-Month", FORMAT([Date], "YYYY-MM"),
-					"Year-Month Sort", YEAR([Date]) * 100 + MONTH([Date])
+					"Year-Month Sort", YEAR([Date]) * 100 + MONTH([Date]),
+					"Month Start", DATE(YEAR([Date]), MONTH([Date]), 1),
+					"Year", YEAR([Date])
 				)
 

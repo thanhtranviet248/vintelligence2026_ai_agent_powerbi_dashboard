@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
   "name": "p4-table-category",
   "position": {
-    "x": 1280,
-    "y": 856,
-    "z": 1000,
-    "height": 314,
-    "width": 600,
-    "tabOrder": 44
+    "x": 40,
+    "y": 2378,
+    "z": 30000,
+    "height": 400,
+    "width": 1220,
+    "tabOrder": 30000
   },
   "visual": {
     "visualType": "tableEx",
@@ -37,20 +37,6 @@
                       "Entity": "Inventory"
                     }
                   },
-                  "Property": "Current Stock"
-                }
-              },
-              "queryRef": "Inventory.Current Stock",
-              "nativeQueryRef": "Current Stock"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Inventory"
-                    }
-                  },
                   "Property": "Inventory Value"
                 }
               },
@@ -65,11 +51,11 @@
                       "Entity": "Inventory"
                     }
                   },
-                  "Property": "Stock In"
+                  "Property": "Days of Supply"
                 }
               },
-              "queryRef": "Inventory.Stock In",
-              "nativeQueryRef": "Stock In"
+              "queryRef": "Inventory.Days of Supply",
+              "nativeQueryRef": "Days of Supply"
             },
             {
               "field": {
@@ -79,14 +65,74 @@
                       "Entity": "Inventory"
                     }
                   },
-                  "Property": "Stock Out"
+                  "Property": "Inventory Turnover"
                 }
               },
-              "queryRef": "Inventory.Stock Out",
-              "nativeQueryRef": "Stock Out"
+              "queryRef": "Inventory.Inventory Turnover",
+              "nativeQueryRef": "Inventory Turnover"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Inventory"
+                    }
+                  },
+                  "Property": "Fill Rate (Latest)"
+                }
+              },
+              "queryRef": "Inventory.Fill Rate (Latest)",
+              "nativeQueryRef": "Fill Rate (Latest)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Inventory"
+                    }
+                  },
+                  "Property": "Stockout Rate"
+                }
+              },
+              "queryRef": "Inventory.Stockout Rate",
+              "nativeQueryRef": "Stockout Rate"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Inventory"
+                    }
+                  },
+                  "Property": "Excess Value Share"
+                }
+              },
+              "queryRef": "Inventory.Excess Value Share",
+              "nativeQueryRef": "Excess Value Share"
             }
           ]
         }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Inventory"
+                  }
+                },
+                "Property": "Inventory Value"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
       }
     },
     "objects": {
@@ -143,6 +189,36 @@
               }
             }
           }
+        },
+        {
+          "properties": {
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Inventory"
+                        }
+                      },
+                      "Property": "Stockout Rate Color"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "dataViewWildcard": {
+                  "matchingOption": 1
+                }
+              }
+            ],
+            "metadata": "Inventory.Stockout Rate"
+          }
         }
       ],
       "grid": [
@@ -155,6 +231,64 @@
                 }
               }
             }
+          }
+        }
+      ],
+      "columnFormatting": [
+        {
+          "properties": {
+            "dataBars": {
+              "positiveColor": {
+                "solid": {
+                  "color": {
+                    "expr": {
+                      "Literal": {
+                        "Value": "'#B9CCE8'"
+                      }
+                    }
+                  }
+                }
+              },
+              "negativeColor": {
+                "solid": {
+                  "color": {
+                    "expr": {
+                      "Literal": {
+                        "Value": "'#F4C7C3'"
+                      }
+                    }
+                  }
+                }
+              },
+              "axisColor": {
+                "solid": {
+                  "color": {
+                    "expr": {
+                      "Literal": {
+                        "Value": "'#475467'"
+                      }
+                    }
+                  }
+                }
+              },
+              "reverseDirection": {
+                "expr": {
+                  "Literal": {
+                    "Value": "false"
+                  }
+                }
+              },
+              "hideText": {
+                "expr": {
+                  "Literal": {
+                    "Value": "false"
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Inventory.Inventory Value"
           }
         }
       ]
@@ -173,7 +307,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Inventory Summary by Category'"
+                  "Value": "'Inventory Health by Category'"
                 }
               }
             },
@@ -300,7 +434,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Stock: latest snapshot; flows: summed over snapshots in the period · Region not applied'"
+                  "Value": "'Latest snapshot · Region not applied · Stockout Rate in red = above the all-category rate · sorted by Inventory Value'"
                 }
               }
             },
@@ -331,7 +465,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Table of product categories with current stock, inventory value, units received and units sold.'"
+                  "Value": "'Table scorecard by category: inventory value with data bars, days of supply, annual turnover, fill rate, stockout rate (red text when above the all-category rate) and the share of value above 90 days of cover.'"
                 }
               }
             }

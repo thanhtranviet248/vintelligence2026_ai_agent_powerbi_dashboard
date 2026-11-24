@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
   "name": "kpi-inventory-value",
   "position": {
-    "x": 506,
+    "x": 970,
     "y": 254,
-    "z": 1000,
+    "z": 13000,
     "height": 132,
-    "width": 442,
-    "tabOrder": 31
+    "width": 290,
+    "tabOrder": 13000
   },
   "visual": {
     "visualType": "card",
@@ -231,17 +231,29 @@
                 }
               }
             },
-            "text": {
-              "expr": {
-                "Literal": {
-                  "Value": "'Latest snapshot · Region not applied'"
-                }
-              }
-            },
             "fontSize": {
               "expr": {
                 "Literal": {
                   "Value": "10D"
+                }
+              }
+            },
+            "bold": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Date"
+                    }
+                  },
+                  "Property": "Inventory Value vs PY Label"
                 }
               }
             },
@@ -265,7 +277,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Card showing inventory value at list price in the latest snapshot of the selected period.'"
+                  "Value": "'Card: inventory value at list price at the latest snapshot in the period, with the percent change versus the same snapshot dates a year earlier in the subtitle.'"
                 }
               }
             }

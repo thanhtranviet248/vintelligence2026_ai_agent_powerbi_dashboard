@@ -10,7 +10,7 @@ annotation __PBI_TimeIntelligenceEnabled = 1
 
 annotation PBI_ProTooling = ["DevMode"]
 
-annotation PBI_QueryOrder = ["Customers","Geography","Products","Orders","OrderItems","Payments","Shipments","Returns","Reviews","Inventory","Sales","WebTraffic","Promotions"]
+annotation PBI_QueryOrder = ["Customers","Geography","Products","Orders","OrderItems","Shipments","Returns","Reviews","Inventory","Promotions"]
 
 ref table Date
 ref table Customers
@@ -18,18 +18,21 @@ ref table Geography
 ref table Products
 ref table Orders
 ref table OrderItems
-ref table Payments
 ref table Shipments
 ref table Returns
 ref table Reviews
 ref table Inventory
-ref table Sales
-ref table WebTraffic
 ref table Promotions
 ref table DateTableTemplate_9136b3bc-35a1-4634-9b18-f5a024f9180e
 ref table LocalDateTable_3eaa25eb-3058-4a65-aed3-fc8ae4fbf34a
 ref table LocalDateTable_72b8f196-8ba6-4eea-99d5-494cc312ecb3
 ref table LocalDateTable_6e707ba1-3953-4cf9-9d56-ae8a916408d0
+ref table 'Low Stock Threshold'
+ref table 'Transit Day Threshold'
+ref table 'Minimum Reviews'
+ref table 'Return Reduction'
+ref table 'Trend Metric'
+ref table 'Breakdown Dimension'
 
 ref cultureInfo en-US
 

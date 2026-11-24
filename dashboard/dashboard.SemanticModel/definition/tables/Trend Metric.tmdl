@@ -1,0 +1,50 @@
+table 'Trend Metric'
+	lineageTag: e72c305d-52c1-477a-bf03-dd144982ba72
+
+	column 'Trend Metric'
+		lineageTag: 0e03de45-14fb-4be3-82e3-561ef7c2a90d
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: 'Trend Metric Order'
+
+		relatedColumnDetails
+			groupByColumn: 'Trend Metric Fields'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Trend Metric Fields'
+		isHidden
+		lineageTag: 2cb158dc-5af6-4231-833f-6124169f696e
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: 'Trend Metric Order'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Trend Metric Order'
+		isHidden
+		formatString: 0
+		lineageTag: ca71a097-7bf5-489f-a982-00afb4e1ec72
+		summarizeBy: sum
+		sourceColumn: [Value3]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Trend Metric' = calculated
+		mode: import
+		source =
+				{
+				    ("Net Sales", NAMEOF('OrderItems'[Net Sales]), 0),
+				    ("Gross Sales", NAMEOF('OrderItems'[Gross Sales]), 1),
+				    ("Gross Profit", NAMEOF('OrderItems'[Gross Profit]), 2),
+				    ("COGS", NAMEOF('OrderItems'[COGS]), 3),
+				    ("Discount Amount", NAMEOF('OrderItems'[Discount Amount]), 4),
+				    ("Refund Amount", NAMEOF('Returns'[Refund Amount]), 5)
+				}
+

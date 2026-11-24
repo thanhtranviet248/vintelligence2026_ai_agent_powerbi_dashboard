@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
   "name": "kpi-avg-rating",
   "position": {
-    "x": 972,
+    "x": 40,
     "y": 254,
-    "z": 1000,
+    "z": 10000,
     "height": 132,
-    "width": 442,
-    "tabOrder": 32
+    "width": 290,
+    "tabOrder": 10000
   },
   "visual": {
     "visualType": "card",
@@ -234,7 +234,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'By order date'"
+                  "Value": "'1–5 stars · order date'"
                 }
               }
             },
@@ -265,7 +265,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Card showing the average review rating, on a 1 to 5 scale.'"
+                  "Value": "'Card showing the average star rating of reviews on orders placed in the selected period.'"
                 }
               }
             }

@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
   "name": "p2-table-category",
   "position": {
-    "x": 1420,
-    "y": 856,
-    "z": 1000,
-    "height": 314,
-    "width": 460,
-    "tabOrder": 44
+    "x": 660,
+    "y": 1498,
+    "z": 29000,
+    "height": 320,
+    "width": 1220,
+    "tabOrder": 29000
   },
   "visual": {
     "visualType": "tableEx",
@@ -51,6 +51,34 @@
                       "Entity": "OrderItems"
                     }
                   },
+                  "Property": "Gross Profit"
+                }
+              },
+              "queryRef": "OrderItems.Gross Profit",
+              "nativeQueryRef": "Gross Profit"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "OrderItems"
+                    }
+                  },
+                  "Property": "Gross Margin %"
+                }
+              },
+              "queryRef": "OrderItems.Gross Margin %",
+              "nativeQueryRef": "Gross Margin %"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "OrderItems"
+                    }
+                  },
                   "Property": "Units Sold"
                 }
               },
@@ -70,9 +98,41 @@
               },
               "queryRef": "OrderItems.Average Order Value",
               "nativeQueryRef": "Average Order Value"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "OrderItems"
+                    }
+                  },
+                  "Property": "Promoted Sales Share"
+                }
+              },
+              "queryRef": "OrderItems.Promoted Sales Share",
+              "nativeQueryRef": "Promoted Sales Share"
             }
           ]
         }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "OrderItems"
+                  }
+                },
+                "Property": "Net Sales"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
       }
     },
     "objects": {
@@ -129,6 +189,36 @@
               }
             }
           }
+        },
+        {
+          "properties": {
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "OrderItems"
+                        }
+                      },
+                      "Property": "Gross Profit Color"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "dataViewWildcard": {
+                  "matchingOption": 1
+                }
+              }
+            ],
+            "metadata": "OrderItems.Gross Margin %"
+          }
         }
       ],
       "grid": [
@@ -141,6 +231,64 @@
                 }
               }
             }
+          }
+        }
+      ],
+      "columnFormatting": [
+        {
+          "properties": {
+            "dataBars": {
+              "positiveColor": {
+                "solid": {
+                  "color": {
+                    "expr": {
+                      "Literal": {
+                        "Value": "'#B9CCE8'"
+                      }
+                    }
+                  }
+                }
+              },
+              "negativeColor": {
+                "solid": {
+                  "color": {
+                    "expr": {
+                      "Literal": {
+                        "Value": "'#F4C7C3'"
+                      }
+                    }
+                  }
+                }
+              },
+              "axisColor": {
+                "solid": {
+                  "color": {
+                    "expr": {
+                      "Literal": {
+                        "Value": "'#475467'"
+                      }
+                    }
+                  }
+                }
+              },
+              "reverseDirection": {
+                "expr": {
+                  "Literal": {
+                    "Value": "false"
+                  }
+                }
+              },
+              "hideText": {
+                "expr": {
+                  "Literal": {
+                    "Value": "false"
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "OrderItems.Net Sales"
           }
         }
       ]
@@ -159,7 +307,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Category Performance'"
+                  "Value": "'Net Sales, Profit and Promotion Mix by Category'"
                 }
               }
             },
@@ -286,7 +434,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'By order date'"
+                  "Value": "'Order date; growth by category is in the YoY chart beside it'"
                 }
               }
             },
@@ -317,7 +465,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Table of product categories with net sales, units sold and average order value.'"
+                  "Value": "'Table by product category with net sales, gross profit, gross margin, units sold, average order value and promoted sales share, sorted by net sales.'"
                 }
               }
             }

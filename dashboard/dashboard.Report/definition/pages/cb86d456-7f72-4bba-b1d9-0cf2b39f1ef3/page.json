@@ -3,6 +3,98 @@
   "name": "cb86d456-7f72-4bba-b1d9-0cf2b39f1ef3",
   "displayName": "Customer Satisfaction",
   "displayOption": "FitToWidth",
-  "height": 1570,
-  "width": 1920
+  "height": 2240,
+  "width": 1920,
+  "visualInteractions": [
+    {
+      "source": "p7-search-product",
+      "target": "filter-1-year-month",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p7-search-product",
+      "target": "filter-2-category",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p7-search-product",
+      "target": "filter-3-productname",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p7-search-product",
+      "target": "filter-4-region",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p7-search-product",
+      "target": "kpi-avg-days-to-review",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p7-search-product",
+      "target": "kpi-avg-rating",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p7-search-product",
+      "target": "kpi-negative-review-rate",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p7-search-product",
+      "target": "kpi-positive-review-rate",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p7-search-product",
+      "target": "kpi-review-count",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p7-search-product",
+      "target": "kpi-review-coverage",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p7-search-product",
+      "target": "p7-bar-rating-category",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p7-search-product",
+      "target": "p7-bar-rating-share",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p7-search-product",
+      "target": "p7-col-coverage-year",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p7-search-product",
+      "target": "p7-col-days-to-review",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p7-search-product",
+      "target": "p7-line-sentiment-month",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p7-search-product",
+      "target": "p7-col-neg-rate-transit",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p7-search-product",
+      "target": "p7-table-satisfaction-region",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p7-search-product",
+      "target": "hdr-data-through",
+      "type": "NoFilter"
+    }
+  ]
 }

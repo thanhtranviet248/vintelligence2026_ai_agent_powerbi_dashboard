@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
   "name": "p4-detail-stock",
   "position": {
     "x": 40,
-    "y": 1200,
-    "z": 1000,
-    "height": 280,
-    "width": 900,
-    "tabOrder": 60
+    "y": 2898,
+    "z": 33000,
+    "height": 520,
+    "width": 1840,
+    "tabOrder": 33000
   },
   "visual": {
     "visualType": "tableEx",
@@ -23,11 +23,11 @@
                       "Entity": "Inventory"
                     }
                   },
-                  "Property": "SnapshotDate"
+                  "Property": "Category"
                 }
               },
-              "queryRef": "Inventory.SnapshotDate",
-              "nativeQueryRef": "SnapshotDate"
+              "queryRef": "Inventory.Category",
+              "nativeQueryRef": "Category"
             },
             {
               "field": {
@@ -48,73 +48,161 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Inventory"
+                      "Entity": "Products"
                     }
                   },
-                  "Property": "StockOnHand"
+                  "Property": "ABC Class"
                 }
               },
-              "queryRef": "Inventory.StockOnHand",
-              "nativeQueryRef": "StockOnHand"
+              "queryRef": "Products.ABC Class",
+              "nativeQueryRef": "ABC Class"
             },
             {
               "field": {
-                "Column": {
+                "Measure": {
                   "Expression": {
                     "SourceRef": {
                       "Entity": "Inventory"
                     }
                   },
-                  "Property": "StockoutDays"
+                  "Property": "Planning Action"
                 }
               },
-              "queryRef": "Inventory.StockoutDays",
-              "nativeQueryRef": "StockoutDays"
+              "queryRef": "Inventory.Planning Action",
+              "nativeQueryRef": "Planning Action"
             },
             {
               "field": {
-                "Column": {
+                "Measure": {
                   "Expression": {
                     "SourceRef": {
                       "Entity": "Inventory"
                     }
                   },
-                  "Property": "DaysOfSupply"
+                  "Property": "Stock Status"
                 }
               },
-              "queryRef": "Inventory.DaysOfSupply",
-              "nativeQueryRef": "DaysOfSupply"
+              "queryRef": "Inventory.Stock Status",
+              "nativeQueryRef": "Stock Status"
             },
             {
               "field": {
-                "Column": {
+                "Measure": {
                   "Expression": {
                     "SourceRef": {
                       "Entity": "Inventory"
                     }
                   },
-                  "Property": "FillRate"
+                  "Property": "Current Stock"
                 }
               },
-              "queryRef": "Inventory.FillRate",
-              "nativeQueryRef": "FillRate"
+              "queryRef": "Inventory.Current Stock",
+              "nativeQueryRef": "Current Stock"
             },
             {
               "field": {
-                "Column": {
+                "Measure": {
                   "Expression": {
                     "SourceRef": {
                       "Entity": "Inventory"
                     }
                   },
-                  "Property": "ReorderFlag"
+                  "Property": "Units Sold (Latest Month)"
                 }
               },
-              "queryRef": "Inventory.ReorderFlag",
-              "nativeQueryRef": "ReorderFlag"
+              "queryRef": "Inventory.Units Sold (Latest Month)",
+              "nativeQueryRef": "Units Sold (Latest Month)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Inventory"
+                    }
+                  },
+                  "Property": "Days of Supply"
+                }
+              },
+              "queryRef": "Inventory.Days of Supply",
+              "nativeQueryRef": "Days of Supply"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Inventory"
+                    }
+                  },
+                  "Property": "Stockout Days (Latest)"
+                }
+              },
+              "queryRef": "Inventory.Stockout Days (Latest)",
+              "nativeQueryRef": "Stockout Days (Latest)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Inventory"
+                    }
+                  },
+                  "Property": "Fill Rate (Latest)"
+                }
+              },
+              "queryRef": "Inventory.Fill Rate (Latest)",
+              "nativeQueryRef": "Fill Rate (Latest)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Inventory"
+                    }
+                  },
+                  "Property": "Excess Units"
+                }
+              },
+              "queryRef": "Inventory.Excess Units",
+              "nativeQueryRef": "Excess Units"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Inventory"
+                    }
+                  },
+                  "Property": "Excess Stock Value"
+                }
+              },
+              "queryRef": "Inventory.Excess Stock Value",
+              "nativeQueryRef": "Excess Stock Value"
             }
           ]
         }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Inventory"
+                  }
+                },
+                "Property": "Excess Stock Value"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
       }
     },
     "objects": {
@@ -171,6 +259,66 @@
               }
             }
           }
+        },
+        {
+          "properties": {
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Inventory"
+                        }
+                      },
+                      "Property": "Stock Status Color"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "dataViewWildcard": {
+                  "matchingOption": 1
+                }
+              }
+            ],
+            "metadata": "Inventory.Stock Status"
+          }
+        },
+        {
+          "properties": {
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Inventory"
+                        }
+                      },
+                      "Property": "Planning Action Color"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "dataViewWildcard": {
+                  "matchingOption": 1
+                }
+              }
+            ],
+            "metadata": "Inventory.Planning Action"
+          }
         }
       ],
       "grid": [
@@ -183,6 +331,108 @@
                 }
               }
             }
+          }
+        }
+      ],
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "141.09238277948288D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Inventory.ProductName"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "150D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Inventory.Planning Action"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "150D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Inventory.Stock Status"
+          }
+        }
+      ],
+      "columnFormatting": [
+        {
+          "properties": {
+            "dataBars": {
+              "positiveColor": {
+                "solid": {
+                  "color": {
+                    "expr": {
+                      "Literal": {
+                        "Value": "'#F5C9A6'"
+                      }
+                    }
+                  }
+                }
+              },
+              "negativeColor": {
+                "solid": {
+                  "color": {
+                    "expr": {
+                      "Literal": {
+                        "Value": "'#F4C7C3'"
+                      }
+                    }
+                  }
+                }
+              },
+              "axisColor": {
+                "solid": {
+                  "color": {
+                    "expr": {
+                      "Literal": {
+                        "Value": "'#475467'"
+                      }
+                    }
+                  }
+                }
+              },
+              "reverseDirection": {
+                "expr": {
+                  "Literal": {
+                    "Value": "false"
+                  }
+                }
+              },
+              "hideText": {
+                "expr": {
+                  "Literal": {
+                    "Value": "false"
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Inventory.Excess Stock Value"
           }
         }
       ]
@@ -201,7 +451,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Inventory Exception Detail'"
+                  "Value": "'Planning Actions by Product'"
                 }
               }
             },
@@ -328,7 +578,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Snapshot rows in the period · Region slicer not applied'"
+                  "Value": "'Latest snapshot per product · largest excess value first · ▲ Replenish = ≤ 20 units or under 30 days of cover · ▼ Reduce excess = overstock-flagged stock above 90 days of cover · Region not applied'"
                 }
               }
             },
@@ -359,7 +609,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Table of inventory snapshot rows with snapshot date, product, stock on hand, stockout days, days of supply, fill rate and reorder flag.'"
+                  "Value": "'Table of products at the latest snapshot with ABC class, a suggested planning action (Replenish, Reduce excess or Healthy, as text with an arrow and colour), stock status, units on hand, units sold in the month, days of supply, stockout days, fill rate, excess units and excess value with data bars, sorted by excess value. The product search box filters it.'"
                 }
               }
             }
@@ -368,5 +618,121 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "eaa0fc5454dc0a388f30",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Inventory"
+              }
+            },
+            "Property": "Category"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "d1fad9a82fe89cfa6d70",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Inventory"
+              }
+            },
+            "Property": "ProductName"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "300c377cb3dbabf46749",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Inventory"
+              }
+            },
+            "Property": "Stock Status"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "7fecdcc370bed57ca05e",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Inventory"
+              }
+            },
+            "Property": "Current Stock"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "e67d96ef39cd32c13a4e",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Inventory"
+              }
+            },
+            "Property": "Stockout Days (Latest)"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "414b96a6594d141a9c37",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Inventory"
+              }
+            },
+            "Property": "Fill Rate (Latest)"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "79834c5e0a878e80f023",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Inventory"
+              }
+            },
+            "Property": "Excess Units"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "2314ec78147aac1e437d",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "Inventory"
+              }
+            },
+            "Property": "Excess Stock Value"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

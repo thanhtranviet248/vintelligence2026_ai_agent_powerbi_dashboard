@@ -1,0 +1,24 @@
+table 'Transit Day Threshold'
+	lineageTag: a7cd69e1-5fdb-4d33-b420-527730b6290a
+
+	measure 'Transit Day Threshold Value' = SELECTEDVALUE('Transit Day Threshold'[Transit Day Threshold], 3)
+		formatString: 0
+		lineageTag: 4b3fd30f-2f3e-4682-835d-53a18d8d7e06
+
+	column 'Transit Day Threshold'
+		formatString: 0
+		lineageTag: 8caf7756-4b0e-43d4-9119-41d8b5b39c4d
+		summarizeBy: none
+		sourceColumn: [Value]
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 0
+				}
+
+		annotation SummarizationSetBy = User
+
+	partition 'Transit Day Threshold' = calculated
+		mode: import
+		source = GENERATESERIES(1, 7, 1)
+

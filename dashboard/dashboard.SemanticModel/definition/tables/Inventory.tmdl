@@ -2,52 +2,249 @@ table Inventory
 	lineageTag: 7f3069cc-2f58-4d80-8d7f-ef8dbd8a4ed0
 
 	measure 'Current Stock' = VAR LatestSnapshot = MAX(Inventory[SnapshotDate]) RETURN CALCULATE(SUM(Inventory[StockOnHand]), Inventory[SnapshotDate] = LatestSnapshot)
+		formatString: #,0
 		lineageTag: 858c1591-e9e0-4082-bde1-0fd217d73349
 
 	measure 'Inventory Value' = VAR LatestSnapshot = MAX(Inventory[SnapshotDate]) RETURN CALCULATE(SUMX(Inventory, Inventory[StockOnHand] * RELATED(Products[Price])), Inventory[SnapshotDate] = LatestSnapshot)
+		formatString: $#,0.00;($#,0.00);$#,0.00
 		lineageTag: 166e8752-691b-4647-92bd-4d343177875a
 
-	measure 'Stock In' = SUM(Inventory[UnitsReceived])
+	/// Inbound units: units received, summed over the snapshot months in context.
+	measure 'Inbound Stock' = SUM(Inventory[UnitsReceived])
+		formatString: #,0
 		lineageTag: 9a5aebf7-2a8b-4e31-8757-417b0e527c55
 
-	measure 'Stock Out' = SUM(Inventory[UnitsSold])
+	/// Outbound units: units sold, summed over the snapshot months in context. Not the same as Stockout (running out of stock).
+	measure 'Outbound Stock' = SUM(Inventory[UnitsSold])
+		formatString: #,0
 		lineageTag: 6f9e2557-beb6-47c8-9c5f-af88f6d61118
 
-	measure 'Low-Stock Products' = VAR LatestSnapshot = MAX(Inventory[SnapshotDate]) RETURN CALCULATE(DISTINCTCOUNT(Inventory[ProductID]), Inventory[SnapshotDate] = LatestSnapshot, Inventory[StockOnHand] <= 20)
+	/// Products at or below the Low Stock Threshold (20 units unless the slicer is changed) at the latest snapshot.
+	measure 'Low-Stock Products' =
+			VAR LatestSnapshot = MAX(Inventory[SnapshotDate])
+			VAR Threshold = [Low Stock Threshold Value]
+			RETURN
+				CALCULATE(DISTINCTCOUNT(Inventory[ProductID]), Inventory[SnapshotDate] = LatestSnapshot, Inventory[StockOnHand] <= Threshold)
+		formatString: #,0
 		lineageTag: 283265a7-a696-4292-a5f0-2664d01ce213
 
-	measure 'Out-of-Stock Products' = VAR LatestSnapshot = MAX(Inventory[SnapshotDate]) RETURN CALCULATE(DISTINCTCOUNT(Inventory[ProductID]), Inventory[SnapshotDate] = LatestSnapshot, Inventory[StockOnHand] = 0)
-		lineageTag: 013acd95-afae-4c7b-a679-9e7abe54bd8b
-
-	measure 'Stockout Days' = AVERAGE(Inventory[StockoutDays])
-		lineageTag: ed62fda7-92ca-4842-9cc9-299288057a60
-
-	measure 'Days of Supply' = AVERAGE(Inventory[DaysOfSupply])
-		lineageTag: b1eac39c-d444-4ac3-b23e-3f150c672b33
-
-	measure 'Fill Rate' = AVERAGE(Inventory[FillRate])
+	/// Units sold in the month of the latest snapshot divided by units sold plus closing stock (the source definition, applied to totals).
+	measure 'Sell-Through Rate' =
+			VAR LatestSnapshot = MAX(Inventory[SnapshotDate])
+			RETURN
+				CALCULATE(DIVIDE(SUM(Inventory[UnitsSold]), SUM(Inventory[StockOnHand]) + SUM(Inventory[UnitsSold])), Inventory[SnapshotDate] = LatestSnapshot)
 		formatString: 0.0%
-		lineageTag: c2e6e8f0-59b1-4fab-ac86-5eefdf0ddfdc
-
-	measure 'Sell-Through Rate' = AVERAGE(Inventory[SellThroughRate])
 		lineageTag: 53362be0-94ea-4bc1-9127-e61f0b61d788
 
-	measure 'Reorder Candidates' = VAR LatestSnapshot = MAX(Inventory[SnapshotDate]) RETURN CALCULATE(DISTINCTCOUNT(Inventory[ProductID]), Inventory[SnapshotDate] = LatestSnapshot, Inventory[ReorderFlag] = 1)
-		lineageTag: 5a71c040-2fac-4f47-aefc-b089db4583e8
-
+	/// Share of products that had at least one stockout day in the month of the latest snapshot (StockoutFlag = StockoutDays > 0). It is not the share of products at zero stock.
 	measure 'Stockout Rate' = VAR LatestSnapshot = MAX(Inventory[SnapshotDate]) RETURN CALCULATE(DIVIDE(SUM(Inventory[StockoutFlag]), COUNTROWS(Inventory)), Inventory[SnapshotDate] = LatestSnapshot)
 		formatString: 0.0%
 		lineageTag: e655a24b-f3e7-4e4a-91e9-c40a75d3c15c
 
-	measure 'Overstock Rate' = VAR LatestSnapshot = MAX(Inventory[SnapshotDate]) RETURN CALCULATE(DIVIDE(SUM(Inventory[OverstockFlag]), COUNTROWS(Inventory)), Inventory[SnapshotDate] = LatestSnapshot)
+	/// Products with an inventory row at the latest snapshot.
+	measure 'Products in Snapshot' =
+			VAR LatestSnapshot = MAX(Inventory[SnapshotDate])
+			RETURN
+				CALCULATE(DISTINCTCOUNT(Inventory[ProductID]), Inventory[SnapshotDate] = LatestSnapshot)
+		formatString: #,0
+		lineageTag: dc966b0c-b402-484f-87fb-b17e6cf7faab
+
+	/// Share of stocked products at or below the Low Stock Threshold (20 units unless the slicer is changed) at the latest snapshot.
+	measure 'Low-Stock Product Share' = DIVIDE([Low-Stock Products], [Products in Snapshot])
 		formatString: 0.0%
-		lineageTag: 67ad1ff0-51b3-41d7-965c-d242eb95feb0
+		lineageTag: fb457c84-2be3-467e-b73d-10a7010a0df9
 
-	measure 'Average Stock on Hand' = AVERAGE(Inventory[StockOnHand])
-		lineageTag: 124ea199-8c17-4d48-ba10-5e6b5c1673c0
+	/// Annualised inventory turnover at cost: cost of units sold over the snapshot months in context, divided by the average month-end stock at cost, scaled to 12 months. Stock is averaged across snapshots, never summed. Region does not filter Inventory.
+	measure 'Inventory Turnover' =
+			VAR SnapshotCount = DISTINCTCOUNT(Inventory[SnapshotDate])
+			VAR CostOfUnitsSold = SUMX(Inventory, Inventory[UnitsSold] * RELATED(Products[COGS]))
+			VAR AverageStockAtCost =
+				AVERAGEX(
+					VALUES(Inventory[SnapshotDate]),
+					CALCULATE(SUMX(Inventory, Inventory[StockOnHand] * RELATED(Products[COGS])))
+				)
+			RETURN
+				DIVIDE(CostOfUnitsSold, AverageStockAtCost) * DIVIDE(12, SnapshotCount)
+		formatString: 0.00
+		lineageTag: 48c8b6dc-19e4-4100-90e4-2c89386397c4
 
-	measure 'Snapshot Dates' = DISTINCTCOUNT(Inventory[SnapshotDate])
-		lineageTag: 3bd1bc02-9642-4cd9-af94-30d89d6efbc1
+	/// Average of monthly Inventory Turnover across the months selected on the page. Reference line for the monthly turnover trend (snapshot date).
+	measure 'Inventory Turnover Period Average' =
+			VAR SelectedMonths = CALCULATETABLE(VALUES('Date'[Month Start]), ALLSELECTED('Date'))
+			RETURN
+				AVERAGEX(
+					SelectedMonths,
+					VAR ThisMonth = 'Date'[Month Start]
+					RETURN CALCULATE([Inventory Turnover], REMOVEFILTERS('Date'), 'Date'[Month Start] = ThisMonth)
+				)
+		formatString: 0.00
+		lineageTag: ee2e9aa7-453c-42a9-aa2b-0a11c58c91e2
+
+	/// Hex colour for the scorecard: dark red when a category's stockout rate is above the rate for all selected categories. Paired with the Watch column text.
+	measure 'Stockout Rate Color' =
+			VAR ThisRate = [Stockout Rate]
+			VAR AllRate = CALCULATE([Stockout Rate], ALLSELECTED(Products[Category]))
+			RETURN
+				IF(ISBLANK(ThisRate), BLANK(), IF(ThisRate > AllRate, "#B42318", "#344054"))
+		isHidden
+		lineageTag: fb186af0-3d87-4cb5-8fbe-ef92f4805c82
+
+	/// Stockout days recorded in the latest snapshot in context (snapshot, not summed across dates).
+	measure 'Stockout Days (Latest)' =
+			VAR LatestSnapshot = MAX(Inventory[SnapshotDate])
+			RETURN
+				CALCULATE(SUM(Inventory[StockoutDays]), Inventory[SnapshotDate] = LatestSnapshot)
+		formatString: #,0
+		lineageTag: 7e8a2e72-ad44-4e04-b572-641552a94b56
+
+	/// Average fill rate in the latest snapshot in context.
+	measure 'Fill Rate (Latest)' =
+			VAR LatestSnapshot = MAX(Inventory[SnapshotDate])
+			RETURN
+				CALCULATE(AVERAGE(Inventory[FillRate]), Inventory[SnapshotDate] = LatestSnapshot)
+		formatString: 0.0%
+		lineageTag: 96f89aec-75cb-4e70-9ab6-1ec6fec97c3b
+
+	/// Text flag for the latest snapshot: low stock (at or below Low Stock Threshold), stockout days recorded, or OK. Blank when there is no stock row.
+	measure 'Stock Status' =
+			IF(
+				ISBLANK([Current Stock]), BLANK(),
+				IF([Current Stock] <= [Low Stock Threshold Value], "▼ Low stock",
+					IF([Stockout Days (Latest)] > 0, "! Stockout days", "OK")))
+		lineageTag: a9576b72-4f5a-4ca8-a8c6-28a65b003a09
+
+	/// Font colour for Stock Status; repeats the text flag (red low stock, amber stockout days, ink otherwise).
+	measure 'Stock Status Color' =
+			SWITCH([Stock Status],
+				"▼ Low stock", "#B42318",
+				"! Stockout days", "#B54708",
+				"#344054")
+		isHidden
+		lineageTag: 2fe66c56-e763-40fe-83dd-2691fdcd1663
+
+	/// Products flagged as overstock (source overstock_flag) at the latest snapshot in context. Region does not filter Inventory.
+	measure 'Overstock Products' =
+			VAR LatestSnapshot = MAX(Inventory[SnapshotDate])
+			RETURN
+				CALCULATE(DISTINCTCOUNT(Inventory[ProductID]), Inventory[SnapshotDate] = LatestSnapshot, Inventory[OverstockFlag] = 1)
+		formatString: #,0
+		lineageTag: 42605162-5d84-45f5-81ef-c63ee11f3306
+
+	/// Share of stocked products flagged as overstock at the latest snapshot.
+	measure 'Overstock Product Share' = DIVIDE([Overstock Products], [Products in Snapshot])
+		formatString: 0.0%
+		lineageTag: 693ca137-e100-46d4-9da9-3ac66f88566d
+
+	/// Excess units at the latest snapshot: stock above 90 days of cover (StockOnHand - 3 x monthly UnitsSold), counted only for products carrying the source overstock flag (flag = days of supply > 90). Blank for products not flagged.
+	measure 'Excess Units' =
+			VAR LatestSnapshot = MAX(Inventory[SnapshotDate])
+			RETURN
+				CALCULATE(SUMX(Inventory, MAX(0, Inventory[StockOnHand] - 3 * Inventory[UnitsSold])), Inventory[SnapshotDate] = LatestSnapshot, Inventory[OverstockFlag] = 1)
+		formatString: #,0
+		lineageTag: 512259b7-b7c7-4db5-8946-ea426bc0d6a3
+
+	/// Value (units x list price, as Inventory Value) of the Excess Units above 90 days of cover at the latest snapshot. The snapshot is fixed before the flag filter so an earlier overstock month is never picked up.
+	measure 'Excess Stock Value' =
+			VAR LatestSnapshot = MAX(Inventory[SnapshotDate])
+			RETURN
+				CALCULATE(SUMX(Inventory, MAX(0, Inventory[StockOnHand] - 3 * Inventory[UnitsSold]) * RELATED(Products[Price])), Inventory[SnapshotDate] = LatestSnapshot, Inventory[OverstockFlag] = 1)
+		formatString: $#,0
+		lineageTag: 7a25a159-1d92-4b95-b22b-0b1bbf1a95fd
+
+	/// Share of Inventory Value that sits above 90 days of cover at the latest snapshot.
+	measure 'Excess Value Share' = DIVIDE([Excess Stock Value], [Inventory Value])
+		formatString: 0.0%
+		lineageTag: 99483942-23b2-4241-ad42-b00562187798
+
+	/// Days of cover at the latest snapshot in context: units on hand divided by units sold in that snapshot month, times 30. Weighted across products (total stock / total sales), not an average of product values. Blank when nothing sold.
+	measure 'Days of Supply' =
+			VAR LatestSnapshot = MAX(Inventory[SnapshotDate])
+			RETURN
+				CALCULATE(DIVIDE(SUM(Inventory[StockOnHand]), SUM(Inventory[UnitsSold])) * 30, Inventory[SnapshotDate] = LatestSnapshot)
+		formatString: #,0
+		lineageTag: 49efc146-255c-4f9e-b521-b068517bffd7
+
+	/// Units sold in the latest snapshot month in context (the demand rate behind Days of Supply).
+	measure 'Units Sold (Latest Month)' =
+			VAR LatestSnapshot = MAX(Inventory[SnapshotDate])
+			RETURN
+				CALCULATE(SUM(Inventory[UnitsSold]), Inventory[SnapshotDate] = LatestSnapshot)
+		formatString: #,0
+		lineageTag: ad30fef0-849d-435d-8504-aaf4376fedb9
+
+	/// Card subtitle for Inventory Value: units on hand at the latest snapshot.
+	measure 'Units on Hand Label' = IF(ISBLANK([Current Stock]), "No stock in the latest snapshot", FORMAT([Current Stock], "#,0") & " units on hand · at list price · latest snapshot")
+		isHidden
+		lineageTag: 12a32176-e07b-44ea-ac40-9c306bfa345c
+
+	/// Card subtitle for Excess Stock Value: share of inventory value above 90 days of cover.
+	measure 'Excess Value Share Label' = IF(ISBLANK([Excess Value Share]), "No excess stock at the latest snapshot", FORMAT([Excess Value Share], "0.0%") & " of inventory value is above 90 days of cover")
+		isHidden
+		lineageTag: bf7a8b80-9c2a-4717-8e63-999feeafa99f
+
+	/// Suggested planning action for one product at the latest snapshot: replenish when at or below the low-stock threshold or under 30 days of cover, reduce when it carries excess units (overstock flag, above 90 days of cover), otherwise healthy. Blank above product level.
+	measure 'Planning Action' =
+			IF(
+				NOT HASONEVALUE(Inventory[ProductName]) || ISBLANK([Current Stock]), BLANK(),
+				IF([Current Stock] <= [Low Stock Threshold Value] || (NOT ISBLANK([Days of Supply]) && [Days of Supply] < 30), "▲ Replenish",
+					IF([Excess Units] > 0, "▼ Reduce excess", "● Healthy")))
+		lineageTag: 2a68d9bc-1374-49b6-822e-7843d19597c7
+
+	/// Font colour for Planning Action; repeats the arrow and text.
+	measure 'Planning Action Color' = SWITCH(LEFT([Planning Action], 1), "▲", "#B42318", "▼", "#B54708", "#344054")
+		isHidden
+		lineageTag: 3b9aa0aa-66e4-4200-895a-bcdc38ffc6d1
+
+	/// Products in Shortage risk (Inventory[Stock Risk]: at or below 20 units or under 30 days of cover) at the latest snapshot in context. 0 when products are stocked but none is at risk.
+	measure 'Shortage-Risk Products' =
+			VAR LatestSnapshot = MAX(Inventory[SnapshotDate])
+			VAR AtRisk = CALCULATE(DISTINCTCOUNT(Inventory[ProductID]), Inventory[SnapshotDate] = LatestSnapshot, Inventory[Stock Risk] = "Shortage risk")
+			RETURN
+				IF(ISBLANK([Products in Snapshot]), BLANK(), COALESCE(AtRisk, 0))
+		formatString: #,0
+		lineageTag: 13594b72-0fac-47ae-a63d-90766efdf285
+
+	/// Share of stocked products in Shortage risk at the latest snapshot.
+	measure 'Shortage-Risk Product Share' = DIVIDE([Shortage-Risk Products], [Products in Snapshot])
+		formatString: 0.0%
+		lineageTag: 37dfca40-4fc4-4f15-b382-506235d90373
+
+	/// Products in Excess stock (Inventory[Stock Risk]: overstock-flagged and above 90 days of cover) at the latest snapshot in context. 0 when products are stocked but none carries excess.
+	measure 'Excess-Stock Products' =
+			VAR LatestSnapshot = MAX(Inventory[SnapshotDate])
+			VAR WithExcess = CALCULATE(DISTINCTCOUNT(Inventory[ProductID]), Inventory[SnapshotDate] = LatestSnapshot, Inventory[Stock Risk] = "Excess stock")
+			RETURN
+				IF(ISBLANK([Products in Snapshot]), BLANK(), COALESCE(WithExcess, 0))
+		formatString: #,0
+		lineageTag: 2e9516b1-befa-44e9-9155-97bad9b4c1f6
+
+	/// Share of stocked products in Excess stock at the latest snapshot.
+	measure 'Excess-Stock Product Share' = DIVIDE([Excess-Stock Products], [Products in Snapshot])
+		formatString: 0.0%
+		lineageTag: 7d6a1011-a3bd-4594-95ce-f71e8fa10530
+
+	/// Card subtitle for Shortage-Risk Products.
+	measure 'Shortage-Risk Product Label' = IF(ISBLANK([Products in Snapshot]), "No stock in the latest snapshot", FORMAT([Shortage-Risk Product Share], "0.0%") & " of stocked products · ≤ 20 units or under 30 days of cover")
+		isHidden
+		lineageTag: 4d360d3d-9659-403f-a58c-d38ec63ed3b4
+
+	/// Card subtitle for Excess-Stock Products.
+	measure 'Excess-Stock Product Label' = IF(ISBLANK([Products in Snapshot]), "No stock in the latest snapshot", FORMAT([Excess-Stock Product Share], "0.0%") & " of stocked products · overstock-flagged, above 90 days of cover")
+		isHidden
+		lineageTag: 3ce265b1-d3fa-4e2f-bf54-be48e77623b7
+
+	/// Card subtitle for Units on Hand: units received and units sold, summed over the snapshot months in the period.
+	measure 'Stock Flow Label' =
+			IF(
+				ISBLANK([Inbound Stock]) && ISBLANK([Outbound Stock]), "No stock movement in the period",
+				FORMAT([Inbound Stock], "#,0") & " in · " & FORMAT([Outbound Stock], "#,0") & " out · units over the period")
+		isHidden
+		lineageTag: 74b03994-2de8-4cbd-a014-00917e3ec3de
+
+	/// Stockout Rate with any Stock Risk filter removed, so the Category Tooltip shows the whole category's rate when hovering a Stock Risk segment.
+	measure 'Category Stockout Rate' = CALCULATE([Stockout Rate], REMOVEFILTERS(Inventory[Stock Risk], Inventory[Stock Risk Order]))
+		formatString: 0.0%
+		lineageTag: d271b294-2da6-4488-9391-94a6d4c05952
 
 	column SnapshotDate
 		dataType: dateTime
@@ -62,6 +259,7 @@ table Inventory
 
 	column ProductID
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: 285f6cf4-75a8-41f3-bdca-9d6176cb6e3f
 		summarizeBy: none
@@ -80,6 +278,7 @@ table Inventory
 
 	column UnitsReceived
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: 59df209b-8e56-43f2-9470-e8f4aa1c5956
 		summarizeBy: sum
@@ -89,6 +288,7 @@ table Inventory
 
 	column UnitsSold
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: bf539415-9100-48fb-b3bc-6e0d58d7fde9
 		summarizeBy: sum
@@ -155,19 +355,11 @@ table Inventory
 
 	column StockoutFlag
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: 3b8f1d6e-2a44-4c5d-9e77-1f6b0a2d3c33
 		summarizeBy: sum
 		sourceColumn: stockout_flag
-
-		annotation SummarizationSetBy = Automatic
-
-	column OverstockFlag
-		dataType: int64
-		formatString: 0
-		lineageTag: 5c2d7e8f-9a11-4b6c-8d33-0f4e1a2b3c44
-		summarizeBy: sum
-		sourceColumn: overstock_flag
 
 		annotation SummarizationSetBy = Automatic
 
@@ -180,30 +372,51 @@ table Inventory
 
 		annotation SummarizationSetBy = Automatic
 
-	column SellThroughRate
-		dataType: double
-		formatString: 0.0%
-		lineageTag: 7e4f9a0b-1c33-4d8e-0f55-2b6a3c4d5e66
-		summarizeBy: average
-		sourceColumn: sell_through_rate
+	column OverstockFlag
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: f9ed21fd-2e5b-4c7d-b782-5490c42f6f6c
+		summarizeBy: none
+		sourceColumn: overstock_flag
 
 		annotation SummarizationSetBy = Automatic
 
-	column year
-		dataType: int64
-		formatString: 0
-		lineageTag: 46cc6d67-63e7-4d14-b100-af76fb8cd042
-		summarizeBy: sum
-		sourceColumn: year
+	/// Days-of-supply band of the product in this snapshot row (source days_of_supply). Blank stays blank.
+	column 'Cover Band' = IF(ISBLANK(Inventory[DaysOfSupply]), BLANK(), IF(Inventory[DaysOfSupply] < 30, "Under 30 days", IF(Inventory[DaysOfSupply] < 90, "30–90 days", IF(Inventory[DaysOfSupply] < 180, "90–180 days", IF(Inventory[DaysOfSupply] < 365, "180–365 days", "Over 365 days")))))
+		dataType: string
+		lineageTag: 6bdb6292-52a4-4dcd-8a64-fe4110a0b8ff
+		summarizeBy: none
+		sortByColumn: 'Cover Band Order'
 
 		annotation SummarizationSetBy = Automatic
 
-	column month
+	/// Sort order for Cover Band.
+	column 'Cover Band Order' = IF(ISBLANK(Inventory[DaysOfSupply]), BLANK(), IF(Inventory[DaysOfSupply] < 30, 1, IF(Inventory[DaysOfSupply] < 90, 2, IF(Inventory[DaysOfSupply] < 180, 3, IF(Inventory[DaysOfSupply] < 365, 4, 5)))))
 		dataType: int64
+		isHidden
 		formatString: 0
-		lineageTag: acc4f879-2bd1-4ebc-9948-c038dcbdcf33
-		summarizeBy: sum
-		sourceColumn: month
+		lineageTag: ff6da0e2-794b-4f5f-b93d-585e060e2255
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Planning risk per product and snapshot month, the same rule as Planning Action: Shortage risk at or below 20 units or under 30 days of cover (StockOnHand / UnitsSold x 30); Excess stock when overstock-flagged and above 90 days of cover (StockOnHand > 3 x UnitsSold); otherwise Healthy.
+	column 'Stock Risk' = IF(Inventory[StockOnHand] <= 20 || (Inventory[UnitsSold] > 0 && DIVIDE(Inventory[StockOnHand], Inventory[UnitsSold]) * 30 < 30), "Shortage risk", IF(Inventory[OverstockFlag] = 1 && Inventory[StockOnHand] > 3 * Inventory[UnitsSold], "Excess stock", "Healthy"))
+		dataType: string
+		lineageTag: 76a588fa-011e-4d67-b117-292cef060d77
+		summarizeBy: none
+		sortByColumn: 'Stock Risk Order'
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Sort order for Stock Risk.
+	column 'Stock Risk Order' = IF(Inventory[StockOnHand] <= 20 || (Inventory[UnitsSold] > 0 && DIVIDE(Inventory[StockOnHand], Inventory[UnitsSold]) * 30 < 30), 1, IF(Inventory[OverstockFlag] = 1 && Inventory[StockOnHand] > 3 * Inventory[UnitsSold], 2, 3))
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: cba66d24-a528-4f59-aa11-29d50eaa1176
+		summarizeBy: none
 
 		annotation SummarizationSetBy = Automatic
 
@@ -213,7 +426,8 @@ table Inventory
 				let
 				    Source = Csv.Document(File.Contents("D:\projects\vintelligence2026_ai_agent_powerbi_dashboard\data\inventory.csv"), [Delimiter = ",", Columns = 17, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
 				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
-				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"snapshot_date", type date}, {"product_id", Int64.Type}, {"stock_on_hand", Int64.Type}, {"units_received", Int64.Type}, {"units_sold", Int64.Type}, {"stockout_days", Int64.Type}, {"days_of_supply", type number}, {"fill_rate", type number}, {"stockout_flag", Int64.Type}, {"overstock_flag", Int64.Type}, {"reorder_flag", Int64.Type}, {"sell_through_rate", type number}, {"product_name", type text}, {"category", type text}, {"segment", type text}, {"year", Int64.Type}, {"month", Int64.Type}})
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"snapshot_date", type date}, {"product_id", Int64.Type}, {"stock_on_hand", Int64.Type}, {"units_received", Int64.Type}, {"units_sold", Int64.Type}, {"stockout_days", Int64.Type}, {"days_of_supply", type number}, {"fill_rate", type number}, {"stockout_flag", Int64.Type}, {"overstock_flag", Int64.Type}, {"reorder_flag", Int64.Type}, {"sell_through_rate", type number}, {"product_name", type text}, {"category", type text}, {"segment", type text}, {"year", Int64.Type}, {"month", Int64.Type}}),
+				    #"Removed Unused Columns" = Table.RemoveColumns(#"Changed Type", {"sell_through_rate", "year", "month"})
 				in
-				    #"Changed Type"
+				    #"Removed Unused Columns"
 

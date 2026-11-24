@@ -2,17 +2,12 @@ table Reviews
 	lineageTag: 7008ce5d-12f2-4f05-a3ec-b9fd1ae5e553
 
 	measure 'Average Rating' = AVERAGE(Reviews[Rating])
+		formatString: 0.00
 		lineageTag: ae64bd97-f6b7-4816-a8ad-b2668b14bb47
 
 	measure 'Review Count' = COUNTROWS(Reviews)
+		formatString: #,0
 		lineageTag: 3cb6d9ca-fed6-4868-b305-22ea8730b6f3
-
-	measure 'Reviewed Orders' = DISTINCTCOUNT(Reviews[OrderID])
-		lineageTag: 92f2ce08-f6f0-4ece-a132-f0d3c25c4efd
-
-	measure 'Review Order Coverage Rate' = DIVIDE([Reviewed Orders], [Total Orders])
-		formatString: 0.0%
-		lineageTag: ed886dd0-a4a6-4cb1-9c67-1328dfd37bc9
 
 	measure 'Positive Review Rate' = DIVIDE(CALCULATE(COUNTROWS(Reviews), Reviews[Rating] >= 4), [Review Count])
 		formatString: 0.0%
@@ -30,21 +25,79 @@ table Reviews
 		formatString: 0.0
 		lineageTag: b8d3df91-f41c-4a74-9cf1-bb446b9f3de5
 
-	measure 'Low Rating Products' = COUNTROWS(FILTER(VALUES(Products[ProductID]), [Average Rating] < 3))
-		lineageTag: b8f38c6f-a1a3-4e09-9ff2-45dbcda457a0
+	/// Average rating, shown only when the review count reaches the Minimum Reviews setting (10 unless the slicer is changed), so thinly reviewed items do not rank on one or two ratings.
+	measure 'Average Rating (Min Reviews)' = IF([Review Count] >= [Minimum Reviews Value], [Average Rating])
+		formatString: 0.00
+		lineageTag: e8efb127-e71e-4be9-9bd0-b714349bc523
 
-	column ReviewID
-		dataType: string
-		lineageTag: e8601ff1-e0f1-43a6-8b71-d19847752ebd
-		summarizeBy: none
-		sourceColumn: review_id
+	/// Average rating with shipment attributes (such as Transit Days) allowed to filter reviews through the order. Use only on visuals grouped or filtered by a Shipments column.
+	measure 'Average Rating by Shipment' = CALCULATE([Average Rating], CROSSFILTER(Shipments[OrderID], Orders[OrderID], BOTH))
+		formatString: 0.00
+		lineageTag: ca1008ce-4bef-4373-a2a8-5a36c2eaadee
 
-		annotation SummarizationSetBy = Automatic
+	/// Review count with shipment attributes (such as Transit Days) allowed to filter reviews through the order.
+	measure 'Review Count by Shipment' = CALCULATE([Review Count], CROSSFILTER(Shipments[OrderID], Orders[OrderID], BOTH))
+		formatString: #,0
+		lineageTag: 6b0f00b2-191f-463e-a3fe-6594f05e79e5
 
-		annotation PBI_FormatHint = {"isText":true}
+	/// Review count, shown only when it reaches the Minimum Reviews slicer value (10 when nothing is selected). Blank otherwise, so thinly reviewed products drop out of rating tables.
+	measure 'Review Count (Min Reviews)' = IF([Review Count] >= [Minimum Reviews Value], [Review Count])
+		formatString: #,0
+		lineageTag: 8d19c0a7-0740-4164-8601-8e227133c669
+
+	/// Positive review rate (rating 4 or 5), shown only when the review count reaches the Minimum Reviews setting.
+	measure 'Positive Review Rate (Min Reviews)' = IF([Review Count] >= [Minimum Reviews Value], [Positive Review Rate])
+		formatString: 0.0%
+		lineageTag: 552bc361-ecd5-4018-8795-bccd8aea996d
+
+	/// Negative review rate (rating 1 or 2), shown only when the review count reaches the Minimum Reviews setting.
+	measure 'Negative Review Rate (Min Reviews)' = IF([Review Count] >= [Minimum Reviews Value], [Negative Review Rate])
+		formatString: 0.0%
+		lineageTag: f46c583c-2773-404f-b95e-9a8b95615195
+
+	/// Return rate for product orders, shown only when the review count reaches the Minimum Reviews setting, so it lines up with the rating columns beside it.
+	measure 'Return Rate (Min Reviews)' = IF([Review Count] >= [Minimum Reviews Value], [Return Rate for Product Orders])
+		formatString: 0.0%
+		lineageTag: db74a198-64cf-42f1-a968-e24e44084210
+
+	/// Positive review rate (rating 4 or 5) by the date the review was written.
+	measure 'Positive Review Rate by Review Date' = CALCULATE([Positive Review Rate], USERELATIONSHIP('Date'[Date], Reviews[ReviewDate]), CROSSFILTER('Date'[Date], Orders[OrderDate], NONE))
+		formatString: 0.0%
+		lineageTag: 606adfed-55b8-4b44-b86a-4f38357cf4e9
+
+	/// Negative review rate (rating 1 or 2) by the date the review was written.
+	measure 'Negative Review Rate by Review Date' = CALCULATE([Negative Review Rate], USERELATIONSHIP('Date'[Date], Reviews[ReviewDate]), CROSSFILTER('Date'[Date], Orders[OrderDate], NONE))
+		formatString: 0.0%
+		lineageTag: b4019148-3bac-43f9-93a8-3ef4364fbc83
+
+	/// Negative review rate with shipment attributes (such as Transit Days) allowed to filter reviews through the order. Use only on visuals grouped or filtered by a Shipments column.
+	measure 'Negative Review Rate by Shipment' = CALCULATE([Negative Review Rate], CROSSFILTER(Shipments[OrderID], Orders[OrderID], BOTH))
+		formatString: 0.0%
+		lineageTag: 83773464-ec5f-4ffc-9abc-b49d5db0a64a
+
+	/// Share of reviews at each star rating.
+	measure 'Rating Share' = DIVIDE([Review Count], CALCULATE([Review Count], REMOVEFILTERS(Reviews[Rating], Reviews[Rating Label])))
+		formatString: 0.0%
+		lineageTag: d2e59cc1-2a4e-466f-86eb-39cde39bd107
+
+	/// Delivered orders with at least one review.
+	measure 'Reviewed Orders' = CALCULATE(DISTINCTCOUNT(Reviews[OrderID]), KEEPFILTERS(Orders[OrderStatus] = "delivered"))
+		formatString: #,0
+		lineageTag: f4b11e14-2110-4a43-96d3-5cc4029c39e8
+
+	/// Share of delivered orders that received at least one review: how much of the customer base the ratings represent.
+	measure 'Review Coverage' = DIVIDE([Reviewed Orders], [Delivered Orders])
+		formatString: 0.0%
+		lineageTag: bc24f3cc-1667-4265-8ee1-e94ff413f30f
+
+	/// Average days from the order date to the review date.
+	measure 'Average Days to Review' = AVERAGE(Reviews[Days to Review])
+		formatString: 0.0
+		lineageTag: 835481b6-a9ee-4dc9-b2a9-ba301b4cfb9d
 
 	column OrderID
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: da0ef8e3-f96d-4bc9-a6e6-2df8d7d5d8a3
 		summarizeBy: none
@@ -54,6 +107,7 @@ table Reviews
 
 	column ProductID
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: a09b80ed-aecd-4d11-8afc-4dbdd30cf575
 		summarizeBy: none
@@ -61,17 +115,9 @@ table Reviews
 
 		annotation SummarizationSetBy = Automatic
 
-	column CustomerID
-		dataType: int64
-		formatString: 0
-		lineageTag: 7c087267-67cc-4e3a-b613-86a0d5249ffa
-		summarizeBy: none
-		sourceColumn: customer_id
-
-		annotation SummarizationSetBy = Automatic
-
 	column ReviewDate
 		dataType: dateTime
+		isHidden
 		formatString: Short Date
 		lineageTag: cdc13792-5a0b-4c8d-853a-da3ee5a5cfba
 		summarizeBy: none
@@ -90,15 +136,22 @@ table Reviews
 
 		annotation SummarizationSetBy = Automatic
 
-	column ReviewTitle
-		dataType: string
-		lineageTag: 59065e24-0d4a-4b4d-94a6-c06f0a4de3a4
+	/// Days from the order date to the review date.
+	column 'Days to Review' = INT(Reviews[ReviewDate] - RELATED(Orders[OrderDate]))
+		dataType: int64
+		formatString: 0
+		lineageTag: 35f77249-628a-4a2d-accb-aa8190bd9826
 		summarizeBy: none
-		sourceColumn: review_title
 
 		annotation SummarizationSetBy = Automatic
 
-		annotation PBI_FormatHint = {"isText":true}
+	/// Star rating as a label (5 ★ … 1 ★) for rating-mix charts.
+	column 'Rating Label' = FORMAT(Reviews[Rating], "0") & " ★"
+		dataType: string
+		lineageTag: 8101082b-7bab-470f-8b9c-80cde721efd5
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
 
 	partition Reviews-d1f34ff8-f0fd-4358-9d6b-c95f4537b0f8 = m
 		mode: import
@@ -106,7 +159,8 @@ table Reviews
 				let
 				    Source = Csv.Document(File.Contents("D:\projects\vintelligence2026_ai_agent_powerbi_dashboard\data\reviews.csv"), [Delimiter = ",", Columns = 7, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
 				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
-				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"review_id", type text}, {"order_id", Int64.Type}, {"product_id", Int64.Type}, {"customer_id", Int64.Type}, {"review_date", type date}, {"rating", Int64.Type}, {"review_title", type text}})
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"review_id", type text}, {"order_id", Int64.Type}, {"product_id", Int64.Type}, {"customer_id", Int64.Type}, {"review_date", type date}, {"rating", Int64.Type}, {"review_title", type text}}),
+				    #"Removed Unused Columns" = Table.RemoveColumns(#"Changed Type", {"review_id", "customer_id", "review_title"})
 				in
-				    #"Changed Type"
+				    #"Removed Unused Columns"
 

@@ -1,8 +1,105 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
   "name": "a1f2c3d4-e5b6-47c8-9d0e-1f2a3b4c5d6e",
-  "displayName": "Customers and Market Performance",
-  "displayOption": "FitToWidth",
-  "height": 1570,
-  "width": 1920
+  "displayName": "Customers & Market",
+  "displayOption": "FitToPage",
+  "height": 2240,
+  "width": 1920,
+  "visualInteractions": [
+    {
+      "source": "p3-search-city",
+      "target": "filter-1-year-month",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p3-search-city",
+      "target": "filter-2-category",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p3-search-city",
+      "target": "filter-3-productname",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p3-search-city",
+      "target": "filter-4-region",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p3-search-city",
+      "target": "hdr-data-through",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p3-search-city",
+      "target": "kpi-active-customers",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p3-search-city",
+      "target": "kpi-new-customers",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p3-search-city",
+      "target": "kpi-repeat-rate",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p3-search-city",
+      "target": "kpi-repeat-rate-alltime",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p3-search-city",
+      "target": "kpi-revenue-per-customer",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p3-search-city",
+      "target": "p3-bar-age",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p3-search-city",
+      "target": "p3-bar-device",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p3-search-city",
+      "target": "p3-bar-payment",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p3-search-city",
+      "target": "p3-bar-region-sales",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p3-search-city",
+      "target": "p3-bar-segment",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p3-search-city",
+      "target": "p3-bar-source",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p3-search-city",
+      "target": "p3-col-channel",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p3-search-city",
+      "target": "p3-line-new-repeat",
+      "type": "NoFilter"
+    },
+    {
+      "source": "p3-search-city",
+      "target": "p3-line-repeat-rate",
+      "type": "NoFilter"
+    }
+  ]
 }

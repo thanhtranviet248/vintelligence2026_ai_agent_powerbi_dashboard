@@ -4,7 +4,7 @@
     {
       "ordinal": 0,
       "scrollPosition": {
-        "x": 0,
+        "x": 131.82679506897406,
         "y": 0
       },
       "nodes": [
@@ -88,19 +88,6 @@
         },
         {
           "location": {
-            "x": 1265.9708052312537,
-            "y": -2.4981159994465543
-          },
-          "nodeIndex": "Payments",
-          "nodeLineageTag": "a725eb32-3b90-4f02-869d-79af156a4d0e",
-          "size": {
-            "height": 200,
-            "width": 234
-          },
-          "zIndex": 0
-        },
-        {
-          "location": {
             "x": 827.7274594993271,
             "y": 1018.2221032898124
           },
@@ -153,19 +140,6 @@
         },
         {
           "location": {
-            "x": 50.024446734131288,
-            "y": 559.95333143125868
-          },
-          "nodeIndex": "Sales",
-          "nodeLineageTag": "4f2dc7d6-4d73-4f4e-bf19-df3f5b5f2a11",
-          "size": {
-            "height": 224,
-            "width": 234
-          },
-          "zIndex": 0
-        },
-        {
-          "location": {
             "x": 478.43802981706381,
             "y": 310.77827424767429
           },
@@ -179,20 +153,85 @@
         },
         {
           "location": {
-            "x": 50,
-            "y": 908.65255460370213
+            "x": 1831.2211235323814,
+            "y": 608.11795891369093
           },
-          "nodeIndex": "WebTraffic",
-          "nodeLineageTag": "9e0956b1-7b32-4bfe-aba6-a5bed4e90d66",
+          "nodeIndex": "Breakdown Dimension",
+          "nodeLineageTag": "1421e6d2-2c5b-4f26-9f46-0fe37966dc24",
           "size": {
-            "height": 300,
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2115.2211235323812,
+            "y": 572.11795891369093
+          },
+          "nodeIndex": "Low Stock Threshold",
+          "nodeLineageTag": "bd435493-bbeb-429a-8bee-6736f045d9c7",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2399.2211235323812,
+            "y": 572.11795891369093
+          },
+          "nodeIndex": "Minimum Reviews",
+          "nodeLineageTag": "9c9cf2e6-b888-448d-95de-d2255cf1842b",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2683.2211235323812,
+            "y": 572.11795891369093
+          },
+          "nodeIndex": "Return Reduction",
+          "nodeLineageTag": "6b23b425-b2b3-43d1-94b4-f6a120f2e5fd",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2967.2211235323812,
+            "y": 572.11795891369093
+          },
+          "nodeIndex": "Transit Day Threshold",
+          "nodeLineageTag": "a7cd69e1-5fdb-4d33-b420-527730b6290a",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 3251.2211235323812,
+            "y": 608.11795891369093
+          },
+          "nodeIndex": "Trend Metric",
+          "nodeLineageTag": "e72c305d-52c1-477a-bf03-dd144982ba72",
+          "size": {
+            "height": 152,
             "width": 234
           },
           "zIndex": 0
         }
       ],
       "name": "All tables",
-      "zoomValue": 100,
+      "zoomValue": 40.052554724883258,
       "pinKeyFieldsToTop": false,
       "showExtraHeaderInfo": false,
       "hideKeyFieldsWhenCollapsed": false,

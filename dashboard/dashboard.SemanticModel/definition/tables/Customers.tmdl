@@ -3,6 +3,7 @@ table Customers
 
 	column CustomerID
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: 587ac73d-784d-4dbf-a9b1-0ecfd0bdbfcd
 		summarizeBy: none
@@ -10,26 +11,9 @@ table Customers
 
 		annotation SummarizationSetBy = Automatic
 
-	column Zip
-		dataType: int64
-		lineageTag: acb2cb7d-a4b3-4f36-a9b7-cce86bfec17a
-		summarizeBy: sum
-		sourceColumn: zip
-
-		annotation SummarizationSetBy = Automatic
-
-	column City
-		dataType: string
-		lineageTag: 8bf7e17f-1f5b-4869-bba1-7408f764e27d
-		summarizeBy: none
-		sourceColumn: city
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isText":true}
-
 	column SignupDate
 		dataType: dateTime
+		isHidden
 		formatString: Short Date
 		lineageTag: 33b4d2a6-5d61-4418-9864-1d0c66f1d345
 		summarizeBy: none
@@ -80,7 +64,8 @@ table Customers
 				let
 				    Source = Csv.Document(File.Contents("D:\projects\vintelligence2026_ai_agent_powerbi_dashboard\data\customers.csv"), [Delimiter = ",", Columns = 7, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
 				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
-				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"customer_id", Int64.Type}, {"zip", Int64.Type}, {"city", type text}, {"signup_date", type date}, {"gender", type text}, {"age_group", type text}, {"acquisition_channel", type text}})
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {{"customer_id", Int64.Type}, {"zip", Int64.Type}, {"city", type text}, {"signup_date", type date}, {"gender", type text}, {"age_group", type text}, {"acquisition_channel", type text}}),
+				    #"Removed Unused Columns" = Table.RemoveColumns(#"Changed Type", {"zip", "city"})
 				in
-				    #"Changed Type"
+				    #"Removed Unused Columns"
 

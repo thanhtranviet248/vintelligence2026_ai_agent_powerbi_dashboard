@@ -1,13 +1,13 @@
 {
-  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.7.0/schema.json",
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
   "name": "p2-detail-profitability",
   "position": {
     "x": 40,
-    "y": 1200,
-    "z": 1000,
-    "height": 280,
-    "width": 900,
-    "tabOrder": 60
+    "y": 2324,
+    "z": 36000,
+    "height": 434,
+    "width": 1005,
+    "tabOrder": 36000
   },
   "visual": {
     "visualType": "tableEx",
@@ -185,6 +185,66 @@
               }
             }
           }
+        },
+        {
+          "properties": {
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "OrderItems"
+                        }
+                      },
+                      "Property": "Gross Profit Color"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "dataViewWildcard": {
+                  "matchingOption": 1
+                }
+              }
+            ],
+            "metadata": "OrderItems.Gross Profit"
+          }
+        },
+        {
+          "properties": {
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "OrderItems"
+                        }
+                      },
+                      "Property": "Gross Profit Color"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "dataViewWildcard": {
+                  "matchingOption": 1
+                }
+              }
+            ],
+            "metadata": "OrderItems.Gross Margin %"
+          }
         }
       ],
       "grid": [
@@ -342,7 +402,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'By order date · uses catalog cost, not historical cost'"
+                  "Value": "'Loss-making products show gross profit in (parentheses) and red; catalog cost, not historical cost (order date)'"
                 }
               }
             },
