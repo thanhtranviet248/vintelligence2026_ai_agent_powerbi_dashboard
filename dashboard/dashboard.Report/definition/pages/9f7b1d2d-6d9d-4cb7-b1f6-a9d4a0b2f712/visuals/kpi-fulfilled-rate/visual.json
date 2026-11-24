@@ -263,23 +263,5 @@
       ]
     },
     "drillFilterOtherVisuals": true
-  },
-  "filterConfig": {
-    "filters": [
-      {
-        "name": "a809bf339e68c71efe9b",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "Shipments"
-              }
-            },
-            "Property": "Fulfilled Rate"
-          }
-        },
-        "type": "Advanced"
-      }
-    ]
   }
 }

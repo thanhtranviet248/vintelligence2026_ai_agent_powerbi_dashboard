@@ -211,23 +211,5 @@
       ]
     },
     "drillFilterOtherVisuals": true
-  },
-  "filterConfig": {
-    "filters": [
-      {
-        "name": "69b9a5f775d6c638582a",
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "Inventory"
-              }
-            },
-            "Property": "ProductName"
-          }
-        },
-        "type": "Categorical"
-      }
-    ]
   }
 }

@@ -19,23 +19,11 @@
               {
                 "textRuns": [
                   {
-                    "value": "Sales and Profitability",
+                    "value": "Sales & Profitability",
                     "textStyle": {
-                      "fontFamily": "'Segoe UI Semibold', wf_segoe-ui_semibold, helvetica, arial, sans-serif",
+                      "fontFamily": "Segoe UI Semibold",
                       "fontSize": "22pt",
-                      "color": "#FFFFFF"
-                    }
-                  }
-                ]
-              },
-              {
-                "textRuns": [
-                  {
-                    "value": "Order-date view · Net Sales is after discounts, before refunds · margins use catalog COGS",
-                    "textStyle": {
-                      "fontFamily": "'Segoe UI', wf_segoe-ui_normal, helvetica, arial, sans-serif",
-                      "fontSize": "10pt",
-                      "color": "#EAF2FF"
+                      "color": "#ffffff"
                     }
                   }
                 ]

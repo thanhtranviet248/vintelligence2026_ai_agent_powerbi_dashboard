@@ -263,23 +263,5 @@
       ]
     },
     "drillFilterOtherVisuals": true
-  },
-  "filterConfig": {
-    "filters": [
-      {
-        "name": "496c774e82a5edee2382",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "Inventory"
-              }
-            },
-            "Property": "Stockout Rate"
-          }
-        },
-        "type": "Advanced"
-      }
-    ]
   }
 }

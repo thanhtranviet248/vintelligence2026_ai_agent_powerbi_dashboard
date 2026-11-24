@@ -263,23 +263,5 @@
       ]
     },
     "drillFilterOtherVisuals": true
-  },
-  "filterConfig": {
-    "filters": [
-      {
-        "name": "de466a175b66638ac9bd",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "Orders"
-              }
-            },
-            "Property": "Repeat Customer Rate KPI"
-          }
-        },
-        "type": "Advanced"
-      }
-    ]
   }
 }

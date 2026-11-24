@@ -19,11 +19,11 @@
               {
                 "textRuns": [
                   {
-                    "value": "Delivery and Logistics",
+                    "value": "Shipping & Delivery",
                     "textStyle": {
-                      "fontFamily": "'Segoe UI Semibold', wf_segoe-ui_semibold, helvetica, arial, sans-serif",
+                      "fontFamily": "Segoe UI Semibold",
                       "fontSize": "22pt",
-                      "color": "#FFFFFF"
+                      "color": "#ffffff"
                     }
                   }
                 ]
@@ -31,12 +31,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Shipment progress and transit diagnostics; no promised delivery date is available to measure lateness",
-                    "textStyle": {
-                      "fontFamily": "'Segoe UI', wf_segoe-ui_normal, helvetica, arial, sans-serif",
-                      "fontSize": "10pt",
-                      "color": "#EAF2FF"
-                    }
+                    "value": ""
                   }
                 ]
               }

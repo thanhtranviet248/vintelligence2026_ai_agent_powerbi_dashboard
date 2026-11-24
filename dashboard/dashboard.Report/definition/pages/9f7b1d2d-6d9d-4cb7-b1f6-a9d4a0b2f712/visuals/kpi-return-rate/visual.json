@@ -263,23 +263,5 @@
       ]
     },
     "drillFilterOtherVisuals": true
-  },
-  "filterConfig": {
-    "filters": [
-      {
-        "name": "5a6ef8a125f14d961e31",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "Returns"
-              }
-            },
-            "Property": "Return Rate (Closed Window)"
-          }
-        },
-        "type": "Advanced"
-      }
-    ]
   }
 }

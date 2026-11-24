@@ -263,23 +263,5 @@
       ]
     },
     "drillFilterOtherVisuals": true
-  },
-  "filterConfig": {
-    "filters": [
-      {
-        "name": "555e723d7c230d626dff",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "Shipments"
-              }
-            },
-            "Property": "Average Order-to-Delivery Days"
-          }
-        },
-        "type": "Advanced"
-      }
-    ]
   }
 }

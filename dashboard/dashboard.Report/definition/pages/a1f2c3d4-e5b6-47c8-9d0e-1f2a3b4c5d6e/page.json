@@ -1,7 +1,7 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
   "name": "a1f2c3d4-e5b6-47c8-9d0e-1f2a3b4c5d6e",
-  "displayName": "Customers & Market",
+  "displayName": "Customers & Markets",
   "displayOption": "FitToPage",
   "height": 2240,
   "width": 1920,

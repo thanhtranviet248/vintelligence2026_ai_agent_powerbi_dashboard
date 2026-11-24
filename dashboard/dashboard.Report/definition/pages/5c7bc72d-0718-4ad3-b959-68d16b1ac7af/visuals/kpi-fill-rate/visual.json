@@ -263,23 +263,5 @@
       ]
     },
     "drillFilterOtherVisuals": true
-  },
-  "filterConfig": {
-    "filters": [
-      {
-        "name": "ac37d06775ebd971843d",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "Inventory"
-              }
-            },
-            "Property": "Fill Rate (Latest)"
-          }
-        },
-        "type": "Advanced"
-      }
-    ]
   }
 }

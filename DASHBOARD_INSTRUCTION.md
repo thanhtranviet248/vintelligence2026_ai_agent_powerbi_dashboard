@@ -4,7 +4,7 @@
 
 ## 1.1. Primary User
 
-Ecommerce Manager (the report header reads "VinTelligence · E-commerce Performance"), working with the supply chain, fulfilment and customer-service teams. The original spec named the Supply Chain Manager; the supply-chain pages (Inventory, Shipment, Returns & Product Quality) still serve that role.
+Ecommerce Manager (the report header reads "VinTelligence · E-commerce Performance"), working with the supply chain, fulfilment and customer-service teams. The original spec named the Supply Chain Manager; the supply-chain pages (Inventory, Shipping & Delivery, Returns & Product Quality) still serve that role.
 
 ## 1.2. Objectives and Scope
 
@@ -89,7 +89,7 @@ The tables below describe the semantic model **as built**. Formulas are the DAX 
 
 **Not built:** the model has no measure for it. Usually a required field (for example a promised delivery date) or a business rule is missing.
 
-Page abbreviations (page tab names in brackets): **EO** Executive Overview · **SP** Sales and Profitability ("Sales & Profitability") · **CM** Customers and Market Performance ("Customers & Market") · **IP** Inventory Performance ("Inventory") · **DL** Delivery and Logistics ("Shipment") · **RQ** Returns and Product Quality ("Returns & Product Quality") · **CS** Customer Satisfaction.
+Page abbreviations (page tab name, which is also the header title, then the metric domain of sections 2.3–2.8 in brackets): **EO** Executive Overview · **SP** Sales & Profitability (Sales and Profitability) · **CM** Customers & Markets (Customers and Market Performance) · **IP** Inventory (Inventory Performance) · **DL** Shipping & Delivery (Delivery and Logistics) · **RQ** Returns & Product Quality (Returns and Product Quality) · **CS** Customer Satisfaction.
 
 ## 2.2. Common Calculation Rules
 
@@ -433,17 +433,17 @@ Use the appropriate inactive date role explicitly for shipment, delivery, return
   | --- | --- | --- | --- | --- |
   | 1 | Executive Overview | `9f7b1d2d-…f712` | Fit to page | 1920×1750 |
   | 2 | Sales & Profitability | `2d466881-…34d5` | Fit to page | 1920×2780 |
-  | 3 | Customers & Market | `a1f2c3d4-…5d6e` | Fit to page | 1920×2240 |
+  | 3 | Customers & Markets | `a1f2c3d4-…5d6e` | Fit to page | 1920×2240 |
   | 4 | Inventory | `5c7bc72d-…68d16b1ac7af` | Fit to page | 1920×3460 |
-  | 5 | Shipment | `fcd9a8b8-…183f6a` | Fit to width | 1920×2460 |
+  | 5 | Shipping & Delivery | `fcd9a8b8-…183f6a` | Fit to width | 1920×2460 |
   | 6 | Returns & Product Quality | `b2f3c4d5-…5d6e7f` | Fit to width | 1920×2240 |
   | 7 | Customer Satisfaction | `cb86d456-…1ef3` | Fit to width | 1920×2240 |
   | – | Category Tooltip (hidden) | `c3e4d5f6-…6d7e` | Actual size | 320×240 |
 
-  Customers & Market, Returns & Product Quality and Customer Satisfaction are 2240 high because every story step opens with a 40-high section heading and row D adds a search box (y 1756, h 80) above its detail table (y 1842); Shipment is 2460 because its row D stacks a region table, a search box and the city table. They share one storytelling grid (section 6.2).
+  Customers & Markets, Returns & Product Quality and Customer Satisfaction are 2240 high because every story step opens with a 40-high section heading and row D adds a search box (y 1756, h 80) above its detail table (y 1842); Shipping & Delivery is 2460 because its row D stacks a region table, a search box and the city table. They share one storytelling grid (section 6.2).
 - **Theme:** `purple-slicer`, registered as both the base theme and the custom theme. Colours come from the theme, not from per-visual formatting.
 - **Navigation:** page tabs only. There is no drill-through page, no page-navigator buttons and no bookmarks.
-- **Tooltips:** the six category bar charts (`p2-bar-yoy-category`, `p2-bar-discount-rate` (SP), `p4-bar-risk-category` (IP), `p5-bar-cost-category` (Shipment), `p6-bar-refund-category` (RQ), `p7-bar-rating-category` (CS)) use the Category Tooltip page (section 6.3.8). Every other visual shows the default tooltip plus any extra tooltip fields listed in section 6.3.
+- **Tooltips:** the six category bar charts (`p2-bar-yoy-category`, `p2-bar-discount-rate` (SP), `p4-bar-risk-category` (IP), `p5-bar-cost-category` (Shipping & Delivery), `p6-bar-refund-category` (RQ), `p7-bar-rating-category` (CS)) use the Category Tooltip page (section 6.3.8). Every other visual shows the default tooltip plus any extra tooltip fields listed in section 6.3.
 - **Parameters:** the only parameter slicers are the two field-parameter slicers on Sales & Profitability (Trend Metric, Breakdown Dimension). No page has a what-if slicer, so Low Stock Threshold and Minimum Reviews stay at their defaults (20 and 10). The Transit Day Threshold and Return Reduction tables are column-only and feed no measure.
 - **Reset filters:** every page has one (`hdr-reset-filters`, *Clear all slicers*), next to `hdr-data-through`.
 - **Alt text:** set on every visual except the shared header and slicers. It describes the chart type, the measure, and the dimension.
@@ -458,20 +458,20 @@ Every analytical page uses the same grid. The x positions run from 40 to 1880.
 
 | Row | y | Height | Contents |
 | --- | --- | --- | --- |
-| Header | 16 | – | `hdr-band` (background band), `hdr-brand`, `hdr-title` (page title at 22pt and a one-line purpose at 10pt, no padding, so both lines fit the 64-high box) |
+| Header | 16 | – | `hdr-band` (shape, 0, 0, 1920×96), the title text box `hdr-title` (40, 16, 1100×64: the page's tab name in Segoe UI Semibold 22 pt white, no padding, no purpose line; on Executive Overview this text box is named `ce53d977703e5a68ca69`), `hdr-reset-filters` (1150, 28), `hdr-data-through` (1316, 24) and `hdr-brand` (1500, 32, 380×32) |
 | Slicers | 110 | – | Four dropdown slicers, left to right (below) |
-| KPI cards | 254 | 132 | 6 cards 290 wide at x = 40, 350, 660, 970, 1280, 1590, named `kpi-*` (Customers & Market has 5 cards 352 wide). A second row at y = 406 on Executive Overview (5 × 352), Sales & Profitability (6 × 290) and Inventory (3 × 600) |
+| KPI cards | 254 | 132 | 6 cards 290 wide at x = 40, 350, 660, 970, 1280, 1590, named `kpi-*` (Customers & Markets has 5 cards 352 wide). A second row at y = 406 on Executive Overview (5 × 352), Sales & Profitability (6 × 290) and Inventory (3 × 600) |
 
-Executive Overview and Sales and Profitability use their own storytelling grid below the cards (sections 6.3.1 and 6.3.2). The domain pages all follow the same four-step story, so a reader always finds the same kind of answer in the same place. Every page below the KPI cards is split into numbered sections, each opened by a section heading: a text box 1840×40 at x = 40 (copied from `p4-section-service`, named `p<N>-section-<subject>`) with "N · Title" in Segoe UI Semibold 15 pt navy and the question the section answers in 11 pt grey. The heading sits 10 below the previous section and its visuals start 50 below the heading. On the four domain pages the headings are at y = 416, 896, 1296 and 1706:
+Executive Overview and Sales & Profitability use their own storytelling grid below the cards (sections 6.3.1 and 6.3.2). The domain pages all follow the same four-step story, so a reader always finds the same kind of answer in the same place. Every page below the KPI cards is split into numbered sections, each opened by a section heading: a text box 1840×40 at x = 40 (copied from `p4-section-service`, named `p<N>-section-<subject>`) with "N · Title" in Segoe UI Semibold 15 pt navy and the question the section answers in 11 pt grey. The heading sits 10 below the previous section and its visuals start 50 below the heading. On the four domain pages the headings are at y = 416, 896, 1296 and 1706:
 
 | Row | y | Height | Story step | Typical layout |
 | --- | --- | --- | --- | --- |
-| A | 466 | 400 | **What is happening over time?** The main trend | Trend line (w 1220) + a supporting trend or yearly column (w 600). Shipment: 900 + 450 + 450 |
-| B | 946 | 320 | **Why / what drives it?** Drivers and mix | Three visuals 600 wide at x = 40, 660, 1280. Shipment: 1220 + 600 |
-| C | 1346 | 330 | **Where to act?** Category or region comparison | Category bar (w 600) + region table (w 1220) on Returns and Customer Satisfaction; 1220 + 600 on Shipment; four 445-wide bars on Customers & Market |
-| D | 1756 | 80 + 380 | **Which records?** Detail at the bottom | Search box (y 1756, h 80), then the full-width detail table (y 1842, h 380), ending at y = 2222. Shipment: full-width region table (1756, h 180), search box (1966), city table (2052, h 380); page height 2460 |
+| A | 466 | 400 | **What is happening over time?** The main trend | Trend line (w 1220) + a supporting trend or yearly column (w 600). Shipping & Delivery: 900 + 450 + 450 |
+| B | 946 | 320 | **Why / what drives it?** Drivers and mix | Three visuals 600 wide at x = 40, 660, 1280. Shipping & Delivery: 1220 + 600 |
+| C | 1346 | 330 | **Where to act?** Category or region comparison | Category bar (w 600) + region table (w 1220) on Returns and Customer Satisfaction; 1220 + 600 on Shipping & Delivery; four 445-wide bars on Customers & Markets |
+| D | 1756 | 80 + 380 | **Which records?** Detail at the bottom | Search box (y 1756, h 80), then the full-width detail table (y 1842, h 380), ending at y = 2222. Shipping & Delivery: full-width region table (1756, h 180), search box (1966), city table (2052, h 380); page height 2460 |
 
-Gaps between visuals are 20. Customers & Market's four row C bars sit at x = 40, 505, 970, 1435.
+Gaps between visuals are 20. Customers & Markets' four row C bars sit at x = 40, 505, 970, 1435.
 
 **Slicers.** All four are dropdowns. Each has its own sync group, so a selection carries across all seven pages.
 
@@ -492,7 +492,7 @@ Section 4 shows which tables each slicer reaches.
 
 Purpose: totals only, with no product-level detail. The page reads top to bottom as a story in three labelled sections (1 sales performance, 2 operations health, 3 category scorecard): how big is the business, is it growing and how much comes back → how hard is stock working and is the network delivering → how sales compare with last year → how turnover, stock availability and the order mix move → which category needs attention.
 
-Header extras (every page): `hdr-reset-filters` is a *Clear all slicers* button (actionButton, 1150, 28, 150×40) and `hdr-data-through` is a transparent card showing `Data Through Label` (1316, 24, 176×48).
+Header: the title text box on this page is `ce53d977703e5a68ca69` (auto-named by Desktop; same position, style and role as `hdr-title` on the other pages) and reads "Executive Overview". Header extras (every page): `hdr-reset-filters` is a *Clear all slicers* button (actionButton, 1150, 28, 150×40) and `hdr-data-through` is a transparent card showing `Data Through Label` (1316, 24, 176×48).
 
 Card subtitles: Net Sales, Net Sales YoY and Net Sales MoM have text subtitles (definition and date basis), and Transit Within 3 Days says "Diagnostic only, no promised date in the data (order date)". Gross Margin, Total Orders, Return Rate, Inventory Turnover, Stockout Rate, Fulfilled Rate and Avg Order-to-Delivery Days have **no subtitle** (a Desktop save removed their `… vs PY Label` bindings, and the unbound label measures have since been deleted).
 
@@ -506,7 +506,7 @@ Reading aids: `Net Sales YoY %` and `Net Sales MoM %` use the format string `▲
 | 1 Sales (618, 400) | `p1-line-net-sales-vs-py` | Line (w 1220) | Net Sales vs Prior Year by Month | `Net Sales` (solid navy) and `Net Sales Prior Year` (dashed grey) by `Date[Month Start]` |
 | 1 Sales | `p1-col-net-sales-yoy` | Column (w 600) | Net Sales YoY % by Year | `Net Sales YoY %` by `Date[Year]`, labels with ▲/▼, bars coloured by `Net Sales YoY Color` (green up, red down), value axis hidden. 2012 blank, 2013 is July–December only |
 | 2 Operations (1098, 300) | `p1-line-inventory-turnover` | Line | Inventory Turnover by Month | `Inventory Turnover` and `Inventory Turnover Period Average` (dashed) by `Date[Month Start]` (snapshot date) |
-| 2 Operations | `p1-line-stockout-rate` | Line | Stockout Rate by Month | `Stockout Rate` by `Date[Month Start]` (snapshot date). Delivery lead time by month is on the Delivery page |
+| 2 Operations | `p1-line-stockout-rate` | Line | Stockout Rate by Month | `Stockout Rate` by `Date[Month Start]` (snapshot date). Delivery lead time by month is on the Shipping & Delivery page |
 | 2 Operations | `p1-bar-orderstatus` | Bar | Order Share by Status | `Order Status Share` by `Orders[OrderStatus]`, sorted descending, `Total Orders` in the tooltip |
 | 3 Scorecard (1478, 252) | `p1-table-category-summary` | Table (w 1840) | Category Scorecard by Category | Category; Watch (`Category Watch Flag`: ⚠ names falling sales, stockouts or returns above the all-category rate, else ✓); Net Sales (data bars), Net Sales YoY % (▲ green / ▼ red), Gross Margin %, Inventory Turnover, Stockout Rate and Return Rate for Product Orders (red when above the all-category rate), Fulfilled Rate, Average Order-to-Delivery Days, Average Rating. Fixed column widths |
 
@@ -538,7 +538,7 @@ Reading aids: the four growth cards use the format `▲ 0.0%;▼ 0.0%;0.0%` and 
 
 The page is 2780 high and ends at y = 2758.
 
-### 6.3.3. Customers & Market (`a1f2c3d4-…5d6e`)
+### 6.3.3. Customers & Markets (`a1f2c3d4-…5d6e`)
 
 Story: how big is the customer base and are we keeping customers → who the customers are → where and how they buy → detail. Order date throughout.
 
@@ -589,7 +589,7 @@ Chart palette: the charts on this page use a softer palette set per visual (teal
 
 Header extras: the same `hdr-reset-filters` and `hdr-data-through` as Executive Overview, at the same positions.
 
-### 6.3.5. Shipment (`fcd9a8b8-…183f6a`)
+### 6.3.5. Shipping & Delivery (`fcd9a8b8-…183f6a`)
 
 Story (shipping and fulfilment manager's view), in four labelled sections: 1 shipping cost — is cost per shipment falling, and what drives the fee (basket size, category) → 2 order fulfilment — how the order-status mix moves year by year and which payment methods cancel most → 3 delivery speed — the lead-time trend and the spread of transit days → 4 region and city detail. Speed is flat in this data (about 1.5 days to ship + 4.5 in transit, the same in every region and year), so the page leads with cost and fulfilment, where the variation is. The 3-day transit share stays only as a diagnostic column in the city table.
 
@@ -652,7 +652,7 @@ Cards, coverage, mix, timing, category, region and product views use order date;
 
 ### 6.3.8. Category Tooltip (`c3e4d5f6-…6d7e`, hidden)
 
-Report-page tooltip (`type: Tooltip`, `pageBinding` Pod1, 320×240, actual size, hidden in view mode). It is not in the page tabs; it opens when the reader hovers a category on `p2-bar-yoy-category`, `p2-bar-discount-rate` (SP), `p4-bar-risk-category` (IP), `p5-bar-cost-category` (Shipment), `p6-bar-refund-category` (RQ), `p7-bar-rating-category` (CS). Every card follows the hovered category plus the page's slicers.
+Report-page tooltip (`type: Tooltip`, `pageBinding` Pod1, 320×240, actual size, hidden in view mode). It is not in the page tabs; it opens when the reader hovers a category on `p2-bar-yoy-category`, `p2-bar-discount-rate` (SP), `p4-bar-risk-category` (IP), `p5-bar-cost-category` (Shipping & Delivery), `p6-bar-refund-category` (RQ), `p7-bar-rating-category` (CS). Every card follows the hovered category plus the page's slicers.
 
 | Position | Folder | Visual | Title | Fields |
 | --- | --- | --- | --- | --- |
@@ -666,8 +666,9 @@ The final build has these known issues. They are recorded here, not fixed. Measu
 
 | Issue | Where | Effect |
 | --- | --- | --- |
-| KPI cards without a subtitle | EO: Gross Margin, Total Orders, Return Rate, Inventory Turnover, Stockout Rate, Fulfilled Rate, Order-to-Delivery Days. SP: Gross Margin. CM: Active, New and Repeat Customers. IP: Fill Rate, Stockout Rate, Days of Supply, Turnover. Shipment: `kpi-fulfillment-rate` | The last Desktop save dropped their subtitles, including most `… vs PY Label` bindings. The unbound label measures were later deleted; only `Total Orders vs PY Label` and `Inventory Value vs PY Label` remain |
+| KPI cards without a subtitle | EO: Gross Margin, Total Orders, Return Rate, Inventory Turnover, Stockout Rate, Fulfilled Rate, Order-to-Delivery Days. SP: Gross Margin. CM: Active, New and Repeat Customers. IP: Fill Rate, Stockout Rate, Days of Supply, Turnover. Shipping & Delivery: `kpi-fulfillment-rate` | The last Desktop save dropped their subtitles, including most `… vs PY Label` bindings. The unbound label measures were later deleted; only `Total Orders vs PY Label` and `Inventory Value vs PY Label` remain |
 | Hidden binding | `hdr-data-through` | `Total Orders vs PY Label` is bound only inside this hidden text visual |
+| Title visual name | Executive Overview: `ce53d977703e5a68ca69` | The page title text box doesn't follow the `hdr-title` name used on the other six pages. Behaviour is identical; rename it only if asked |
 | Filter path | Region slicer → `Inventory` | `Inventory` connects only to `Products` and the snapshot date, so the Region slicer doesn't filter inventory visuals |
 
 ## 6.5. Design Rules for Future Changes

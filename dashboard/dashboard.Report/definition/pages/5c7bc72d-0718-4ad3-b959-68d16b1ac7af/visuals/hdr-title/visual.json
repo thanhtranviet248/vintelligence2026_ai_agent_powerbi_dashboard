@@ -19,23 +19,11 @@
               {
                 "textRuns": [
                   {
-                    "value": "Inventory Performance",
+                    "value": "Inventory",
                     "textStyle": {
-                      "fontFamily": "'Segoe UI Semibold', wf_segoe-ui_semibold, helvetica, arial, sans-serif",
+                      "fontFamily": "Segoe UI Semibold",
                       "fontSize": "22pt",
-                      "color": "#FFFFFF"
-                    }
-                  }
-                ]
-              },
-              {
-                "textRuns": [
-                  {
-                    "value": "Latest monthly snapshot in the period · flows summed over snapshot months · Region slicer does not filter inventory",
-                    "textStyle": {
-                      "fontFamily": "'Segoe UI', wf_segoe-ui_normal, helvetica, arial, sans-serif",
-                      "fontSize": "10pt",
-                      "color": "#EAF2FF"
+                      "color": "#ffffff"
                     }
                   }
                 ]

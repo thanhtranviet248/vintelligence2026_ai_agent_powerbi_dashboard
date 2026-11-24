@@ -17,7 +17,7 @@ A Power BI dashboard that brings sales, customers, inventory, shipment, returns 
 
 **How it is read.** Executive Overview gives the headline. Each of the other six pages covers one domain and reads top to bottom as a short story: KPI cards → what is happening over time → what drives it → where to act → which records.
 
-**Detailed specification.** [`dashboard/DASHBOARD_INSTRUCTION.md`](dashboard/DASHBOARD_INSTRUCTION.md) defines every metric, its business rules and every visual on every page.
+**Detailed specification.** [`DASHBOARD_INSTRUCTION.md`](DASHBOARD_INSTRUCTION.md) defines every metric, its business rules and every visual on every page.
 
 ## 2. Data sources
 
@@ -52,7 +52,7 @@ The data is 13 CSV files covering orders from 2012 to 2022. Ten of them are load
 The report has **7 pages**, opening on Executive Overview, plus one hidden tooltip page.
 
 **On every page:**
-- a header with the page title, a one-line note on how to read the page, a *Data through* date and a **Reset filters** button;
+- a header with the page title (the same as the tab name), a *Data through* date and a **Reset filters** button;
 - four dropdown slicers, synced across all pages: **Reporting period** (year-month), **Product category**, **Product**, **Region**;
 - numbered section headings, each naming the question the section answers;
 - a search box above each detail table (product, promotion or city). It filters only that table.
@@ -81,7 +81,7 @@ Where do revenue, growth and margin come from?
   2. **Category and mix:** Net Sales YoY % by category; sales, profit and promotion mix by category; Net Sales by a dimension the reader picks (**Breakdown Dimension** list, which opens on Segment); discount rate by category.
   3. **Product and promotion detail:** a product profitability table (at catalog cost) and a promotion table, each with its own search box.
 
-### 3.3. Customers & Market
+### 3.3. Customers & Markets
 
 How big is the customer base, who are the customers, and how do they buy?
 
@@ -103,7 +103,7 @@ Are we filling demand, and where is stock short or excessive? The planner's view
   3. **Stock status and risk:** products by month and by category, split into Shortage risk / Excess stock / Healthy.
   4. **Category and product detail:** a category health table, inventory value by ABC class and cover band, and a **planning action** for each product (▲ Replenish / ▼ Reduce excess / ● Healthy), with excess units and excess stock value.
 
-### 3.5. Shipment
+### 3.5. Shipping & Delivery
 
 What does shipping cost, are orders fulfilled, and how fast do they arrive?
 

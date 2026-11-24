@@ -21,9 +21,9 @@
                   {
                     "value": "Customer Satisfaction",
                     "textStyle": {
-                      "fontFamily": "'Segoe UI Semibold', wf_segoe-ui_semibold, helvetica, arial, sans-serif",
+                      "fontFamily": "Segoe UI Semibold",
                       "fontSize": "22pt",
-                      "color": "#FFFFFF"
+                      "color": "#ffffff"
                     }
                   }
                 ]
@@ -31,12 +31,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Ratings, review volume, and customer experience diagnostics",
-                    "textStyle": {
-                      "fontFamily": "'Segoe UI', wf_segoe-ui_normal, helvetica, arial, sans-serif",
-                      "fontSize": "10pt",
-                      "color": "#EAF2FF"
-                    }
+                    "value": ""
                   }
                 ]
               }
