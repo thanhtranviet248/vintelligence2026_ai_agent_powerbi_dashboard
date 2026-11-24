@@ -9,7 +9,6 @@ This repo holds a Power BI e-commerce / supply-chain dashboard saved in **PBIP f
 ```
 README.md                      Project overview, pages, KPIs, assumptions (describes the final build)
 data/*.csv                     13 source CSVs (committed). The semantic model loads 10 of them.
-forecast/sample_submission.csv Placeholder for a future forecasting task — OUT OF SCOPE, don't touch
 dashboard/
   dashboard.pbip               Entry point — open this in Power BI Desktop
   DASHBOARD_INSTRUCTION.md     Metric catalogue and per-page design spec (describes the final build; §6.4 known issues)
