@@ -8,7 +8,7 @@ Ecommerce Manager (the report header reads "VinTelligence · E-commerce Performa
 
 ## 1.2. Objectives and Scope
 
-The dashboard provides an integrated view of supply chain performance and its relationship with sales and customer outcomes. It should help the Supply Chain Manager:
+The dashboard provides an integrated view of supply chain performance and its relationship with sales and customer outcomes. It should help the Ecommerce Manager:
 
 - Monitor sales, revenue, gross profit, and demand trends.
 - Compare performance across products, categories, customer segments, sales channels, and geographic markets.
@@ -442,17 +442,16 @@ Use the appropriate inactive date role explicitly for shipment, delivery, return
   | 5 | Shipment | `fcd9a8b8-…183f6a` | Fit to width | 1920×2460 |
   | 6 | Returns & Product Quality | `b2f3c4d5-…5d6e7f` | Fit to width | 1920×2240 |
   | 7 | Customer Satisfaction | `cb86d456-…1ef3` | Fit to width | 1920×2240 |
-
   | – | Category Tooltip (hidden) | `c3e4d5f6-…6d7e` | Actual size | 320×240 |
 
-  The four domain pages are 2240 high because every story step opens with a 40-high section heading and row D adds a search box (y 1756, h 80) above its detail table (y 1842); Shipment is 2460 because its row D stacks a region table, a search box and the city table. They share one storytelling grid (section 6.2).
+  Customers & Market, Returns & Product Quality and Customer Satisfaction are 2240 high because every story step opens with a 40-high section heading and row D adds a search box (y 1756, h 80) above its detail table (y 1842); Shipment is 2460 because its row D stacks a region table, a search box and the city table. They share one storytelling grid (section 6.2).
 - **Theme:** `purple-slicer`, registered as both the base theme and the custom theme. Colours come from the theme, not from per-visual formatting.
 - **Navigation:** page tabs only. There is no drill-through page, no page-navigator buttons and no bookmarks.
 - **Tooltips:** the six category bar charts (`p2-bar-yoy-category`, `p2-bar-discount-rate` (SP), `p4-bar-risk-category` (IP), `p5-bar-cost-category` (Shipment), `p6-bar-refund-category` (RQ), `p7-bar-rating-category` (CS)) use the Category Tooltip page (section 6.3.8). Every other visual shows the default tooltip plus any extra tooltip fields listed in section 6.3.
 - **Parameters:** the only parameter slicers are the two field-parameter slicers on Sales & Profitability (Trend Metric, Breakdown Dimension). No page has a what-if slicer, so Low Stock Threshold, Transit Day Threshold, Return Reduction and Minimum Reviews stay at their defaults (20, 3, 0%, 10).
 - **Reset filters:** every page has one (`hdr-reset-filters`, *Clear all slicers*), next to `hdr-data-through`.
 - **Alt text:** set on every visual except the shared header and slicers. It describes the chart type, the measure, and the dimension.
-- **Subtitles:** set on every chart and table except the header and slicers, in grey 10 pt. Some KPI cards have no subtitle (section 6.3 lists them per page). Trend axes use `Date[Month Start]`, a true date, so the axis is continuous. Each one states the date basis: "By order date", "Monthly, by ship date", "Monthly, by return date", "Monthly, by review date", "All-time", or "Latest snapshot · Region not applied" for inventory. The 3-day transit visuals add "diagnostic, not an SLA".
+- **Subtitles:** set on every chart and table except the header and slicers, in grey 10 pt. Some KPI cards have no subtitle (section 6.3 lists them per page). Trend axes use `Date[Month Start]`, a true date, so the axis is continuous. Each one states the date basis: "order date" on almost every visual, "review date" on `p7-line-sentiment-month` only, and "Snapshot month" or "Latest snapshot" plus "Region not applied" on the inventory visuals. No visual uses ship date or return date (the `… by Ship Date` / `… by Return Date` measures stay in the model unbound). Wherever the 3-day transit share appears it is labelled diagnostic, not an SLA.
 - **Report-level filters:** none.
 - **Search boxes:** every detail table has a search slicer just above it (`…-search-<field>`: a dropdown copied from `filter-3-productname` with `selfFilterEnabled` on, no sync group, w 420 h 80). Type part of a name, tick the match, and only that table filters: the page's `visualInteractions` give each search slicer **NoFilter** on every other visual. Add the same entries when adding a visual to a page with a search box.
 - **Not built from the original design:** a Diagnostics page, a Data Quality page, and scatter-chart cross-domain views.
@@ -471,12 +470,12 @@ Executive Overview and Sales and Profitability use their own storytelling grid b
 
 | Row | y | Height | Story step | Typical layout |
 | --- | --- | --- | --- | --- |
-| A | 466 | 400 | **What is happening over time?** The main trend | Trend line (w 1220) + a supporting trend or mix (w 600) |
-| B | 946 | 320 | **Why / what drives it?** Drivers and mix | Three visuals 600 wide at x = 40, 660, 1280 (or 600 + 1220, or 920 + 900) |
-| C | 1346 | 330 | **Where to act?** Category or region comparison | Parameter slicer (w 280) + chart (w 600) + table (w 920), or three 600-wide visuals |
-| D | 1756 | 380 | **Which records?** Detail at the bottom | Full-width detail table, or a slicer with cards and tables beside it. Ends at y = 2222 |
+| A | 466 | 400 | **What is happening over time?** The main trend | Trend line (w 1220) + a supporting trend or yearly column (w 600). Shipment: 900 + 450 + 450 |
+| B | 946 | 320 | **Why / what drives it?** Drivers and mix | Three visuals 600 wide at x = 40, 660, 1280. Shipment: 1220 + 600 |
+| C | 1346 | 330 | **Where to act?** Category or region comparison | Category bar (w 600) + region table (w 1220) on Returns and Customer Satisfaction; 1220 + 600 on Shipment; four 445-wide bars on Customers & Market |
+| D | 1756 | 80 + 380 | **Which records?** Detail at the bottom | Search box (y 1756, h 80), then the full-width detail table (y 1842, h 380), ending at y = 2222. Shipment: full-width region table (1756, h 180), search box (1966), city table (2052, h 380); page height 2460 |
 
-Gaps between visuals are 20. Customers & Market splits row C into four 445-wide charts (x = 40, 505, 970, 1435).
+Gaps between visuals are 20. Customers & Market's four row C bars sit at x = 40, 505, 970, 1435.
 
 **Slicers.** All four are dropdowns. Each has its own sync group, so a selection carries across all seven pages.
 
@@ -526,7 +525,7 @@ Reading aids: the four growth cards use the format `▲ 0.0%;▼ 0.0%;0.0%` and 
 | Row (y, height) | Visual (folder) | Type | Title | Content |
 | --- | --- | --- | --- | --- |
 | KPI 1 (254, 132) | `kpi-net-sales`, `kpi-gross-sales`, `kpi-total-orders`, `kpi-aov`, `kpi-promoted-sales-share`, `kpi-top20-product-share` | Cards (6) | Net Sales · Gross Sales · Total Orders · Average Order Value · Promoted Sales Share · Top 20% Product Sales Share | Measures of the same names |
-| KPI 2 (406, 132) | `kpi-net-sales-yoy`, `kpi-net-sales-mom`, `kpi-discount-rate`, `kpi-gross-profit-yoy`, `kpi-total-orders-yoy`, `kpi-gross-margin` | Cards (6) | Net Sales YoY · Net Sales MoM · Discount Rate · Gross Profit YoY · Total Orders YoY · Gross Margin % | Growth measures from `Date.tmdl`, `Discount Rate` (discount ÷ gross sales) and `Gross Margin %` |
+| KPI 2 (406, 132) | `kpi-net-sales-yoy`, `kpi-net-sales-mom`, `kpi-discount-rate`, `kpi-gross-profit-yoy`, `kpi-total-orders-yoy`, `kpi-gross-margin` | Cards (6) | Net Sales Growth YoY · Net Sales Growth MoM · Discount Rate · Gross Profit Growth YoY · Order Growth YoY · Gross Margin | Growth measures from `Date.tmdl`, `Discount Rate` (discount ÷ gross sales) and `Gross Margin %` |
 | Section labels (568, 1448, 2188; h 40) | `p2-section-sales-trend`, `p2-section-category-mix`, `p2-section-product-promotion` | Text boxes (w 1840, h 40, copied from `p4-section-service`) | 1 · Sales trend and growth · 2 · Category and mix · 3 · Product and promotion detail | Heading plus the question the section answers; alt text set |
 | 1 Trend (618, 400) | `p2-line-net-sales-vs-py` | Line (w 1220) | Net Sales vs Prior Year by Month | `Net Sales` (solid navy) and `Net Sales Prior Year` (dashed grey) by `Date[Month Start]` |
 | 1 Trend | `p2-col-growth-yoy` | Column (w 600) | Net Sales, Gross Profit and Order Growth YoY by Year | `Net Sales YoY %` (navy), `Gross Profit YoY %` (teal), `Total Orders YoY %` (grey) by `Date[Year]`. Legend on top, no data labels (values in the tooltip) |
@@ -538,7 +537,7 @@ Reading aids: the four growth cards use the format `▲ 0.0%;▼ 0.0%;0.0%` and 
 | 2 Mix | `p2-slicer-breakdown` | Slicer (list, single select) | Breakdown Dimension | Field parameter `Breakdown Dimension`: Category, Segment, Size, Color, Region, City, District, Promotion Type. Opens on Segment |
 | 2 Mix | `p2-bar-discount-rate` | Bar (w 600) | Discount Rate by Category | `Discount Rate` by Category, value axis hidden (data labels) |
 | 3 Detail (2238, 80) | `p2-search-product`, `p2-search-promotion` | Search slicers (w 420) | Search product (filters the profitability table) · Search promotion (filters the promotion table) | `Products[ProductName]` and `Promotions[PromoName]`, each filtering only the table below it |
-| 3 Detail (2324, 434) | `p2-detail-profitability` | Table (w 1005) | Catalog-Cost Profitability Estimate (Not Historical Cost) | Category, ProductName; Gross Sales, Discount Amount, Net Sales, COGS, Gross Profit, Gross Margin % |
+| 3 Detail (2324, 434) | `p2-detail-profitability` | Table (w 1005) | Catalog-Cost Profitability Estimate (Not Historical Cost) | ProductName, Category; Gross Sales, Discount Amount, Net Sales, COGS, Gross Profit, Gross Margin % |
 | 3 Detail | `p2-table-promotion` | Table (w 815) | Sales, Discount, and Margin by Promotion | PromoType, PromoName; Net Sales, Discount Amount, Discount Rate, Units Sold, Gross Margin %. Sorted by Net Sales. The blank row is lines with no promotion |
 
 The page is 2780 high and ends at y = 2758.
@@ -585,7 +584,7 @@ Story (planner's view), in four labelled sections: 1 service level — are we fi
 | 3 Risk | `p4-bar-risk-category` | Stacked bar (x 1280, w 600) | Products by Category and Stock Risk | `Products in Snapshot` by `Products[Category]`, stacked by `Inventory[Stock Risk]`, sorted by products descending. Its subtitle invites the reader to hover for the Category Tooltip (section 6.3.8) |
 | 4 Detail (2378, 400) | `p4-table-category` | Table (x 40, w 1220) | Inventory Health by Category | Category; Inventory Value (data bars), Days of Supply, Inventory Turnover, Fill Rate (Latest), Stockout Rate (red when above the all-category rate, `Stockout Rate Color`), Excess Value Share. Sorted by Inventory Value descending |
 | 4 Detail | `p4-bar-abc-cover-band` | Stacked bar (x 1280, w 600) | Inventory Value by ABC Class and Cover Band | `Inventory Value` by `Products[ABC Class]`, stacked by `Inventory[Cover Band]` (same band colours); tooltips `Products in Snapshot`, `Days of Supply` |
-| 4 Detail (2798, 80) | `p4-search-product` | Search slicer (x 40, w 420, above the table) | Search product (filters the planning table) | `Inventory[ProductName]` |
+| 4 Detail (2798, 80) | `p4-search-product` | Search slicer (x 40, w 420, above the table) | Search product | `Inventory[ProductName]` |
 | 4 Detail (2898, 520) | `p4-detail-stock` | Table (w 1840) | Planning Actions by Product | Category, ProductName, ABC Class; `Planning Action` (▲ Replenish / ▼ Reduce excess / ● Healthy, coloured by `Planning Action Color`), `Stock Status`, Current Stock, `Units Sold (Latest Month)`, `Days of Supply`, `Stockout Days (Latest)`, `Fill Rate (Latest)`, `Excess Units`, `Excess Stock Value` (data bars). One row per product at its latest snapshot, sorted by Excess Stock Value descending |
 
 Cover bands, ABC classes and planning actions: `Inventory[Cover Band]` buckets each snapshot row by the source `DaysOfSupply` (Under 30, 30–90, 90–180, 180–365, Over 365 days; blank when the source is blank), sorted by the hidden `Cover Band Order`. `Inventory[Stock Risk]` (sorted by hidden `Stock Risk Order`) applies the Planning Action rule per snapshot row: Shortage risk at ≤ 20 units or under 30 days of cover (`StockOnHand ÷ UnitsSold × 30`), Excess stock when overstock-flagged and `StockOnHand > 3 × UnitsSold`, otherwise Healthy; `Shortage-Risk Products` / `Excess-Stock Products` count products by it at the latest snapshot (0, not blank, when none) and `… Product Share` divides by `Products in Snapshot`. `Products[ABC Class]` ranks products by usage at cost (`UnitsSold × COGS`) over the last 12 snapshot months: A is the first 80% of cumulative usage, B the next 15%, C the rest, and *No recent sales* has no usage. `Planning Action` is ▲ Replenish when stock is at or below the low-stock threshold (20 units) or covers under 30 days (a product with no units sold has no cover and is not counted as short), ▼ Reduce excess when `Excess Units` > 0, otherwise ● Healthy; it is blank above product level. The low-stock cards and the low-stock threshold slicer were removed; `Low Stock Threshold Value` uses its default of 20 units.
@@ -600,7 +599,7 @@ Story (shipping and fulfilment manager's view), in four labelled sections: 1 shi
 
 | Row (y, height) | Visual (folder) | Type | Title | Content |
 | --- | --- | --- | --- | --- |
-| KPI (254, 132) | `kpi-shipment-cost`, `kpi-cost-per-shipment`, `kpi-premium-fee-share`, `kpi-fulfillment-rate`, `kpi-cancellation-rate`, `kpi-order-to-delivery-days` | Cards (6, w 290) | Shipment Cost · Shipment Cost per Shipment · Premium-Fee Shipments · Fulfilled Rate · Cancellation Rate · Average Order-to-Delivery Days | Measures of the same names (order date); Fulfilled Rate is the same measure as on Executive Overview (folder still `kpi-fulfillment-rate`, no subtitle, stale alt text). The order-to-delivery card subtitle is `Lead Time Split Label` (days to ship + days in transit); the other four cards have text subtitles |
+| KPI (254, 132) | `kpi-shipment-cost`, `kpi-cost-per-shipment`, `kpi-premium-fee-share`, `kpi-fulfillment-rate`, `kpi-cancellation-rate`, `kpi-order-to-delivery-days` | Cards (6, w 290) | Shipment Cost · Shipment Cost per Shipment · Premium-Fee Shipments · Fulfilled Rate · Cancellation Rate · Average Order-to-Delivery Days | Measures of the same names (order date); Fulfilled Rate is the same measure as on Executive Overview (folder `kpi-fulfillment-rate`, no subtitle). The order-to-delivery card subtitle is `Lead Time Split Label` (days to ship + days in transit); the other four cards have text subtitles |
 | Section labels (416, 896, 1296, 1706; h 40) | `p5-section-shipping-cost`, `p5-section-fulfilment`, `p5-section-delivery-speed`, `p5-section-region-city` | Text boxes (w 1840, h 40, copied from `p4-section-service`) | 1 · Shipping cost · 2 · Order fulfilment · 3 · Delivery speed · 4 · Region and city detail | Heading plus the question the section answers; alt text set |
 | 1 Cost (466, 400) | `p5-line-cost-premium` | Line (x 40, w 900) | Cost per Shipment and Premium-Fee Share by Month | `Shipment Cost per Shipment` (soft blue) and, on the secondary axis, `Premium-Fee Shipment Share` (soft orange) by `Date[Month Start]` (order date) |
 | 1 Cost | `p5-bar-cost-basket` | Bar (x 960, w 450) | Cost per Shipment by Basket Size | `Shipment Cost per Shipment` by `Orders[Basket Size]` (1 unit … 11+ units, sorted by `Basket Size Order`); tooltips `Shipment Records`, `Premium-Fee Shipment Share` |
@@ -611,7 +610,7 @@ Story (shipping and fulfilment manager's view), in four labelled sections: 1 shi
 | 3 Speed | `p5-col-transit-days` | Column (x 1280, w 600) | Shipments by Transit Days | `Shipment Records` by `Shipments[Transit Days]` |
 | 4 Detail (1756, 180) | `p5-table-cost-region` | Table (w 1840) | Shipping Cost and Fulfilment by Region | Region; Shipment Records, Shipment Cost, Shipment Cost per Shipment, Premium-Fee Shipment Share, Shipment Cost % of Net Sales, Fulfilled Rate, Cancellation Rate, Average Order-to-Delivery Days |
 | 4 Detail (1966, 80) | `p5-search-city` | Search slicer (w 420) | Search city (filters the table below) | `Geography[City]` |
-| 4 Detail (2052, 380) | `p5-detail-city` | Table (w 1840) | Delivery Lead Time by City | Region, City; Shipment Records, Shipment Cost per Shipment, Premium-Fee Shipment Share, Average Days to Ship, Average Transit Time, Average Order-to-Delivery Days, Transit Within 3 Days (diagnostic) |
+| 4 Detail (2052, 380) | `p5-detail-city` | Table (w 1840) | Delivery Lead Time by City | Region, City; Shipment Records, Shipment Cost per Shipment, Premium-Fee Shipment Share, Average Days to Ship, Average Transit Time (column header on `Average Delivery Time`), Average Order-to-Delivery Days, Transit Within 3 Days (diagnostic) |
 
 Every visual uses order date. Shipment measures respond to Region, status, and product through the order (section 4). `Premium-Fee Shipment Share` counts shipments with `ShippingFee >= 10`: fees fall into two tiers (about $0–3 and $20–32), so $10 separates them. `Cancellation Rate` is cancelled orders ÷ `Total Orders`. `Orders[Basket Size]` bands the units in each order (sum of `OrderItems[Quantity]`, computed in the hidden `Basket Size Order` with `ALLEXCEPT(Orders, Orders[OrderID])` to avoid a circular dependency). The `Transit Day Threshold` parameter and the `… by Ship Date` measures stay in the model but no visual uses them.
 
