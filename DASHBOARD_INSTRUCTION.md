@@ -22,14 +22,14 @@ Inventory reporting is limited to the frequency of the available snapshots. Mont
 
 ## 1.3. Key Business Questions
 
-Sales and profitability: Track units sold, order volume, gross sales, discounts, net sales, COGS, gross profit, and gross margin over time. Key questions include:
+Sales & Profitability: Track units sold, order volume, gross sales, discounts, net sales, COGS, gross profit, and gross margin over time. Key questions include:
 
 - Which products, categories, channels, and customer segments generate the most revenue and gross profit?
 - Where are sales or margins improving or declining?
 - How do discount levels and promotional activity relate to sales volume and profitability?
 - Are changes in revenue associated with changes in order volume, average order value, or product mix?
 
-Customers and market performance: Evaluate customer purchasing activity and commercial performance across customer segments, acquisition channels, sales channels, and geographic markets. Key questions include:
+Customers & Markets: Evaluate customer purchasing activity and commercial performance across customer segments, acquisition channels, sales channels, and geographic markets. Key questions include:
 
 - Which customer segments, regions, and cities contribute the most customers, orders, and revenue?
 - Which segments or markets are growing or declining?
@@ -39,7 +39,7 @@ Customers and market performance: Evaluate customer purchasing activity and comm
 
 Customer acquisition channel and order sales channel should remain separate: one describes how the customer was acquired, while the other describes where an order was placed.
 
-Inventory performance: Monitor stock availability, stock receipts, sales movement, and fulfillment indicators at the product and inventory-snapshot level. Key questions include:
+Inventory: Monitor stock availability, stock receipts, sales movement, and fulfillment indicators at the product and inventory-snapshot level. Key questions include:
 
 - Which products are out of stock, below the low-stock threshold, or flagged for replenishment?
 - Which products have excess inventory or low sales movement?
@@ -48,7 +48,7 @@ Inventory performance: Monitor stock availability, stock receipts, sales movemen
 - Which products require investigation because inventory availability may be constraining sales?
 - Potential lost sales should not be presented as a measured value unless unmet demand or another approved estimation method is available.
 
-Delivery and logistics performance: Track order progression from placement through shipment and delivery. Key questions include:
+Shipping & Delivery: Track order progression from placement through shipment and delivery. Key questions include:
 
 - How long does it take to dispatch and deliver orders?
 - What proportion of orders have been shipped, delivered, cancelled, or remain open?
@@ -57,7 +57,7 @@ Delivery and logistics performance: Track order progression from placement throu
 - How do delivery performance and shipping charges relate to returns and customer ratings?
 - A long delivery lead time does not automatically mean a delivery is late. Identifying late deliveries requires a promised delivery date or an agreed service-level target.
 
-Returns and product quality: Track returned quantities, refund values, return rates, and return reasons. Key questions include:
+Returns & Product Quality: Track returned quantities, refund values, return rates, and return reasons. Key questions include:
 
 - Which products and categories have the highest return rates and refund values?
 - What reasons are most frequently recorded for returns?
@@ -66,7 +66,7 @@ Returns and product quality: Track returned quantities, refund values, return ra
 - How much do refunds reduce revenue after discounts?
 - Return reasons should be used to distinguish potential product-quality issues from delivery problems, customer preference, or other causes.
 
-Customer satisfaction: Review product ratings and written feedback alongside sales, delivery, and return performance. Key questions include:
+Customer Satisfaction: Review product ratings and written feedback alongside sales, delivery, and return performance. Key questions include:
 
 - Which products receive consistently high or low ratings?
 - How do ratings change over time?
@@ -89,7 +89,7 @@ The tables below describe the semantic model **as built**. Formulas are the DAX 
 
 **Not built:** the model has no measure for it. Usually a required field (for example a promised delivery date) or a business rule is missing.
 
-Page abbreviations (page tab name, which is also the header title, then the metric domain of sections 2.3–2.8 in brackets): **EO** Executive Overview · **SP** Sales & Profitability (Sales and Profitability) · **CM** Customers & Markets (Customers and Market Performance) · **IP** Inventory (Inventory Performance) · **DL** Shipping & Delivery (Delivery and Logistics) · **RQ** Returns & Product Quality (Returns and Product Quality) · **CS** Customer Satisfaction.
+Page abbreviations (each is the page tab name, which is also the header title; sections 2.3–2.8 are named after the same pages): **EO** Executive Overview · **SP** Sales & Profitability · **CM** Customers & Markets · **INV** Inventory · **SD** Shipping & Delivery · **RQ** Returns & Product Quality · **CS** Customer Satisfaction.
 
 ## 2.2. Common Calculation Rules
 
@@ -117,7 +117,7 @@ Page abbreviations (page tab name, which is also the header title, then the metr
 
 **Missing data:** Exclude invalid records from calculations where necessary, but report missing dates, missing costs, and unmatched records as data-quality exceptions.
 
-## 2.3. Sales and Profitability Metrics
+## 2.3. Sales & Profitability Metrics
 
 The sales measures don't apply an order-status filter. They count every order line and order in context, whatever the status (see `Total Orders`). The model has no data-quality exclusions for invalid quantities, prices, or dates. Sales trends use the order date.
 
@@ -128,7 +128,7 @@ The sales measures don't apply an order-status filter. They count every order li
 | Net Sales | Gross sales less discounts, before refunds | `[Gross Sales] - [Discount Amount]` | order_items.csv | Built `Net Sales`: EO, SP, CM |
 | Discount Rate | Discount value as a share of gross sales | `DIVIDE([Discount Amount], [Gross Sales])` | order_items.csv | Built `Discount Rate`: SP |
 | Units Sold | Quantity on order lines | `SUM(OrderItems[Quantity])` | order_items.csv | Built `Units Sold`: SP |
-| Total Orders | Distinct orders | `DISTINCTCOUNT(Orders[OrderID])` with `CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH)`, so product filters reach it. All statuses, no eligibility filter. The only status-specific count is `Delivered Orders` | orders.csv | Built (differs): no eligible-order rule. EO, SP, CM, DL |
+| Total Orders | Distinct orders | `DISTINCTCOUNT(Orders[OrderID])` with `CROSSFILTER(OrderItems[OrderID], Orders[OrderID], BOTH)`, so product filters reach it. All statuses, no eligibility filter. The only status-specific count is `Delivered Orders` | orders.csv | Built (differs): no eligible-order rule. EO, SP, CM, SD |
 | Average Order Value (AOV) | Net sales per order | `DIVIDE([Net Sales], [Total Orders])` | orders.csv, order_items.csv | Built `Average Order Value`: SP, CM (by payment method) |
 | COGS | Cost of units sold at **current catalog cost** | `SUMX(OrderItems, Quantity * RELATED(Products[COGS]))` | order_items.csv, products.csv | Built `COGS`: SP (titled as a catalog-cost estimate) |
 | Gross Profit | Net sales less COGS | `[Net Sales] - [COGS]` | order_items.csv, products.csv | Built `Gross Profit`: SP |
@@ -149,7 +149,7 @@ All growth measures use the order date and compare like-for-like days: each date
 
 `Date[Year]` (a whole-number column) is the axis for the yearly growth columns. 2012 is blank and 2013 covers only July–December, because those are the only 2013 dates with a 2012 match.
 
-## 2.4. Customers and Market Performance Metrics
+## 2.4. Customers & Markets Metrics
 
 | Metric | Definition / requirement | Formula / logic (as built) | Source | Status |
 | --- | --- | --- | --- | --- |
@@ -165,23 +165,23 @@ All growth measures use the order date and compare like-for-like days: each date
 | Sales by Channel | Buying behaviour by payment method, order source, and device type | `[Average Order Value]` by `Orders[PaymentMethod]`, `[Net Sales]` by `Orders[OrderSource]`, `[Order Frequency]` by `Orders[DeviceType]`, each with `[Total Orders]` in the tooltip | orders.csv, order_items.csv | Built as visuals: CM |
 | Customer KPI measures | Card values that fall back to the latest 12 months when no date is filtered (all-time New Customers would equal every customer, and the all-time period repeat rate is blank) | `Active Customers KPI`, `New Customers KPI`, `Repeat Customer Rate KPI` (Orders), `Revenue per Active Customer KPI` (OrderItems); `Repeat Customer Rate Period Average` draws the dashed average line | orders.csv, order_items.csv | Built: CM |
 
-## 2.5. Inventory Performance Metrics
+## 2.5. Inventory Metrics
 
 Inventory measures use the product-by-month-end snapshot grain. Stock balances take the latest snapshot in context (`VAR LatestSnapshot = MAX(Inventory[SnapshotDate])`) and never sum across dates. Inventory is related to `Products` and, through `Inventory[SnapshotDate]`, to `Date` (see section 4). The Reporting-period slicer filters it by snapshot date. The Region slicer doesn't reach it. "Current" therefore means the latest snapshot inside the selected period. The model doesn't display the snapshot date it used.
 
 | Metric | Definition | Formula / logic (as built) | Source | Status |
 | --- | --- | --- | --- | --- |
-| Current Stock | Units on hand at the latest snapshot | Sum of `StockOnHand` where `SnapshotDate = LatestSnapshot` | inventory.csv | Built `Current Stock`: IP |
-| Inventory Value | Latest-snapshot stock valued at catalog price | `SUMX` of `StockOnHand * RELATED(Products[Price])` at `LatestSnapshot` | inventory.csv, products.csv | Built `Inventory Value`: IP |
-| Inbound Stock / Outbound Stock | Units received / sold in the snapshot records | `SUM(Inventory[UnitsReceived])` / `SUM(Inventory[UnitsSold])` across the rows in context | inventory.csv | Built `Inbound Stock`, `Outbound Stock`: IP |
-| Low Stock | A product at or below the low-stock threshold at the latest snapshot. The threshold comes from the Low Stock Threshold parameter; no page has its slicer, so it stays at the default of 20 | `StockOnHand <= [Low Stock Threshold Value]` at `LatestSnapshot`, tested inside `Stock Status` and `Planning Action` (there is no separate low-stock count). Stock on hand never falls below 3 in the data, so no product is ever out of stock | inventory.csv | Built inside `Stock Status`, `Planning Action`: IP. `Products in Snapshot` is the denominator of the IP share measures and appears in the IP category scorecard |
-| Stockout Rate | Share of products flagged stockout at the latest snapshot. The flag means at least one stockout day in the snapshot month, not zero stock | `DIVIDE(SUM(Inventory[StockoutFlag]), COUNTROWS(Inventory))` where `SnapshotDate = LatestSnapshot` | inventory.csv | Built `Stockout Rate`: EO, IP (`Stockout Rate Color` marks above-average rows red in the scorecards). `Category Stockout Rate` (same measure with the `Inventory[Stock Risk]` filter removed): Category Tooltip |
-| Inventory Turnover | Annualised cost of goods sold over average stock at cost | `DIVIDE(SUMX(Inventory, UnitsSold * RELATED(Products[COGS])), AVERAGEX(VALUES(SnapshotDate), stock at cost)) * DIVIDE(12, snapshot count)`. Stock is averaged across the snapshots in context, never summed. Over all data it is about 1.1×, falling from about 3.1× in 2012 to 0.6–0.7× in 2020–2022 | inventory.csv, products.csv | Built `Inventory Turnover`: EO, IP (`Inventory Turnover Period Average` draws the average line) |
-| Stockout Days, Days of Supply, Fill Rate, Reorder Flag | Source values per product and snapshot; Days of Supply is recomputed from units | `Stockout Days (Latest)` and `Fill Rate (Latest)` (average) at the latest snapshot. `Days of Supply` is weighted: `DIVIDE(SUM(StockOnHand), SUM(UnitsSold)) * 30` at `LatestSnapshot`; `Units Sold (Latest Month)` is `SUM(UnitsSold)` there. `ReorderFlag` is 0 on every source row and is not used | inventory.csv | Built: IP |
-| Overstock | Products carrying the source `overstock_flag` (column `OverstockFlag`, hidden) at the latest snapshot. About 80% of products are flagged at the last snapshot, and many are also flagged stockout in the same month | `Excess Units` (stock above 90 days of cover: `StockOnHand − 3 × UnitsSold`, floored at 0, flagged products only), `Excess Stock Value` (excess units × list price, as Inventory Value), `Excess Value Share` (÷ `Inventory Value`). In the source, the flag is set exactly when `days_of_supply > 90`, and `days_of_supply = stock_on_hand ÷ units_sold × 30`; so the flag covers a product's whole stock, and the excess measures count only the part above the 90-day line. The snapshot is fixed before the flag filter. `Excess-Stock Products` and `Shortage-Risk Products` count products at the latest snapshot by `Inventory[Stock Risk]`; their `… Label` measures (and `Excess Value Share Label`) are the IP card subtitles, and read `Excess-Stock Product Share` / `Shortage-Risk Product Share` (÷ `Products in Snapshot`) | inventory.csv, products.csv | Built `Excess-Stock Products`, `Shortage-Risk Products`, `Excess Units`, `Excess Stock Value`, `Excess Value Share`: IP. The two `… Product Share` measures are helpers of the labels |
-| Cover Band, ABC Class, Planning Action | Planning segmentation (section 6.3.4) | Calculated columns `Inventory[Cover Band]` (+ hidden `Cover Band Order`), `Inventory[Stock Risk]` (+ hidden `Stock Risk Order`) and `Products[ABC Class]`; measures `Planning Action` (+ hidden `Planning Action Color`), `Stock Status` (▼ Low stock / ! Stockout days / OK, + `Stock Status Color`) and `Stock Flow Label` (Units on Hand card subtitle) | inventory.csv, products.csv | Built: IP |
+| Current Stock | Units on hand at the latest snapshot | Sum of `StockOnHand` where `SnapshotDate = LatestSnapshot` | inventory.csv | Built `Current Stock`: INV |
+| Inventory Value | Latest-snapshot stock valued at catalog price | `SUMX` of `StockOnHand * RELATED(Products[Price])` at `LatestSnapshot` | inventory.csv, products.csv | Built `Inventory Value`: INV |
+| Inbound Stock / Outbound Stock | Units received / sold in the snapshot records | `SUM(Inventory[UnitsReceived])` / `SUM(Inventory[UnitsSold])` across the rows in context | inventory.csv | Built `Inbound Stock`, `Outbound Stock`: INV |
+| Low Stock | A product at or below the low-stock threshold at the latest snapshot. The threshold comes from the Low Stock Threshold parameter; no page has its slicer, so it stays at the default of 20 | `StockOnHand <= [Low Stock Threshold Value]` at `LatestSnapshot`, tested inside `Stock Status` and `Planning Action` (there is no separate low-stock count). Stock on hand never falls below 3 in the data, so no product is ever out of stock | inventory.csv | Built inside `Stock Status`, `Planning Action`: INV. `Products in Snapshot` is the denominator of the INV share measures and appears in the INV category scorecard |
+| Stockout Rate | Share of products flagged stockout at the latest snapshot. The flag means at least one stockout day in the snapshot month, not zero stock | `DIVIDE(SUM(Inventory[StockoutFlag]), COUNTROWS(Inventory))` where `SnapshotDate = LatestSnapshot` | inventory.csv | Built `Stockout Rate`: EO, INV (`Stockout Rate Color` marks above-average rows red in the scorecards). `Category Stockout Rate` (same measure with the `Inventory[Stock Risk]` filter removed): Category Tooltip |
+| Inventory Turnover | Annualised cost of goods sold over average stock at cost | `DIVIDE(SUMX(Inventory, UnitsSold * RELATED(Products[COGS])), AVERAGEX(VALUES(SnapshotDate), stock at cost)) * DIVIDE(12, snapshot count)`. Stock is averaged across the snapshots in context, never summed. Over all data it is about 1.1×, falling from about 3.1× in 2012 to 0.6–0.7× in 2020–2022 | inventory.csv, products.csv | Built `Inventory Turnover`: EO, INV (`Inventory Turnover Period Average` draws the average line) |
+| Stockout Days, Days of Supply, Fill Rate, Reorder Flag | Source values per product and snapshot; Days of Supply is recomputed from units | `Stockout Days (Latest)` and `Fill Rate (Latest)` (average) at the latest snapshot. `Days of Supply` is weighted: `DIVIDE(SUM(StockOnHand), SUM(UnitsSold)) * 30` at `LatestSnapshot`; `Units Sold (Latest Month)` is `SUM(UnitsSold)` there. `ReorderFlag` is 0 on every source row and is not used | inventory.csv | Built: INV |
+| Overstock | Products carrying the source `overstock_flag` (column `OverstockFlag`, hidden) at the latest snapshot. About 80% of products are flagged at the last snapshot, and many are also flagged stockout in the same month | `Excess Units` (stock above 90 days of cover: `StockOnHand − 3 × UnitsSold`, floored at 0, flagged products only), `Excess Stock Value` (excess units × list price, as Inventory Value), `Excess Value Share` (÷ `Inventory Value`). In the source, the flag is set exactly when `days_of_supply > 90`, and `days_of_supply = stock_on_hand ÷ units_sold × 30`; so the flag covers a product's whole stock, and the excess measures count only the part above the 90-day line. The snapshot is fixed before the flag filter. `Excess-Stock Products` and `Shortage-Risk Products` count products at the latest snapshot by `Inventory[Stock Risk]`; their `… Label` measures (and `Excess Value Share Label`) are the INV card subtitles, and read `Excess-Stock Product Share` / `Shortage-Risk Product Share` (÷ `Products in Snapshot`) | inventory.csv, products.csv | Built `Excess-Stock Products`, `Shortage-Risk Products`, `Excess Units`, `Excess Stock Value`, `Excess Value Share`: INV. The two `… Product Share` measures are helpers of the labels |
+| Cover Band, ABC Class, Planning Action | Planning segmentation (section 6.3.4) | Calculated columns `Inventory[Cover Band]` (+ hidden `Cover Band Order`), `Inventory[Stock Risk]` (+ hidden `Stock Risk Order`) and `Products[ABC Class]`; measures `Planning Action` (+ hidden `Planning Action Color`), `Stock Status` (▼ Low stock / ! Stockout days / OK, + `Stock Status Color`) and `Stock Flow Label` (Units on Hand card subtitle) | inventory.csv, products.csv | Built: INV |
 
-## 2.6. Delivery and Logistics Performance Metrics
+## 2.6. Shipping & Delivery Metrics
 
 Transit time is a measured elapsed duration. It is not, by itself, proof that an order was late. A true late-delivery KPI requires a promised delivery date or an approved service-level target. The 3-day rule below is therefore a diagnostic threshold, and the report labels it "(Diagnostic)".
 
@@ -189,21 +189,21 @@ Transit time is a measured elapsed duration. It is not, by itself, proof that an
 
 | Metric | Definition / requirement | Formula / logic (as built) | Source | Status |
 | --- | --- | --- | --- | --- |
-| Shipment Cost | Total recorded shipping fees | `SUM(Shipments[ShippingFee])` | shipments.csv | Built `Shipment Cost`: DL (card, region table) |
-| Shipment Records | Distinct orders with a shipment row | `DISTINCTCOUNT(Shipments[OrderID])` | shipments.csv | Built `Shipment Records`: DL |
-| Fulfilled Rate | Orders with status delivered, paid, or returned as a share of non-cancelled orders | `DIVIDE(CALCULATE([Total Orders], KEEPFILTERS(Orders[OrderStatus] IN {"delivered", "paid", "returned"})), CALCULATE([Total Orders], KEEPFILTERS(Orders[OrderStatus] <> "cancelled")))` | orders.csv | Built `Fulfilled Rate` (in the `Shipments` table): EO, DL |
-| Average Transit Time | Average days from ship to delivery for valid delivered shipments | `AVERAGEX` of `DATEDIFF(ShipDate, DeliveryDate, DAY)` where both dates are present and delivery ≥ ship | shipments.csv | Built `Average Delivery Time`: DL (lead-time line; the city table shows it under the header "Average Transit Time") |
-| Transit Within 3 Days | Delivered shipments completed within 3 days (diagnostic) | Shipments with transit ≤ 3 days divided by `Delivered Shipments` (helper: shipments with both dates and delivery ≥ ship) | shipments.csv | Built `Transit Within 3 Days`: EO, DL |
+| Shipment Cost | Total recorded shipping fees | `SUM(Shipments[ShippingFee])` | shipments.csv | Built `Shipment Cost`: SD (card, region table) |
+| Shipment Records | Distinct orders with a shipment row | `DISTINCTCOUNT(Shipments[OrderID])` | shipments.csv | Built `Shipment Records`: SD |
+| Fulfilled Rate | Orders with status delivered, paid, or returned as a share of non-cancelled orders | `DIVIDE(CALCULATE([Total Orders], KEEPFILTERS(Orders[OrderStatus] IN {"delivered", "paid", "returned"})), CALCULATE([Total Orders], KEEPFILTERS(Orders[OrderStatus] <> "cancelled")))` | orders.csv | Built `Fulfilled Rate` (in the `Shipments` table): EO, SD |
+| Average Transit Time | Average days from ship to delivery for valid delivered shipments | `AVERAGEX` of `DATEDIFF(ShipDate, DeliveryDate, DAY)` where both dates are present and delivery ≥ ship | shipments.csv | Built `Average Delivery Time`: SD (lead-time line; the city table shows it under the header "Average Transit Time") |
+| Transit Within 3 Days | Delivered shipments completed within 3 days (diagnostic) | Shipments with transit ≤ 3 days divided by `Delivered Shipments` (helper: shipments with both dates and delivery ≥ ship) | shipments.csv | Built `Transit Within 3 Days`: EO, SD |
 | Late Delivery Rate | Shipments delivered after a promised date | – | needs a promised-date / SLA field | Not built (no promised date in source) |
-| Order-to-Delivery Lead Time | Days from order date to delivery, and its first leg (order to ship) | `Average Days to Ship` = `AVERAGE(Shipments[Days to Ship])`. `Average Order-to-Delivery Days` = average of `Days to Ship + Transit Days` over shipments where both are present. Both use the order-level `CROSSFILTER`. `Lead Time Split Label` (DL card subtitle) splits the total into days to ship and days in transit | orders.csv, shipments.csv | Built `Average Order-to-Delivery Days`: EO, DL. `Average Days to Ship`, `Lead Time Split Label`: DL |
-| Shipping Cost Ratios | Fee per shipped order, and fees as a share of the net sales of the same orders | `DIVIDE([Shipment Cost], [Shipment Records])`. `Shipment Cost % of Net Sales` divides by `[Net Sales]` restricted (`TREATAS`) to orders with a shipment record. The fee belongs to the whole order, so read the percentage without product filters | shipments.csv, order_items.csv | Built `Shipment Cost per Shipment`, `Shipment Cost % of Net Sales`: DL |
-| Premium-Fee Shipment Share | Share of shipments with a fee of 10 or more | `DIVIDE(CALCULATE([Shipment Records], KEEPFILTERS(Shipments[ShippingFee] >= 10)), [Shipment Records])` | shipments.csv | Built: DL |
-| Cancellation Rate | Cancelled orders as a share of all orders | `DIVIDE(CALCULATE([Total Orders], KEEPFILTERS(Orders[OrderStatus] = "cancelled")), [Total Orders])`, shown by `Orders[PaymentMethod]` | orders.csv | Built: DL |
-| Order Status Share | Share of orders by source order status | `DIVIDE([Total Orders], CALCULATE([Total Orders], ALL(Orders[OrderStatus])))` by `Orders[OrderStatus]` | orders.csv | Built: EO (bar), DL (column by `Date[Year]` × status) |
+| Order-to-Delivery Lead Time | Days from order date to delivery, and its first leg (order to ship) | `Average Days to Ship` = `AVERAGE(Shipments[Days to Ship])`. `Average Order-to-Delivery Days` = average of `Days to Ship + Transit Days` over shipments where both are present. Both use the order-level `CROSSFILTER`. `Lead Time Split Label` (SD card subtitle) splits the total into days to ship and days in transit | orders.csv, shipments.csv | Built `Average Order-to-Delivery Days`: EO, SD. `Average Days to Ship`, `Lead Time Split Label`: SD |
+| Shipping Cost Ratios | Fee per shipped order, and fees as a share of the net sales of the same orders | `DIVIDE([Shipment Cost], [Shipment Records])`. `Shipment Cost % of Net Sales` divides by `[Net Sales]` restricted (`TREATAS`) to orders with a shipment record. The fee belongs to the whole order, so read the percentage without product filters | shipments.csv, order_items.csv | Built `Shipment Cost per Shipment`, `Shipment Cost % of Net Sales`: SD |
+| Premium-Fee Shipment Share | Share of shipments with a fee of 10 or more | `DIVIDE(CALCULATE([Shipment Records], KEEPFILTERS(Shipments[ShippingFee] >= 10)), [Shipment Records])` | shipments.csv | Built: SD |
+| Cancellation Rate | Cancelled orders as a share of all orders | `DIVIDE(CALCULATE([Total Orders], KEEPFILTERS(Orders[OrderStatus] = "cancelled")), [Total Orders])`, shown by `Orders[PaymentMethod]` | orders.csv | Built: SD |
+| Order Status Share | Share of orders by source order status | `DIVIDE([Total Orders], CALCULATE([Total Orders], ALL(Orders[OrderStatus])))` by `Orders[OrderStatus]` | orders.csv | Built: EO (bar), SD (column by `Date[Year]` × status) |
 
 No measure uses the delivery-date role yet (`Shipments[DeliveryDate]` → `Date` is inactive and unused). The lead-time measures read the calculated columns `Shipments[Transit Days]` and `Shipments[Days to Ship]` and follow the order date.
 
-## 2.7. Returns and Product Quality Metrics
+## 2.7. Returns & Product Quality Metrics
 
 All return measures follow the order-date path through `Returns[OrderID] → Orders`; none uses the return-date role. The page rates are the closed-window variants (see below), so the latest month isn't under-counted.
 
@@ -247,7 +247,7 @@ Cross-domain views are exploratory comparisons, not causal models. The report ha
 | Diagnostic | Requirement / definition | As built | Status |
 | --- | --- | --- | --- |
 | Sales and Order Trend | Value, volume, and units over equivalent periods | EO shows Net Sales against Net Sales Prior Year by `Date[Month Start]`. On SP the reader picks the metrics (Net Sales, Gross Sales, Gross Profit, COGS, Discount Amount, Refund Amount) from the Trend Metric slicer; with nothing selected the chart shows Gross Profit and Discount Amount. No orders, units, or AOV trend | Built (partial) |
-| Stock Availability and Sales Movement | Stock flags alongside units and net sales | IP shows Inbound Stock, Outbound Stock and Units on Hand by month (stock movement section), and stock-risk product counts by month. Stock flags aren't set against net sales | Built (partial) |
+| Stock Availability and Sales Movement | Stock flags alongside units and net sales | INV shows Inbound Stock, Outbound Stock and Units on Hand by month (stock movement section), and stock-risk product counts by month. Stock flags aren't set against net sales | Built (partial) |
 | Delivery and Returns | Return outcomes by transit group | Not built for returns. CS "Negative Review Rate by Transit Days" compares satisfaction across transit durations instead | Not built |
 | Promotion Performance | Lines with vs without a promotion reference | `Promotions` filters `OrderItems` through `PromoID`. SP shows `Promoted Sales Share` and the table "Sales, Discount, and Margin by Promotion". Lines without a promotion appear as the blank row | Built: SP |
 | Rating and Operational Experience | Ratings next to sales, return, and stock measures | The EO category scorecard (`p1-table-category-summary`) puts net sales, net sales YoY, gross margin, inventory turnover, stockout rate, fulfilled rate, order-to-delivery days, product-order return rate and average rating side by side per category, with `Category Watch Flag` (⚠ text) and `Return Rate Color` / `Stockout Rate Color` (red cells) marking the categories to watch. There is no product-level exception table | Built (partial) |
@@ -327,7 +327,7 @@ Source = Csv.Document(File.Contents("D:\projects\vintelligence2026_ai_agent_powe
   | `Return Reduction` | 0–50%, step 5% | 0% | Nothing (column only; the scenario measures were deleted as unused) |
 
 - **Field-parameter tables** (calculated, built with `NAMEOF`). `Trend Metric` switches a chart between Net Sales, Gross Sales, Gross Profit, COGS, Discount Amount, and Refund Amount. `Breakdown Dimension` switches an axis between Category, Segment, Size, Color, Region, City, District, and Promotion Type. Both are on SP, the only page with parameter slicers. Renaming any of those measures or columns means updating the parameter table as well.
-- `inventory.csv` is loaded at snapshot grain. Its own product attributes (`ProductName`, `Category`, `Segment`) are kept as columns and are used by some IP visuals.
+- `inventory.csv` is loaded at snapshot grain. Its own product attributes (`ProductName`, `Category`, `Segment`) are kept as columns and are used by some INV visuals.
 
 Rules for future changes: keep blanks blank. Don't coerce invalid values to zero. Don't merge the repeated order-item rows. If `sales.csv` is loaded again, keep it as its own table and don't blend it into order revenue.
 
@@ -443,7 +443,7 @@ Use the appropriate inactive date role explicitly for shipment, delivery, return
   Customers & Markets, Returns & Product Quality and Customer Satisfaction are 2240 high because every story step opens with a 40-high section heading and row D adds a search box (y 1756, h 80) above its detail table (y 1842); Shipping & Delivery is 2460 because its row D stacks a region table, a search box and the city table. They share one storytelling grid (section 6.2).
 - **Theme:** `purple-slicer`, registered as both the base theme and the custom theme. Colours come from the theme, not from per-visual formatting.
 - **Navigation:** page tabs only. There is no drill-through page, no page-navigator buttons and no bookmarks.
-- **Tooltips:** the six category bar charts (`p2-bar-yoy-category`, `p2-bar-discount-rate` (SP), `p4-bar-risk-category` (IP), `p5-bar-cost-category` (Shipping & Delivery), `p6-bar-refund-category` (RQ), `p7-bar-rating-category` (CS)) use the Category Tooltip page (section 6.3.8). Every other visual shows the default tooltip plus any extra tooltip fields listed in section 6.3.
+- **Tooltips:** the six category bar charts (`p2-bar-yoy-category`, `p2-bar-discount-rate` (SP), `p4-bar-risk-category` (INV), `p5-bar-cost-category` (SD), `p6-bar-refund-category` (RQ), `p7-bar-rating-category` (CS)) use the Category Tooltip page (section 6.3.8). Every other visual shows the default tooltip plus any extra tooltip fields listed in section 6.3.
 - **Parameters:** the only parameter slicers are the two field-parameter slicers on Sales & Profitability (Trend Metric, Breakdown Dimension). No page has a what-if slicer, so Low Stock Threshold and Minimum Reviews stay at their defaults (20 and 10). The Transit Day Threshold and Return Reduction tables are column-only and feed no measure.
 - **Reset filters:** every page has one (`hdr-reset-filters`, *Clear all slicers*), next to `hdr-data-through`.
 - **Alt text:** set on every visual except the shared header and slicers. It describes the chart type, the measure, and the dimension.
@@ -468,7 +468,7 @@ Executive Overview and Sales & Profitability use their own storytelling grid bel
 | --- | --- | --- | --- | --- |
 | A | 466 | 400 | **What is happening over time?** The main trend | Trend line (w 1220) + a supporting trend or yearly column (w 600). Shipping & Delivery: 900 + 450 + 450 |
 | B | 946 | 320 | **Why / what drives it?** Drivers and mix | Three visuals 600 wide at x = 40, 660, 1280. Shipping & Delivery: 1220 + 600 |
-| C | 1346 | 330 | **Where to act?** Category or region comparison | Category bar (w 600) + region table (w 1220) on Returns and Customer Satisfaction; 1220 + 600 on Shipping & Delivery; four 445-wide bars on Customers & Markets |
+| C | 1346 | 330 | **Where to act?** Category or region comparison | Category bar (w 600) + region table (w 1220) on Returns & Product Quality and Customer Satisfaction; 1220 + 600 on Shipping & Delivery; four 445-wide bars on Customers & Markets |
 | D | 1756 | 80 + 380 | **Which records?** Detail at the bottom | Search box (y 1756, h 80), then the full-width detail table (y 1842, h 380), ending at y = 2222. Shipping & Delivery: full-width region table (1756, h 180), search box (1966), city table (2052, h 380); page height 2460 |
 
 Gaps between visuals are 20. Customers & Markets' four row C bars sit at x = 40, 505, 970, 1435.
@@ -500,7 +500,7 @@ Reading aids: `Net Sales YoY %` and `Net Sales MoM %` use the format string `▲
 
 | Row (y, height) | Visual (folder) | Type | Title | Content |
 | --- | --- | --- | --- | --- |
-| KPI 1 (254, 132) | `kpi-net-sales`, `kpi-net-sales-yoy`, `kpi-net-sales-mom`, `kpi-gross-margin`, `kpi-total-orders`, `kpi-return-rate` | Cards (6, w 290) | Net Sales · Net Sales Growth YoY · Net Sales Growth MoM · Gross Margin · Total Orders · Return Rate | Measures of the same names (order date), except Return Rate, which is `Return Rate (Closed Window)` like the Returns page. Gross Sales is on the Sales page only |
+| KPI 1 (254, 132) | `kpi-net-sales`, `kpi-net-sales-yoy`, `kpi-net-sales-mom`, `kpi-gross-margin`, `kpi-total-orders`, `kpi-return-rate` | Cards (6, w 290) | Net Sales · Net Sales Growth YoY · Net Sales Growth MoM · Gross Margin · Total Orders · Return Rate | Measures of the same names (order date), except Return Rate, which is `Return Rate (Closed Window)` like the Returns & Product Quality page. Gross Sales is on the Sales & Profitability page only |
 | KPI 2 (406, 132) | `kpi-inventory-turnover`, `kpi-stockout-rate`, `kpi-fulfilled-rate`, `kpi-order-to-delivery-days`, `kpi-transit-3-days` | Cards (5, w 352) | Inventory Turnover (x per year) · Stockout Rate · Fulfilled Rate · Avg Order-to-Delivery Days · Transit Within 3 Days (diagnostic) | Inventory cards use the snapshot date and ignore Region. The 3-day card is labelled diagnostic, not an SLA |
 | Section labels (568, 1048, 1428; h 40) | `p1-section-sales-performance`, `p1-section-operations-health`, `p1-section-category-scorecard` | Text boxes (w 1840, h 40, copied from `p4-section-service`) | 1 · Sales performance · 2 · Operations health · 3 · Category scorecard | Heading plus the question the section answers; alt text set |
 | 1 Sales (618, 400) | `p1-line-net-sales-vs-py` | Line (w 1220) | Net Sales vs Prior Year by Month | `Net Sales` (solid navy) and `Net Sales Prior Year` (dashed grey) by `Date[Month Start]` |
@@ -652,7 +652,7 @@ Cards, coverage, mix, timing, category, region and product views use order date;
 
 ### 6.3.8. Category Tooltip (`c3e4d5f6-…6d7e`, hidden)
 
-Report-page tooltip (`type: Tooltip`, `pageBinding` Pod1, 320×240, actual size, hidden in view mode). It is not in the page tabs; it opens when the reader hovers a category on `p2-bar-yoy-category`, `p2-bar-discount-rate` (SP), `p4-bar-risk-category` (IP), `p5-bar-cost-category` (Shipping & Delivery), `p6-bar-refund-category` (RQ), `p7-bar-rating-category` (CS). Every card follows the hovered category plus the page's slicers.
+Report-page tooltip (`type: Tooltip`, `pageBinding` Pod1, 320×240, actual size, hidden in view mode). It is not in the page tabs; it opens when the reader hovers a category on `p2-bar-yoy-category`, `p2-bar-discount-rate` (SP), `p4-bar-risk-category` (INV), `p5-bar-cost-category` (SD), `p6-bar-refund-category` (RQ), `p7-bar-rating-category` (CS). Every card follows the hovered category plus the page's slicers.
 
 | Position | Folder | Visual | Title | Fields |
 | --- | --- | --- | --- | --- |
@@ -666,7 +666,7 @@ The final build has these known issues. They are recorded here, not fixed. Measu
 
 | Issue | Where | Effect |
 | --- | --- | --- |
-| KPI cards without a subtitle | EO: Gross Margin, Total Orders, Return Rate, Inventory Turnover, Stockout Rate, Fulfilled Rate, Order-to-Delivery Days. SP: Gross Margin. CM: Active, New and Repeat Customers. IP: Fill Rate, Stockout Rate, Days of Supply, Turnover. Shipping & Delivery: `kpi-fulfillment-rate` | The last Desktop save dropped their subtitles, including most `… vs PY Label` bindings. The unbound label measures were later deleted; only `Total Orders vs PY Label` and `Inventory Value vs PY Label` remain |
+| KPI cards without a subtitle | EO: Gross Margin, Total Orders, Return Rate, Inventory Turnover, Stockout Rate, Fulfilled Rate, Order-to-Delivery Days. SP: Gross Margin. CM: Active, New and Repeat Customers. INV: Fill Rate, Stockout Rate, Days of Supply, Turnover. SD: `kpi-fulfillment-rate` | The last Desktop save dropped their subtitles, including most `… vs PY Label` bindings. The unbound label measures were later deleted; only `Total Orders vs PY Label` and `Inventory Value vs PY Label` remain |
 | Hidden binding | `hdr-data-through` | `Total Orders vs PY Label` is bound only inside this hidden text visual |
 | Title visual name | Executive Overview: `ce53d977703e5a68ca69` | The page title text box doesn't follow the `hdr-title` name used on the other six pages. Behaviour is identical; rename it only if asked |
 | Filter path | Region slicer → `Inventory` | `Inventory` connects only to `Products` and the snapshot date, so the Region slicer doesn't filter inventory visuals |
